@@ -1,0 +1,330 @@
+/* ASTRA 나머지 쪽 디자인 시안 (정지 화면).
+   배치는 와이어프레임 v46을 그대로 따른다: 구역, 순서, 가운데 정렬 첫 화면, 원 네 개, 하는 일 줄, 과정, 버튼.
+   색·글꼴·버튼·머리말·과정 그림·맨 아래 문의 구역은 브랜드 쪽 시안과 같은 값이다.
+   움직임은 넣지 않았고, 움직였을 때의 한 장면만 그려 두었다. */
+:root {
+  --ink: #0a0a0a;
+  --tile: #161616;
+  --paper: #ffffff;
+  --mist: #cfcfcf;
+  --stone: #8a8a8a;
+  --thread: rgba(255, 255, 255, 0.18);
+  --gutter: clamp(20px, 5vw, 88px);
+  --section: clamp(72px, 9vw, 140px);
+  --display: 'Bodoni Moda', 'Noto Serif KR', serif;
+  --serif-ko: 'Noto Serif KR', 'Bodoni Moda', serif;
+  --sans: 'Pretendard Variable', Pretendard, system-ui, 'Malgun Gothic', sans-serif;
+  --header-h: 72px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--ink); }
+body { margin: 0; background: var(--ink); color: var(--mist); font-family: var(--sans); font-size: 18px; line-height: 1.8; word-break: keep-all; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, p, ol, ul, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: inherit; }
+img { display: block; width: 100%; height: 100%; object-fit: cover; }
+button { font: inherit; }
+.display { font-family: var(--display); font-weight: 500; font-optical-sizing: auto; letter-spacing: -0.02em; line-height: 1; color: var(--paper); }
+.section-title { font-size: clamp(34px, 5vw, 76px); }
+.eyebrow { font-family: var(--display); font-weight: 500; font-size: clamp(16px, 1.4vw, 21px); letter-spacing: 0.14em; line-height: 1.4; color: var(--paper); }
+.eg { position: absolute; left: 14px; bottom: 12px; padding: 2px 10px; background: rgba(10, 10, 10, 0.6); color: var(--paper); font-size: 13px; line-height: 1.6; }
+.slot { padding: 12px 18px; border: 1px dashed var(--mist); color: var(--mist); }
+
+/* 버튼 */
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 56px; padding: 0 32px; border: 1px solid var(--paper); border-radius: 999px; font-size: 17px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.btn-solid { background: var(--paper); color: var(--ink); }
+.btn-line { background: transparent; color: var(--paper); }
+
+/* 머리말 */
+.site-header { position: sticky; top: 0; z-index: 30; height: var(--header-h); padding: 0 var(--gutter); display: flex; align-items: center; justify-content: space-between; gap: 24px; background: rgba(10, 10, 10, 0.42); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.site-header.solid { background: var(--ink); border-bottom: 1px solid var(--thread); }
+/* 머리말의 ASTRA: 로고의 글자와 비슷한 글꼴(대표 2026-11-11). 홈의 큰 ASTRA는 Geist 그대로다 */
+.wordmark { font-family: Cinzel, 'Bodoni Moda', serif; font-size: 21px; font-weight: 700; letter-spacing: 0.32em; margin-right: -0.32em; color: var(--paper); text-decoration: none; }
+/* 머리말 로고: 로고의 그림 부분(A·별·궤도)을 흰색으로, 글자 왼쪽에 둔다 */
+.site-header .wordmark { display: inline-flex; align-items: center; gap: 12px; }
+.wordmark-logo { flex: none; width: auto; height: 40px; object-fit: contain; }
+/* 머리말 로고: 큰 별 + ASTRA 글자 그림 하나(대표 2026-11-12, 둥근 A 표시는 뺐다). 글자 간격 여백이 그림에 걸리지 않게. 정지 시안(글자 ASTRA)은 그대로 */
+.site-header .wordmark:has(.wordmark-type) { letter-spacing: 0; margin-right: 0; }
+.wordmark-type { display: block; width: auto; height: 23px; }
+.nav { display: flex; align-items: center; gap: clamp(14px, 1.9vw, 30px); font-size: 15px; }
+.nav a { padding: 10px 0; color: #bdbdbd; text-decoration: none; }
+.nav a[aria-current="page"] { color: var(--paper); font-weight: 600; box-shadow: 0 1px 0 var(--paper); }
+.nav .btn { min-height: 44px; padding: 0 22px; font-size: 15px; color: var(--ink); }
+.menu-button { display: none; align-items: center; min-height: 44px; padding: 0 20px; border: 1px solid var(--paper); border-radius: 999px; background: transparent; color: var(--paper); font-size: 15px; }
+
+/* 첫 화면: 창을 가득 채우고, 글은 가운데, 아래 가운데에 내려가라는 표시 (와이어프레임 F13) */
+.hero { position: relative; margin-top: calc(-1 * var(--header-h)); height: min(100svh, 1080px); min-height: 560px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(16px, 1.6vw, 24px); padding: var(--header-h) var(--gutter) 96px; text-align: center; }
+.hero-bg { position: absolute; inset: 0; }
+.hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10, 10, 10, 0.5) 0, rgba(10, 10, 10, 0) 170px), linear-gradient(to top, #0a0a0a 0, rgba(10, 10, 10, 0) 34%), radial-gradient(ellipse 70% 60% at 50% 50%, rgba(10, 10, 10, 0.66), rgba(10, 10, 10, 0.4) 100%); }
+.hero > .eyebrow, .hero h1, .hero-actions { position: relative; }
+.hero h1 { max-width: 22em; font-family: var(--serif-ko); font-size: clamp(27px, 3.5vw, 54px); font-weight: 500; line-height: 1.42; letter-spacing: -0.01em; color: var(--paper); }
+.hero h1.slot { font-family: var(--sans); font-size: clamp(18px, 1.8vw, 26px); font-weight: 400; color: var(--mist); }
+.hero-actions { display: flex; gap: 12px; margin-top: clamp(8px, 1vw, 16px); }
+.scroll-hint { position: absolute; left: 50%; bottom: 22px; width: 64px; height: 64px; margin-left: -32px; display: flex; align-items: center; justify-content: center; }
+.wheel { position: relative; display: block; width: 28px; height: 46px; border: 1.5px solid var(--paper); border-radius: 999px; }
+.wheel::after { content: ""; position: absolute; left: 50%; top: 9px; width: 2px; height: 9px; margin-left: -1px; border-radius: 2px; background: var(--paper); }
+.arrow { display: none; width: 20px; height: 20px; border-right: 1.5px solid var(--paper); border-bottom: 1.5px solid var(--paper); transform: rotate(45deg); }
+
+/* 소개: 왼쪽 큰 문장, 오른쪽 아래 설명 */
+.intro { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 32px; align-items: end; padding: var(--section) var(--gutter); }
+.intro-head { grid-column: 1 / span 7; }
+.intro-head .eyebrow { margin-bottom: 20px; color: var(--mist); }
+.intro h2 { font-family: var(--serif-ko); font-size: clamp(26px, 3.2vw, 48px); font-weight: 400; line-height: 1.42; letter-spacing: -0.01em; color: var(--paper); }
+.intro-text { grid-column: 9 / span 4; }
+
+/* 하는 일: 번호 | 제목 | 설명과 낱말. 네(다섯) 줄을 모두 보여 준다 */
+.rows { padding: 0 var(--gutter) var(--section); }
+.row-list { margin-top: clamp(32px, 3.4vw, 48px); }
+.row { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; padding: clamp(32px, 3.2vw, 48px) 0; border-top: 1px solid var(--thread); }
+.row-label { grid-column: 1 / span 3; font-family: var(--display); font-size: 19px; font-weight: 500; letter-spacing: 0.04em; line-height: 1.4; color: var(--paper); }
+.row-label i { font-style: normal; color: var(--stone); }
+.row h3 { grid-column: 4 / span 4; font-family: var(--serif-ko); font-size: clamp(21px, 2vw, 30px); font-weight: 500; line-height: 1.45; color: var(--paper); }
+.row-body { grid-column: 8 / span 5; }
+.row-body p { font-size: 17px; line-height: 1.75; }
+.keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.keywords li { padding: 3px 13px; border: 1px solid var(--thread); border-radius: 999px; font-size: 14px; color: var(--mist); }
+
+/* MCN: 원 네 개 (와이어프레임 그대로 겹쳐 놓는다). 원에 마우스를 올리면 불이 켜지고 아래 같은 줄이 밝아진다 */
+.rings { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0 calc(var(--gutter) + 2%) var(--section); }
+.ring { aspect-ratio: 1 / 1; margin: 0 -12px; display: flex; align-items: center; justify-content: center; padding: 12px; border: 1px solid var(--paper); border-radius: 50%; color: var(--paper); font-family: var(--display); font-size: clamp(15px, 1.8vw, 27px); font-weight: 500; line-height: 1.1; text-align: center; }
+.ring.on { background: var(--paper); color: var(--ink); }
+
+/* 넓은 그림 */
+.wide { position: relative; height: clamp(260px, 36vw, 520px); overflow: hidden; background: var(--tile); }
+.wide.inset { margin: 0 var(--gutter); }
+
+/* 엔터테인먼트: 세로 숏폼 네 칸 (다른 바탕 띠 위에). 올린 칸이 재생되고 나머지는 어두워진다 */
+.shorts { padding: clamp(56px, 7vw, 100px) var(--gutter); background: var(--tile); }
+.shorts-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.short { position: relative; aspect-ratio: 9 / 16; overflow: hidden; background: #222; }
+.short img { opacity: 0.5; }
+.short.on img { opacity: 1; }
+.short .play { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, 0.25); }
+.short .play::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 38%; background: var(--paper); }
+.short .eg { bottom: 18px; }
+
+/* 미디어: 겹친 스튜디오 카드 (대표가 확정한 캐러셀 모양) */
+.studio { padding: 0 0 var(--section); overflow: hidden; }
+.cards { --w: min(640px, 61.5vw); --h: calc(var(--w) * 0.625); position: relative; height: calc(var(--h) + 40px); }
+.card { position: absolute; left: 50%; top: 20px; width: var(--w); height: var(--h); overflow: hidden; border-radius: 18px; background: var(--tile); box-shadow: 0 0 0 1px var(--thread); z-index: var(--z, 3); transform: translateX(calc(-50% + var(--x, 0px))) perspective(calc(var(--w) * 2.5)) rotateY(var(--r, 0deg)) scale(var(--s, 1)); }
+.card img { opacity: var(--o, 1); }
+.card[data-off="1"] { --x: calc(var(--w) * 0.2333); --r: 18deg; --s: 0.92; --z: 2; --o: 0.5; }
+.card[data-off="-1"] { --x: calc(var(--w) * -0.2333); --r: -18deg; --s: 0.92; --z: 2; --o: 0.5; }
+.card[data-off="2"] { --x: calc(var(--w) * 0.4); --r: 26deg; --s: 0.84; --z: 1; --o: 0.25; }
+.card[data-off="-2"] { --x: calc(var(--w) * -0.4); --r: -26deg; --s: 0.84; --z: 1; --o: 0.25; }
+.card-arrow { position: absolute; top: 50%; z-index: 5; width: 44px; height: 44px; margin-top: -22px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--paper); color: var(--ink); }
+.card-arrow.prev { left: calc(50% - var(--w) / 2 - 22px); }
+.card-arrow.next { right: calc(50% - var(--w) / 2 - 22px); }
+
+/* 과정 */
+.process { padding: var(--section) var(--gutter); }
+.steps { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px; margin-top: clamp(40px, 4.4vw, 64px); }
+.steps::before { content: ""; position: absolute; left: 0; right: 0; top: 71px; height: 1px; background: var(--paper); }
+.step { position: relative; padding-right: clamp(8px, 2vw, 32px); }
+.burst { display: block; width: 144px; height: 72px; overflow: visible; }
+.burst line { stroke: #ffffff; stroke-width: 1; stroke-linecap: round; }
+.burst circle { fill: #ffffff; }
+.step-name { margin-top: 28px; font-family: var(--display); font-size: 18px; font-weight: 500; letter-spacing: 0.1em; color: var(--mist); }
+.step h3 { margin-top: 10px; font-size: 21px; font-weight: 600; line-height: 1.45; color: var(--paper); }
+.step-text p:last-child { margin-top: 10px; font-size: 16px; line-height: 1.75; }
+
+/* 맨 아래 문의: 쪽마다 하나뿐인 흰 면 (와이어프레임의 가운데 버튼을 키운 것) */
+.cta { padding: clamp(80px, 10vw, 160px) var(--gutter); background: var(--paper); color: var(--ink); }
+.cta .display { color: var(--ink); font-size: clamp(52px, 10.5vw, 168px); line-height: 0.92; }
+.cta-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 28px 48px; margin-top: clamp(28px, 3.6vw, 56px); }
+.cta-row p { max-width: 24em; font-family: var(--serif-ko); font-size: clamp(20px, 2vw, 30px); font-weight: 500; line-height: 1.5; }
+.cta-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.cta .btn { min-height: 64px; padding: 0 40px; font-size: 18px; border-color: var(--ink); }
+.cta .btn-solid { background: var(--ink); color: var(--paper); }
+.cta .btn-line { color: var(--ink); }
+
+/* 바닥글 */
+.site-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px 48px; padding: 48px var(--gutter) 56px; font-size: 14px; color: var(--stone); }
+/* 바닥글 로고: 글자(ASTRA, ENTERTAINMENT)까지 있는 전체 로고. 브랜드 3판과 같은 크기 */
+.footer-logo { display: block; width: auto; height: 76px; margin-bottom: 16px; object-fit: contain; }
+.site-footer .slot { border-color: var(--stone); color: var(--stone); }
+.footer-links { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+
+/* 홈: 머리말 아래를 움직이는 배경으로 채우고 ASTRA와 WE MAKE NEXT만 둔다. 한 화면으로 끝난다 (F3) */
+.home { position: relative; margin-top: calc(-1 * var(--header-h)); height: 100svh; min-height: 560px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: var(--header-h) 5% 0; text-align: center; }
+.home-bg { position: absolute; inset: 0; }
+.home-bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 62% 46% at 50% 54%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0) 100%); }
+.astra { position: relative; font-family: Geist, 'Helvetica Neue', Arial, sans-serif; font-size: min(20vw, 47vh); letter-spacing: 0.07em; margin-right: -0.07em; line-height: 1.1; white-space: nowrap; color: var(--paper); } /* 대표 11-12: 고객이 위아래로 길다고 해 높이를 17% 낮추고 글자 사이를 넓힘(전 값 min(24vw, 56vh), 글자 사이 0) */
+.home-tag { position: relative; font-family: var(--display); font-size: clamp(18px, 2.4vw, 32px); font-weight: 400; letter-spacing: 0.16em; color: var(--paper); text-shadow: 0 0 14px rgba(0, 0, 0, 0.9); }
+
+/* 회사소개 */
+.story { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 40px; align-items: center; padding: var(--section) var(--gutter); }
+.story-text { grid-column: 1 / span 6; display: flex; flex-direction: column; gap: 18px; }
+.story-text p:first-child { font-family: var(--serif-ko); font-size: clamp(21px, 1.9vw, 28px); line-height: 1.7; color: var(--paper); }
+.story-photo { position: relative; grid-column: 8 / span 5; aspect-ratio: 4 / 5; overflow: hidden; background: var(--tile); }
+.vision { padding: clamp(96px, 12vw, 180px) var(--gutter); background: var(--tile); text-align: center; }
+.vision h2 { margin: 20px auto 0; max-width: 15em; font-family: var(--serif-ko); font-size: clamp(30px, 4.6vw, 68px); font-weight: 400; line-height: 1.34; letter-spacing: -0.015em; color: var(--paper); }
+.sky { max-width: 1100px; margin: clamp(40px, 5vw, 72px) auto; }
+.sky svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sky svg.sky-m { display: none; }
+.sky .link { stroke: rgba(255, 255, 255, 0.5); stroke-width: 1; fill: none; }
+.sky .ray { stroke: #ffffff; stroke-width: 1.1; stroke-linecap: round; }
+.sky .name { font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 500; font-size: 30px; fill: #ffffff; }
+.sky .ko { font-family: 'Pretendard Variable', Pretendard, sans-serif; font-size: 15px; fill: #8a8a8a; }
+.vision-text { display: flex; flex-direction: column; gap: 16px; }
+.vision-text p { max-width: 860px; margin: 0 auto; }
+
+/* 협력사: 서로 반대로 흐르는 로고 두 줄 */
+.logos { padding: clamp(72px, 9vw, 140px) 0 clamp(48px, 6vw, 96px); overflow: hidden; }
+.logo-row { display: flex; gap: 16px; width: max-content; }
+.logo-row + .logo-row { margin-top: 16px; margin-left: -150px; }
+.logo-row li { flex: none; display: flex; align-items: center; justify-content: center; width: 216px; height: 104px; border: 1px dashed var(--stone); color: var(--stone); font-size: 14px; }
+.cta-pad { height: var(--section); }
+
+/* CONTACT: 왼쪽 안내(그림 위에 문구와 카톡 상담), 오른쪽 양식. 양식이 바로 보인다 */
+.contact { display: grid; grid-template-columns: 5fr 7fr; }
+.contact-side { position: relative; min-height: calc(100svh - var(--header-h)); overflow: hidden; }
+.contact-side::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10, 10, 10, 0.82) 0, rgba(10, 10, 10, 0.25) 46%, rgba(10, 10, 10, 0) 70%); }
+.contact-side img { position: absolute; inset: 0; }
+.contact-copy { position: absolute; z-index: 1; left: var(--gutter); right: clamp(20px, 3vw, 48px); top: clamp(32px, 5vw, 72px); display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+.contact-copy h1 { font-family: var(--serif-ko); font-size: clamp(24px, 2.6vw, 38px); font-weight: 500; line-height: 1.4; color: var(--paper); }
+.contact-side .eg { z-index: 1; left: auto; right: 14px; }
+.sheet { background: var(--paper); color: var(--ink); padding: clamp(32px, 5vw, 72px) var(--gutter) clamp(64px, 7vw, 112px) clamp(32px, 5vw, 72px); }
+.switch { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.switch button { min-height: clamp(96px, 9vw, 140px); border: 1px solid var(--ink); background: transparent; color: var(--ink); font-family: var(--serif-ko); font-size: clamp(20px, 2vw, 30px); font-weight: 600; }
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.progress { margin-top: clamp(28px, 3vw, 44px); }
+.progress-text { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; color: #4a4a4a; }
+.progress-text b { padding-right: 6px; font-family: var(--display); font-style: italic; font-weight: 500; font-size: 22px; color: var(--ink); }
+.progress-line { position: relative; height: 2px; margin-top: 10px; background: #dcdcdc; }
+.progress-line::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 40%; background: var(--ink); }
+.fields { display: grid; grid-template-columns: 1fr 1fr; column-gap: 32px; margin-top: 4px; }
+.field { display: flex; flex-direction: column; padding-top: 26px; font-size: 15px; font-weight: 600; color: var(--ink); }
+.field.full { grid-column: 1 / -1; }
+.field i { margin-left: 6px; font-style: normal; font-weight: 400; color: #6a6a6a; }
+.field .box { display: flex; align-items: center; min-height: 52px; border-bottom: 1px solid var(--ink); font-size: 18px; font-weight: 400; color: var(--ink); }
+.field .box.empty { border-bottom-color: #b5b5b5; }
+.field .box.area { min-height: 120px; }
+.field .box.focus { border-bottom-width: 2px; }
+.field .box.focus::after { content: ""; width: 1px; height: 22px; margin-left: 2px; background: var(--ink); }
+.agree { display: flex; align-items: center; gap: 12px; margin-top: 30px; font-size: 16px; color: var(--ink); }
+.agree .check { flex: none; width: 22px; height: 22px; border: 1px solid var(--ink); }
+.sheet .btn { width: 100%; min-height: 60px; margin-top: 26px; border-color: var(--ink); background: var(--ink); color: var(--paper); font-size: 18px; }
+
+/* 오른쪽 아래에 떠 있는 버튼 (대표 지시 2026-11-11). 평소에는 버튼 하나, 누르면 네 개가 위로 펼쳐진다.
+   실제 사이트에서는 화면에 고정(position: fixed)한다. 정지 화면에서는 첫 화면의 오른쪽 아래에 그려 둔다. */
+body { position: relative; }
+.fab-anchor { position: absolute; top: 0; right: 0; width: 0; height: 100svh; z-index: 40; }
+.fab { position: absolute; right: 28px; bottom: 28px; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.fab-menu { display: none; flex-direction: column; align-items: flex-end; gap: 10px; }
+.fab-menu a { display: flex; align-items: center; min-height: 48px; padding: 0 22px; border: 1px solid var(--paper); border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 16px; font-weight: 600; text-decoration: none; white-space: nowrap; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45); }
+.fab-menu a.main { background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--ink), 0 6px 24px rgba(0, 0, 0, 0.45); }
+.fab-button { display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; padding: 0; border: 0; border-radius: 50%; background: var(--paper); color: var(--ink); box-shadow: 0 0 0 1px var(--ink), 0 6px 24px rgba(0, 0, 0, 0.45); }
+.fab-button .x { display: none; }
+body.fab-open .fab-menu { display: flex; }
+body.fab-open .fab-button .talk { display: none; }
+body.fab-open .fab-button .x { display: block; }
+
+@media (max-width: 900px) {
+  body { font-size: 17px; }
+  .nav { display: none; }
+  .menu-button { display: inline-flex; }
+  .hero { padding-bottom: 88px; }
+  .hero h1 br.pc { display: none; }
+  .hero-actions { flex-direction: column; align-self: stretch; }
+  .hero-actions .btn { min-height: 52px; }
+  .wheel { display: none; }
+  .arrow { display: block; }
+  .intro { display: block; }
+  .intro-text { margin-top: 24px; }
+  .rings { grid-template-columns: 1fr 1fr; padding-left: var(--gutter); padding-right: var(--gutter); }
+  .ring { margin: -5px -6px; font-size: 19px; }
+  .row { display: block; padding: 30px 0; }
+  .row h3 { margin-top: 12px; }
+  .row-body { margin-top: 12px; }
+  .wide.inset { margin: 0; }
+  .shorts-row { grid-template-columns: 1fr 1fr; }
+  .cards { --w: 240px; }
+  .card { border-radius: 12px; }
+  .card-arrow.prev { left: 8px; }
+  .card-arrow.next { right: 8px; }
+  .steps { grid-template-columns: 1fr; row-gap: 40px; }
+  .steps::before { display: none; }
+  .step { display: grid; grid-template-columns: 72px minmax(0, 1fr); column-gap: 20px; padding-right: 0; }
+  .burst { width: 72px; height: 36px; margin-top: 8px; }
+  .burst line { stroke-width: 1.8; }
+  .step-name { margin-top: 0; }
+  .cta-actions { width: 100%; }
+  .cta .btn { flex: 1 1 0; min-height: 56px; padding: 0 12px; font-size: 17px; }
+  .site-footer { padding-bottom: 40px; }
+  .fab { right: 16px; bottom: 16px; }
+  .fab-button { width: 56px; height: 56px; }
+  .story { display: flex; flex-direction: column; align-items: stretch; }
+  .sky svg.sky-pc { display: none; }
+  .sky svg.sky-m { display: block; }
+  .vision-text { text-align: left; }
+  .logo-row li { width: 150px; height: 80px; }
+  .contact { display: block; }
+  .contact-side { min-height: 0; height: clamp(220px, 62vw, 320px); }
+  .contact-copy { top: 28px; right: var(--gutter); gap: 16px; }
+  .sheet { padding: 32px var(--gutter) 56px; }
+  .switch button { min-height: 96px; }
+  .fields { grid-template-columns: 1fr; }
+}
+
+/* 휴대폰 머리말을 얇게(대표 2026-11-11, 참고 sedaent.com의 휴대폰 머리말 60px). 높이 72→60, 로고 34→28, 글자 21→18, 메뉴 버튼 44→36.
+   메뉴 버튼은 보이는 크기만 줄이고 누르는 범위는 44px로 둔다 */
+@media (max-width: 900px) {
+  :root { --header-h: 60px; }
+  .wordmark { font-size: 18px; }
+  .site-header .wordmark { gap: 9px; }
+  .wordmark-logo { height: 28px; }
+  .wordmark-type { height: 19px; }
+  .menu-button { position: relative; min-height: 36px; padding: 0 16px; font-size: 14px; }
+  .menu-button::after { content: ""; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; }
+}
+
+/* 엔터테인먼트 첫 화면: 스튜디오 사진 한 장을 다섯 장면으로 잘라 영상처럼 보여 준다(손님 요청 2026-11-11, 참고 sedaent.com/studio).
+   장면마다 1.8초, 전체 9초 반복. 장면은 뚝 끊어 바꾸고(영상의 컷), 장면 안에서는 천천히 움직인다. */
+.hero-tour .hero-bg { overflow: hidden; background: #0a0a0a; }
+.hero-tour .hero-bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; will-change: transform, opacity; animation: 9s linear infinite; }
+.hero-tour .hero-bg .t1 { transform-origin: 50% 46%; animation-name: tour1; }
+.hero-tour .hero-bg .t2 { transform-origin: 50% 0%; animation-name: tour2; }
+.hero-tour .hero-bg .t3 { transform-origin: 50% 47%; animation-name: tour3; }
+.hero-tour .hero-bg .t4 { transform-origin: 6% 72%; animation-name: tour4; }
+.hero-tour .hero-bg .t5 { transform-origin: 50% 100%; animation-name: tour5; }
+@keyframes tour1 { 0% { opacity: 1; transform: scale(1.02); } 20% { opacity: 1; transform: scale(1.1); } 20.01%, 100% { opacity: 0; transform: scale(1.1); } }
+@keyframes tour2 { 0%, 19.99% { opacity: 0; transform: scale(2.1) translateX(5%); } 20% { opacity: 1; transform: scale(2.1) translateX(5%); } 40% { opacity: 1; transform: scale(2.1) translateX(-5%); } 40.01%, 100% { opacity: 0; transform: scale(2.1) translateX(-5%); } }
+@keyframes tour3 { 0%, 39.99% { opacity: 0; transform: scale(2.2); } 40% { opacity: 1; transform: scale(2.2); } 60% { opacity: 1; transform: scale(2.6); } 60.01%, 100% { opacity: 0; transform: scale(2.6); } }
+@keyframes tour4 { 0%, 59.99% { opacity: 0; transform: scale(2.2) translateX(0); } 60% { opacity: 1; transform: scale(2.2) translateX(0); } 80% { opacity: 1; transform: scale(2.2) translateX(-7%); } 80.01%, 100% { opacity: 0; transform: scale(2.2) translateX(-7%); } }
+@keyframes tour5 { 0%, 79.99% { opacity: 0; transform: scale(1.9) translateY(0); } 80% { opacity: 1; transform: scale(1.9) translateY(0); } 100% { opacity: 1; transform: scale(1.9) translateY(6%); } }
+/* 참고 사이트처럼 사진이 밝게 보이게 어두운 막을 옅게 하고, 글자에는 그림자를 준다 */
+.hero-tour .hero-bg::after { background: linear-gradient(to bottom, rgba(10, 10, 10, 0.55) 0, rgba(10, 10, 10, 0) 170px), linear-gradient(to top, #0a0a0a 0, rgba(10, 10, 10, 0) 26%), rgba(10, 10, 10, 0.34); }
+.hero-tour > .eyebrow, .hero-tour h1 { text-shadow: 0 2px 22px rgba(10, 10, 10, 0.7), 0 0 2px rgba(10, 10, 10, 0.5); }
+@media (max-width: 900px) { .hero-tour .hero-bg .t4 { object-position: 4% 50%; transform-origin: 30% 72%; } }
+@media (prefers-reduced-motion: reduce) { .hero-tour .hero-bg img[class] { animation: none; } .hero-tour .hero-bg .t1 { opacity: 1; transform: none; } }
+
+/* 쪽 사이 이동(대표 11-12 "메뉴 이동할 때 끊김·튀는 현상"): 여덟 쪽 머리말이 같은 자리에 있게 하고, 화면은 겹쳐 바뀐다.
+   - 머리말 버튼 폭을 같게(문구는 그대로): 버튼 글자가 쪽마다 달라도 메뉴 자리가 움직이지 않는다
+   - 스크롤 막대를 그리지 않는다: 스크롤하는 쪽(CONTACT, 좁은 창)과 한 화면씩 넘기는 쪽의 화면 폭이 같다. 휠·키보드·손가락 스크롤은 그대로 된다
+   - 쪽 넘김: 크롬의 같은 사이트 안 이동 효과. 머리말은 따로 이름을 붙여 제자리에 둔다 */
+.site-header .nav .btn { min-width: 128px; }
+html { scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.28s; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; } }
+
+/* 휴대폰 메뉴: 브랜드 3판과 같게(대표 11-12 "휴대폰 메뉴도 브랜드처럼"). 머리말 오른쪽 흰 알약 "빠른 지원하기"와 삼선, 누르면 화면 전체 메뉴.
+   값은 브랜드 3판 그대로. 정지 시안의 글자 "메뉴" 버튼은 aria-controls가 없어 그대로다. 동작은 2026-11-11-pages-motion/site-menu.js */
+.quick-apply { display: none; position: relative; align-items: center; min-height: 36px; margin-left: auto; padding: 0 16px; border: 1px solid var(--paper); border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.quick-apply::after { content: ""; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; }
+.site-header .menu-button[aria-controls="menu-panel"] { justify-content: center; width: 44px; height: 44px; min-height: 44px; margin-right: -10px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--paper); cursor: pointer; }
+.site-header .menu-button[aria-controls="menu-panel"]::after { content: none; }
+.menu-panel { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; padding: calc(var(--header-h) + 12px) var(--gutter) 40px; background: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
+.menu-panel[hidden] { display: none; }
+.menu-list { margin: auto 0; display: flex; flex-direction: column; align-items: center; }
+.menu-panel a { min-height: 56px; display: flex; align-items: center; color: var(--paper); font-size: 26px; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; }
+.menu-panel a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 10px; }
+.menu-close { position: absolute; top: calc((var(--header-h) - 44px) / 2); right: var(--gutter); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: var(--paper); cursor: pointer; }
+html.menu-open, html.menu-open body { overflow: hidden; }
+@media (max-width: 900px) {
+  .quick-apply { display: inline-flex; }
+  .site-header:has(.quick-apply) { gap: 10px; }
+}

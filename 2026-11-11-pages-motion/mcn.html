@@ -1,0 +1,989 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<script>/* 첫 화면 글은 움직임 준비(.fx)와 글꼴(.fonts, 최대 1.5초)이 둘 다 될 때까지 감춘다(글꼴이 바뀌며 튀지 않게, 대표 11-12). 움직임 줄이기에서는 감추지 않는다 */
+(function () { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; var r = document.documentElement; r.classList.add('pre');
+  function ok() { r.classList.add('fonts'); } setTimeout(ok, 1500);
+  setTimeout(function () { r.classList.add('bgok'); }, 3000);
+  document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(function () { if (document.fonts && document.fonts.ready) document.fonts.ready.then(ok); else ok(); }); });
+})();</script>
+<style>html.pre:not(.fx) .hero > .eyebrow, html.pre:not(.fx) .hero h1, html.pre:not(.fx) .hero-actions, html.pre:not(.fonts) .hero > .eyebrow, html.pre:not(.fonts) .hero h1, html.pre:not(.fonts) .hero-actions { visibility: hidden; }
+/* 움직이는 배경이 뜰 때까지 멈춘 사진을 감춘다: 멈춘 사진은 자르는 자리가 달라, 바뀌는 순간 배경이 한 번 내려가 보였다(대표 11-12). 3초 안에 안 뜨면 사진을 보인다 */
+html.pre:not(.bgok) .hero-bg img { opacity: 0; }</style>
+<title>ASTRA MCN 움직이는 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../2026-11-10-pages/pages.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+/* MCN 2판 — 겹치는 원 (설계 pages-motion-design.md 3절, 지시서 007).
+   하나의 생각: 마우스가 원의 중심이다. 원이 퍼지고(넓어지는 영향력), 겹치고(연결), 커진다(성장).
+   화면 6개: 첫 화면 → 소개 → 하는 일(휠 네 번) → 사진 → 과정 → 문의 + 바닥글.
+   문구·순서·배치·색·글꼴·사진은 정지 시안(../2026-11-10-pages/mcn.html) 그대로다. 과정의 단계 표시만 겹 원으로 바꿨다(설계 3-10).
+   크기는 큰 창 배율 --k(공통 틀)를 쓴다. 값은 README.md */
+
+/* ── 퍼지는 원 층(3-1): 화면에 고정된 그림판. 어두운 화면에서는 밝은 부분만 더하고, 흰 화면에서는 옅은 회색으로 그린다 ── */
+.ripple { display: none; }
+html.fx .ripple { display: block; position: fixed; inset: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; mix-blend-mode: screen; }
+html.fx .ripple.ink { mix-blend-mode: normal; }
+
+/* ── 화면 1 첫 화면(3-2): 시험판(../2026-11-11-mcn-hero)의 배경 영상과 원. 배경은 마우스에 반응하지 않는다 ── */
+.hero-bg { background: #0a0a0a; }
+/* 글이 읽히게 배경을 조금 더 누른다(시험판과 같다: 위 그늘, 아래 그늘, 전체 27%) */
+.hero-bg::after { background: linear-gradient(to bottom, rgba(10, 10, 10, 0.55) 0, rgba(10, 10, 10, 0) 190px), linear-gradient(to top, #0a0a0a 0, rgba(10, 10, 10, 0) 30%), rgba(10, 10, 10, 0.27); }
+.hero > .eyebrow, .hero h1 { text-shadow: 0 2px 24px rgba(10, 10, 10, 0.75), 0 0 2px rgba(10, 10, 10, 0.5); }
+html.fx .hero-gl.ready { display: block; position: absolute; inset: 0; width: 100%; height: 100%; animation: glIn 0.5s ease-out both; }
+@keyframes glIn { from { opacity: 0; } }
+html.fx .hero-bg img { animation: none; }
+html.deck .hero h1 { font-size: max(32px, min(4.6vw, 8.4vh, calc(66px * var(--k, 1)))); }
+html.deck .hero .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(20px * var(--k, 1)))); }
+html.deck .hero .btn { min-height: calc(56px * var(--k, 1)); padding: 0 calc(32px * var(--k, 1)); font-size: calc(17px * var(--k, 1)); }
+/* 들어올 때: 영문 세 낱말이 원이 태어날 때마다 하나씩 켜지고(22% → 100%), 제목이 한 줄씩 올라오고, 버튼이 떠오른다 */
+html.fx .hero .ew { opacity: 0.22; transition: opacity 0.7s ease; }
+html.fx .hero .ew.on { opacity: 1; }
+html.deck .hero h1 .hl { display: block; overflow: hidden; padding-bottom: 0.08em; }
+html.deck .hero h1 .hl > span { display: block; transform: translateY(108%); transition: transform 1s var(--ease); }
+html.deck .hero h1.in .hl > span { transform: none; }
+html.deck .hero h1.in .hl + br + .hl > span, html.deck .hero h1.in .hl + .hl > span { transition-delay: 0.14s; }
+html.deck .hero h1 br { display: none; }
+html.fx:not(.deck) .hero h1 { opacity: 0; transform: translateY(20px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+html.fx:not(.deck) .hero h1.in { opacity: 1; transform: none; }
+html.fx .hero-actions { opacity: 0; transform: translateY(22px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+html.fx .hero-actions.in { opacity: 1; transform: none; }
+/* 첫 화면 글은 재생이 시작될 때(.go)부터만 움직인다. 처음 들어올 때 움직임 표시가 늦게 붙으면, 보이던 제목이 아래로 내려가고 영문이 흐려진 뒤 다시 올라왔다(대표 11-12 "MCN 최초로 누르면 글자가 내려갔다가 다시 올라옴") */
+html.fx .hero:not(.go) .ew, html.fx .hero:not(.go) h1, html.fx .hero:not(.go) h1 .hl > span, html.fx .hero:not(.go) .hero-actions { transition: none !important; }
+
+/* ── 화면 2 소개(3-3): 원 하나가 문장 위를 지나가며 닿는 낱말부터 밝아진다. 마우스 둘레 둥근 창 안의 낱말만 또렷하다 ── */
+html.deck .intro { height: 100%; align-content: center; padding: calc(var(--header-h) + clamp(18px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 96px); }
+html.deck .intro h2 { font-size: max(26px, min(3.2vw, 6vh, calc(46px * var(--k, 1)))); }
+html.deck .intro-text p { font-size: max(16px, min(1.25vw, 2.5vh, calc(18px * var(--k, 1)))); }
+.intro h2.armed .wd { opacity: 0.22; transition: opacity 0.5s var(--ease); }
+.intro h2.armed .wd.on { opacity: 1; }
+/* 창 밖 낱말: 설계 시작 값 70%는 줄이지 않은 화면에서 차이가 약해 50%로 */
+.intro h2.armed.dim .wd.on { opacity: 0.5; transition-duration: 0.3s; }
+.intro h2.armed.dim .wd.on.lit { opacity: 1; }
+.lens { position: absolute; left: 0; top: 0; z-index: 2; border: 1px solid rgba(255, 255, 255, 0.62); background: radial-gradient(circle, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.05)); border-radius: 50%; pointer-events: none; opacity: 0; will-change: transform, opacity; }
+
+/* ── 화면 3 하는 일(3-4): 원 네 개, 고른 것 하나의 글. 원 그림은 스크립트가 armed를 붙였을 때만 쓴다(움직임 줄이기는 정지 시안 그대로) ── */
+.rings.armed .ring { position: relative; border-color: transparent; background: transparent; color: var(--paper); cursor: pointer; outline: none; -webkit-tap-highlight-color: transparent; }
+.rings.armed .ring .rl { position: absolute; left: -1px; top: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; pointer-events: none; transform: rotate(-90deg); }
+/* 선 굵기는 스크립트가 원 크기에 맞춰 1px로 둔다(non-scaling-stroke를 쓰면 pathLength가 깨져 원이 70%만 그려졌다) */
+.rings.armed .ring .rl circle { fill: none; stroke: #fff; stroke-width: 0.4; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.7s cubic-bezier(0.65, 0, 0.35, 1) var(--dd, 0s), stroke-opacity 0.55s; }
+.rings.armed .ring.drawn .rl circle { stroke-dashoffset: 0; }
+.rings.armed .ring .rn { position: relative; transition: opacity 0.55s; }
+.rings.armed .ring .rf { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 50%; background: var(--paper); color: var(--ink); white-space: pre-line; clip-path: circle(0px at 50% 50%); pointer-events: none; }
+.rings.armed .ring .rf::after { content: attr(data-n); }
+.rings.armed .ring.full .rf { clip-path: circle(72% at 50% 50%); }
+.rings.armed .ring:focus-visible .rl circle { stroke-dasharray: 0.012 0.012; }
+.rings.snap .ring, .rings.snap .ring *, .what.snap .row, .what.snap .row * { transition: none !important; }
+
+html.deck .what { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: calc(var(--header-h) + clamp(10px, 2.6vh, 36px)) var(--gutter) clamp(16px, 4vh, 52px); --D: min(22vw, 34vh); }
+html.deck .what .rows { display: contents; }
+html.deck .what .rows .section-title { grid-row: 1; font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
+html.deck .what .rings { grid-row: 2; position: relative; display: flex; align-items: center; justify-content: center; padding: 0; }
+html.deck .what .ring { flex: none; width: var(--D); height: var(--D); margin: 0 calc(var(--D) * -0.04); padding: calc(var(--D) * 0.06); font-size: calc(var(--D) * 0.085); transition: transform 0.55s var(--ease); animation: breathe 6s ease-in-out infinite; }
+html.deck .what .rings.picked .ring { transform: scale(0.95); }
+html.deck .what .rings.picked .ring.sel { transform: scale(1.14); z-index: 1; }
+html.deck .what .rings.picked .ring:not(.sel) .rl circle { stroke-opacity: 0.45; }
+html.deck .what .rings.picked .ring:not(.sel) .rn { opacity: 0.55; }
+html.deck .what .ring .rf { padding: calc(var(--D) * 0.06); }
+@keyframes breathe { 50% { scale: 1.02; } }
+html.deck .what .row-list { grid-row: 3; display: grid; margin-top: 0; }
+html.deck .what .row { grid-area: 1 / 1; padding: clamp(14px, 2.8vh, 34px) 0 0; visibility: hidden; }
+html.deck .what .row.sel, html.deck .what .row.out { visibility: visible; }
+html.deck .what .row-label { font-size: max(15px, min(1.3vw, 2.6vh, calc(19px * var(--k, 1)))); }
+html.deck .what .row h3 { font-size: max(19px, min(2vw, 3.6vh, calc(30px * var(--k, 1)))); }
+html.deck .what .row-body p { font-size: max(14px, min(1.2vw, 2.3vh, calc(17px * var(--k, 1)))); line-height: 1.7; }
+html.deck .what .keywords { margin-top: clamp(10px, 1.8vh, 18px); }
+/* 오른쪽 아래 상담 버튼(오른쪽 28px + 60px)에 키워드가 가리지 않게 설명 칸 오른쪽을 비운다 — 낮은 화면(1100×620)에서 키워드 둘째 줄이 버튼 높이까지 내려온다 */
+html.deck .what .row-body { padding-right: max(0px, calc(100px - var(--gutter))); }
+html.deck .what .keywords li { font-size: max(12px, min(1vw, 1.9vh, calc(14px * var(--k, 1)))); }
+html.deck .what .row h3 .hw { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.06em; margin-bottom: -0.06em; }
+html.deck .what .row h3 .hw > span { display: inline-block; }
+/* 휴대폰·작은 창: 네 줄은 다 보인다. 줄마다 화면에 들어오면 위쪽 선이 그어지고 글이 떠오른다(3-8) */
+html.fx:not(.deck) .what .row { position: relative; border-top-color: transparent; }
+html.fx:not(.deck) .what .row::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--thread); transform: scaleX(0); transform-origin: left; transition: transform 0.9s var(--ease); }
+html.fx:not(.deck) .what .row > * { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.fx:not(.deck) .what .row.on::before { transform: none; }
+html.fx:not(.deck) .what .row.on > * { opacity: 1; transform: none; }
+html.fx:not(.deck) .what .row.on > :nth-child(2) { transition-delay: 0.1s; }
+html.fx:not(.deck) .what .row.on > :nth-child(3) { transition-delay: 0.2s; }
+
+/* ── 화면 4 사진(3-5): 창을 가득 채운 사진, 그 위에 가는 원 네 개. 깊이가 달라 마우스에 따라 따로 움직인다 ── */
+.halos { display: none; }
+html.fx .halos { display: block; position: absolute; inset: 0; pointer-events: none; }
+.halo { position: absolute; left: 0; top: 0; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 50%; will-change: transform; }
+/* 대표 11-11: 사진 위에 남는 원은 없앤다(처음 넷·22% → 둘·12% → 없음). 넘어가는 동안에만 원 네 개가 보이고 사라진다 */
+.halo { border-color: transparent; }
+html.deck .wide { height: 100%; --scene-bg: var(--tile); }
+html.deck .wide img { transform: translate3d(var(--ix, 0px), var(--iy, 0px), 0) scale(1.04); will-change: transform; }
+
+/* ── 화면 5 과정(3-6): 단계 표시는 가운데 점과 겹 원(1, 2, 3, 4겹). 들어올 때 단계마다 원이 안쪽부터 그려진다 ── */
+.orbit { display: block; width: 120px; height: 120px; overflow: visible; }
+.orbit circle { fill: none; stroke: #fff; stroke-width: 1; }
+.orbit .dot { fill: #fff; stroke: none; }
+.steps::before { top: 60px; }
+html.fx .orbit .o { stroke-dasharray: 1; stroke-dashoffset: 1; transform: rotate(-90deg); transition: stroke-dashoffset 0.7s cubic-bezier(0.65, 0, 0.35, 1) calc(var(--o) * 0.08s), stroke-opacity 0.3s; }
+html.fx .orbit .dot { opacity: 0; transition: opacity 0.4s; }
+html.fx .step.on .orbit .o { stroke-dashoffset: 0; }
+html.fx .step.on .orbit .dot { opacity: 1; }
+html.fx .step .step-text > * { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.fx .step.on .step-text > * { opacity: 1; transform: none; transition-delay: 0.2s; }
+html.fx .step.on .step-text > :nth-child(2) { transition-delay: 0.28s; }
+html.fx .step.on .step-text > :nth-child(3) { transition-delay: 0.36s; }
+html.fx .steps.snap .step *, html.fx .process.snap .steps::before { transition: none !important; }
+.step { transition: opacity 0.4s; }
+.steps.focus .step:not(.hot) { opacity: 0.38; }
+/* 007 검토(설계 3-6 고침): PC에서는 겹 원을 1.7배(반지름 24·44·64·84px × 배율)로 키우고, 표시·가로 선·글 묶음을 제목 아래 남은 높이의 세로 가운데에 둔다.
+   휴대폰·작은 창(스크롤)은 정지 시안과 같은 크기(72px·120px 상자, 반지름 14~50)를 그대로 쓴다. 반지름은 자바스크립트가 방식에 따라 넣는다 */
+html.deck .process { --ob: min(calc(200px * var(--k, 1)), 32vh); display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(16px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 88px); }
+html.deck .process .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
+html.deck .steps { margin-top: 0; align-self: center; }
+html.deck .orbit { width: var(--ob); height: var(--ob); }
+html.deck .steps::before { top: calc(var(--ob) / 2); transform: scaleX(0); transform-origin: left; transition: transform 1.44s cubic-bezier(0.65, 0, 0.35, 1) 0.48s; }
+html.deck .process.in .steps::before { transform: none; }
+html.deck .step-name { margin-top: calc(var(--ob) * 0.04); font-size: max(15px, min(1.25vw, 2.4vh, calc(18px * var(--k, 1)))); }
+html.deck .step h3 { font-size: max(18px, min(1.5vw, 2.9vh, calc(21px * var(--k, 1)))); }
+html.deck .step-text p:last-child { font-size: max(14px, min(1.12vw, 2.2vh, calc(16px * var(--k, 1)))); }
+.step .orbit { cursor: default; }
+
+/* ── 화면 6 문의(3-7): GROW의 원이 커져 흰 화면이 된다. 큰 글자·버튼도 배율만큼 ── */
+.trail { position: absolute; left: 0; top: 0; border: 1px solid rgba(0, 0, 0, 0.14); border-radius: 50%; pointer-events: none; opacity: 0; }
+/* 휴대폰 스크롤 반응(12-3): 둥근 창과 회색 원은 제 구역 안에서만 보인다(쪽 밖으로 나가 가로로 넘치지 않게) */
+html.fx:not(.deck) .intro, html.fx:not(.deck) .scene-end { position: relative; overflow: hidden; overflow: clip; }
+html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1))); }
+html.deck .cta-row p { font-size: max(20px, min(2vw, 4vh, calc(28.8px * var(--k, 1)))); }
+html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
+
+@media (max-width: 900px) {
+  .orbit { width: 72px; height: 72px; margin-top: 0; }
+  .orbit circle { stroke-width: 1.7; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
+  <a class="quick-apply" href="contact.html#apply">빠른 지원하기</a>
+  <button class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu-panel"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h18M3 12h18M3 17.5h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <nav class="nav" aria-label="주 메뉴"><a href="home.html">홈</a><a href="about.html">회사소개</a><a href="mcn.html" aria-current="page">MCN</a><a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a><a href="entertainment.html">엔터테인먼트</a><a href="media.html">미디어</a><a href="partners.html">협력사</a><a href="contact.html">CONTACT</a><a class="btn btn-solid" href="contact.html#apply">지원하기</a></nav>
+</header>
+<nav class="menu-panel" id="menu-panel" aria-label="주 메뉴 (펼침)" hidden>
+  <button class="menu-close" type="button" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <div class="menu-list">
+    <a href="home.html">홈</a>
+    <a href="about.html">회사소개</a>
+    <a href="mcn.html" aria-current="page">MCN</a>
+    <a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a>
+    <a href="entertainment.html">엔터테인먼트</a>
+    <a href="media.html">미디어</a>
+    <a href="partners.html">협력사</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+</nav>
+<main>
+<section class="hero scene" data-name="첫 화면">
+  <div class="hero-bg" aria-hidden="true"><style>@media (max-width: 900px) { .hero-bg img { object-position: 70% 50% !important; } }</style><picture style="display: contents"><img src="../2026-11-10-pages/img/mcn-office.webp" alt="" style="object-position: 50% 50%"></picture><canvas class="hero-gl"></canvas></div>
+  <p class="eyebrow">CREATORS. CONTENT. COMMERCE.</p>
+  <h1>크리에이터의 가능성을 <br class="pc">다음 단계로 연결합니다.</h1>
+  <div class="hero-actions"><a class="btn btn-solid" href="contact.html#apply">크리에이터 지원하기</a></div>
+  <button class="scroll-hint" type="button" aria-label="아래 내용으로 이동"><span class="wheel" aria-hidden="true"></span><span class="arrow" aria-hidden="true"></span></button>
+</section>
+<section class="intro scene" id="page-content" data-name="소개">
+  <div class="intro-head"><h2>ASTRA MCN은 크리에이터마다 가진 고유한 매력과 가능성을 발견하고, 이를 지속 가능한 활동과 성장으로 이어갑니다.</h2></div>
+  <div class="intro-text late"><p>매니지먼트, 콘텐츠 기획·제작, 마케팅, 커머스를 유기적으로 연결해 크리에이터가 자신만의 색을 키우고 더 넓은 기회를 만날 수 있도록 함께합니다</p></div>
+  <div class="lens" aria-hidden="true"></div>
+</section>
+<div class="what scene" data-name="하는 일">
+<section class="rings" aria-label="MCN이 하는 일 네 가지"><div class="ring on">MANAGEMENT</div><div class="ring">MARKETING</div><div class="ring">COMMERCE</div><div class="ring">MEDIA<br>CONTENT</div></section>
+<section class="rows">
+  <h2 class="display section-title rise" style="--i:0">WHAT WE DO</h2>
+  <div class="row-list"><article class="row"><p class="row-label"><i>01 —</i> MANAGEMENT</p><h3>크리에이터의 성장을 함께 설계합니다.</h3><div class="row-body"><p>크리에이터의 강점과 목표에 맞춰 활동 방향을 구체화하고, 안정적인 방송과 콘텐츠 활동을 위한 운영을 지원합니다. 장기적인 성장 전략을 함께 세우며 크리에이터가 자신만의 경쟁력을 만들어가도록 돕습니다.</p><ul class="keywords"><li>크리에이터 발굴</li><li>활동 방향 설정</li><li>매니지먼트</li><li>방송 운영</li><li>성장 전략</li></ul></div></article><article class="row"><p class="row-label"><i>02 —</i> MARKETING</p><h3>크리에이터의 매력을 더 많은 사람에게 전달합니다.</h3><div class="row-body"><p>채널과 팬덤의 특성에 맞는 브랜딩과 마케팅을 기획합니다. 광고·협찬과 브랜드 캠페인을 크리에이터의 콘텐츠에 자연스럽게 연결해, 크리에이터와 브랜드 모두에게 의미 있는 접점을 만듭니다.</p><ul class="keywords"><li>채널 브랜딩</li><li>광고·협찬</li><li>브랜드 캠페인</li><li>팬덤 커뮤니케이션</li><li>파트너십</li></ul></div></article><article class="row"><p class="row-label"><i>03 —</i> COMMERCE</p><h3>콘텐츠의 영향력을 새로운 비즈니스 기회로 확장합니다.</h3><div class="row-body"><p>크리에이터의 관심사와 팬덤에 맞는 브랜드와 상품을 연결하고, 라이브 커머스와 상품 기획을 통해 콘텐츠가 새로운 경험과 수익 기회로 이어지도록 지원합니다.</p><ul class="keywords"><li>라이브 커머스</li><li>브랜드 협업</li><li>상품 기획</li><li>판매 연계</li><li>커머스 콘텐츠</li></ul></div></article><article class="row"><p class="row-label"><i>04 —</i> MEDIA CONTENT</p><h3>아이디어를 크리에이터만의 콘텐츠로 완성합니다.</h3><div class="row-body"><p>기획 단계부터 콘텐츠의 주제와 포맷을 함께 고민하고, 제작과 운영까지 이어갑니다. 숏폼부터 라이브 콘텐츠까지 채널과 시청자에 맞는 콘텐츠를 꾸준히 만들어 크리에이터의 이야기를 확장합니다.</p><ul class="keywords"><li>콘텐츠 기획</li><li>포맷 개발</li><li>영상 제작</li><li>숏폼 콘텐츠</li><li>라이브 콘텐츠</li></ul></div></article></div>
+</section>
+</div>
+<figure class="wide scene" data-name="사진"><img data-bleed src="../2026-11-10-pages/img/mcn-wide.webp" alt="콘텐츠 촬영 현장 예시"><div class="halos" aria-hidden="true"><span class="halo"></span><span class="halo"></span><span class="halo"></span><span class="halo"></span></div></figure>
+<section class="process scene" data-name="과정">
+  <h2 class="display section-title rise" style="--i:0">FROM POTENTIAL TO NEXT</h2>
+  <ol class="steps"><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">DISCOVER</p><h3>가능성을 발견합니다.</h3><p>크리에이터의 개성과 강점을 살펴보고, 활동 목표와 앞으로의 방향을 함께 정합니다.</p></div></li><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="o" r="26" pathLength="1" style="--o:1"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">BUILD</p><h3>성장의 기반을 만듭니다.</h3><p>채널의 정체성을 세우고, 크리에이터에게 맞는 브랜딩과 콘텐츠 방향을 설계합니다.</p></div></li><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="o" r="26" pathLength="1" style="--o:1"/><circle class="o" r="38" pathLength="1" style="--o:2"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">CREATE</p><h3>아이디어를 콘텐츠로 완성합니다.</h3><p>콘텐츠 기획부터 포맷 개발과 제작·운영까지, 크리에이터의 색이 담긴 콘텐츠를 만들어갑니다.</p></div></li><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="o" r="26" pathLength="1" style="--o:1"/><circle class="o" r="38" pathLength="1" style="--o:2"/><circle class="o" r="50" pathLength="1" style="--o:3"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">GROW</p><h3>더 넓은 기회로 확장합니다.</h3><p>마케팅과 브랜드 협업, 커머스를 연결해 크리에이터의 영향력과 활동 기회를 넓혀갑니다.</p></div></li></ol>
+</section>
+<div class="scene scene-end" data-name="문의" data-light>
+<section class="cta">
+  <p class="display" data-words>WE MAKE NEXT.</p>
+  <div class="cta-row rise" style="--i:3"><p>당신의 채널 이야기를 들려주세요. 발견부터 성장까지 함께합니다.</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#apply">크리에이터 지원하기</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
+</section>
+<footer class="site-footer">
+  <div>
+    <img class="footer-logo" src="../2026-11-10-pages/img/logo-astra.webp" alt="ASTRA ENTERTAINMENT" width="87" height="81">
+    <p class="slot">사업자 정보 자리 (상호, 대표자, 사업자번호, 주소, 전화, 이메일)</p>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+    <p class="slot">인스타그램 링크 자리</p>
+  </div>
+</footer>
+<span class="trail" aria-hidden="true"></span><span class="trail" aria-hidden="true"></span>
+</div>
+</main>
+<canvas class="ripple" aria-hidden="true"></canvas>
+<div class="fab-anchor">
+  <div class="fab">
+    <ul class="fab-menu" id="fab-menu">
+      <li><a href="#">카카오톡 상담</a></li>
+      <li><a href="#">인스타그램</a></li>
+      <li><a href="#">블로그</a></li>
+      <li><a class="main" href="contact.html#apply">지원하기</a></li>
+    </ul>
+    <button class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="상담·지원 바로가기 열기">
+      <svg class="talk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10.5H10.5L6 19.5V16H4z"/><path d="M8.5 10.8h.01M12 10.8h.01M15.5 10.8h.01" stroke-width="2.2"/></svg>
+      <svg class="x" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+</div>
+<script src="mcn-motion.js"></script>
+<script src="deck.js"></script>
+<script>
+/* MCN 2판 — 마우스가 원의 중심이다(설계 3절). 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js)이 한다.
+   이 쪽이 하는 일: 퍼지는 원 층, 첫 화면 배경 영상과 원 세 개, 원이 글을 밝힘과 둥근 창, 원 네 개(하는 일),
+   원 네 개가 창이 되는 넘김, 깊이가 다른 원, 겹 원 과정 표시, GROW의 원이 화면이 되는 넘김. 값은 README.md */
+(function () {
+  var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim, EASE = D.EASE;
+  var HERO = 0, INTRO = 1, WHAT = 2, WIDE = 3, PROC = 4, END = 5;
+  var scenes = $$('.scene');
+  var hero = scenes[HERO], intro = scenes[INTRO], what = scenes[WHAT], wide = scenes[WIDE], proc = scenes[PROC], endScene = scenes[END];
+  var header = $('.site-header');
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var lag = function (dt, tau) { return 1 - Math.exp(-dt / tau); }; // 남은 거리 중 이번 화면에 다가갈 비율
+  var easeOut = function (u) { return 1 - Math.pow(1 - u, 3); };
+  var easeInOut = function (u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var now = function () { return performance.now(); };
+  var K = function () { return D.k || 1; };
+  // 이름을 붙인 시계: 같은 이름끼리 한 번에 멈춘다(화면을 떠나면 그 화면의 차례를 지운다)
+  var timers = {};
+  function later(name, fn, ms) { (timers[name] = timers[name] || []).push(setTimeout(fn, ms)); }
+  function clearT(name) { (timers[name] || []).forEach(clearTimeout); timers[name] = []; }
+  // 지금 이 화면만 보이는가(한 화면씩 넘길 때). 넘어가는 중이면 거짓
+  var onlyAt = function (n) { return D.on && D.cur === n && !D.trans; };
+  // 넘김을 끊지 않고 상태를 바로 바꿀 때: 잠깐 transition을 끈다
+  function snap(el, fn) { el.classList.add('snap'); fn(); void el.offsetWidth; el.classList.remove('snap'); }
+
+  /* ───────── 3-1. 퍼지는 원 층 ─────────
+     원 하나에 선 두 개(앞 선과 조금 뒤따라오는 옅은 선, 시험판과 같다). 원끼리 만나는 자리는 밝은 부분만 더해져 저절로 더 밝다.
+     화면마다 밝기: 사진 위 60%, 원 네 개 화면 30%, 흰 화면은 검정 12%. 넘기면 떠 있던 원이 0.3초에 사라진다. */
+  var rc = $('.ripple'), ctx = rc.getContext('2d'), ripples = [], RW = 0, RH = 0, dpr = 1;
+  function rsize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    RW = window.innerWidth; RH = window.innerHeight;
+    rc.width = Math.round(RW * dpr); rc.height = Math.round(RH * dpr);
+  }
+  var DIM = [1, 1, 0.3, 0.6, 1, 1];
+  // 스크롤하는 화면에서 그 자리에 있는 화면(흰 문의 위는 그리지 않는다)
+  function sceneAt(y) {
+    for (var i = 0; i < scenes.length; i++) { var r = scenes[i].getBoundingClientRect(); if (y >= r.top && y < r.bottom) return i; }
+    return -1;
+  }
+  function ripple(x, y, life, R, a, opt) {
+    opt = opt || {};
+    var n = D.on ? D.cur : sceneAt(y);
+    if (n < 0 || (!D.on && n === END)) return null;
+    if (!opt.must && ripples.length >= 6) return null;
+    var g = { x: x, y: y, t: now() / 1000, life: life, R: R, a: a * (opt.raw ? 1 : DIM[n]), ink: D.on && n === END, w: opt.w || 1.4, kill: 0 };
+    ripples.push(g);
+    return g;
+  }
+  var lastMove = 0, lastSpawn = null, lastSpawnAt = 0, idleAt = 0, wander = 0, heroReady = false, inTrans = false;
+  window.addEventListener('pointermove', function (e) {
+    if (reduce || e.pointerType !== 'mouse') return;
+    var t = now();
+    lastMove = t;
+    if (D.on && D.trans) return;
+    if (!lastSpawn) { lastSpawn = [e.clientX, e.clientY]; return; }
+    // 대표 11-11 "정신없다": 320px마다(가장 잦아도 0.3초), 밝기 32%(처음 140px·0.12초·62%)
+    if (Math.hypot(e.clientX - lastSpawn[0], e.clientY - lastSpawn[1]) >= 320 && t - lastSpawnAt >= 300) {
+      ripple(e.clientX, e.clientY, 2.4, RW * 0.22, 0.32);
+      lastSpawn = [e.clientX, e.clientY]; lastSpawnAt = t;
+    }
+  }, { passive: true });
+  window.addEventListener('pointerdown', function (e) {
+    if (reduce || (D.on && D.trans)) return;
+    ripple(e.clientX, e.clientY, 2.4, RW * 0.26, 0.45);
+  }, { passive: true });
+  function rippleFrame(ms) {
+    var t = ms / 1000;
+    // 넘김이 시작되면 떠 있던 원이 0.3초에 사라진다. 흰 화면에서는 그림판을 보통 겹치기로 바꾼다
+    var tr = !!(D.on && D.trans);
+    if (tr && !inTrans) ripples.forEach(function (g) { if (!g.kill) g.kill = t; });
+    inTrans = tr;
+    rc.classList.toggle('ink', D.on && D.cur === END && !tr);
+    // 쉴 때: 2.5초 뒤부터 화면 가운데 근처를 천천히 도는 점에서 5.6초마다 원 하나, 밝기 25%(처음 2.8초·50%. 첫 화면은 들어오는 원이 끝난 뒤부터)
+    if (!tr && ms - lastMove > 2500 && ms - idleAt > 5600 && (!D.on || D.cur !== HERO || heroReady)) {
+      idleAt = ms; wander += 0.9;
+      if (D.on) ripple(RW * (0.5 + 0.24 * Math.cos(wander)), RH * (0.5 + 0.2 * Math.sin(wander * 1.3)), 2.8, RW * 0.22, 0.25);
+      else ripple(RW * (0.25 + 0.5 * (0.5 + 0.5 * Math.cos(wander * 1.7))), RH * (0.3 + 0.4 * (0.5 + 0.5 * Math.sin(wander * 1.3))), 2.8, Math.max(RW, RH) * 0.3, 0.25);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, RW, RH);
+    for (var i = ripples.length - 1; i >= 0; i--) {
+      var g = ripples[i], p = (t - g.t) / g.life, fade = g.kill ? 1 - (t - g.kill) / 0.3 : 1;
+      if (p >= 1 || fade <= 0) { ripples.splice(i, 1); continue; }
+      if (p < 0) continue;
+      ctx.globalCompositeOperation = g.ink ? 'source-over' : 'lighter';
+      for (var k = 0; k < 2; k++) {
+        var q = p - k * 0.1; if (q <= 0) continue;
+        var e = 1 - Math.pow(1 - q, 3), al = g.a * Math.pow(1 - q, 1.6) * (k ? 0.45 : 1) * fade;
+        if (g.ink) al *= 0.12 / 0.62;
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, g.R * e, 0, Math.PI * 2);
+        ctx.strokeStyle = (g.ink ? 'rgba(0,0,0,' : 'rgba(255,255,255,') + al.toFixed(3) + ')';
+        ctx.lineWidth = k ? 1 : g.w;
+        ctx.stroke();
+      }
+    }
+  }
+
+  /* ───────── 3-2. 첫 화면: 배경 영상(혼자 돈다) + 들어올 때 원 세 개 ───────── */
+  var heroGL = $('.hero-gl'), eyebrow = $('.hero .eyebrow'), h1 = $('.hero h1'), acts = $('.hero-actions'), heroSeen = false, glOn = false;
+  function startGL() {
+    if (!window.McnMotion) document.documentElement.classList.add('bgok');
+    if (glOn || reduce || !window.McnMotion) return;
+    glOn = true;
+    window.McnMotion.start(heroGL, function () {
+      if (D.on) return D.cur === HERO || !!(D.trans && (D.trans.from === HERO || D.trans.to === HERO));
+      return heroSeen;
+    }, false);
+  }
+  var words = [];
+  if (!reduce) {
+    eyebrow.innerHTML = eyebrow.textContent.trim().split(' ').map(function (w) { return '<span class="ew">' + w + '</span>'; }).join(' ');
+    words = $$('.ew', eyebrow);
+    // 제목 두 줄을 줄마다 감싼다(글자와 줄바꿈 표시는 그대로. 휴대폰에서는 감싼 것이 보통 글처럼 이어진다)
+    Array.prototype.slice.call(h1.childNodes).forEach(function (n) {
+      if (n.nodeType !== 3 || !n.textContent.trim()) return;
+      var o = document.createElement('span'), i = document.createElement('span');
+      o.className = 'hl'; i.textContent = n.textContent;
+      o.appendChild(i); h1.replaceChild(o, n);
+    });
+  }
+  function heroReset() {
+    clearT('hero'); heroReady = false; hero.classList.remove('go');
+    words.forEach(function (w) { w.classList.remove('on'); });
+    h1.classList.remove('in'); acts.classList.remove('in');
+  }
+  function heroPlay(instant) {
+    heroReset();
+    if (instant) { words.forEach(function (w) { w.classList.add('on'); }); h1.classList.add('in'); acts.classList.add('in'); heroReady = true; return; }
+    void hero.offsetWidth; hero.classList.add('go');
+    // 가운데에서 원 세 개가 0.3초 간격으로 퍼지며(각 1.9초에 화면 밖까지) 영문 낱말이 하나씩 켜진다. 이어서 제목, 버튼
+    [0, 1, 2].forEach(function (i) {
+      later('hero', function () {
+        var r = hero.getBoundingClientRect();
+        ripple(r.left + r.width / 2, r.top + r.height / 2, 1.9, Math.hypot(r.width, r.height) * 0.62, 0.75, { must: true, raw: true });
+        words[i].classList.add('on');
+      }, 500 + i * 300);
+    });
+    later('hero', function () { h1.classList.add('in'); }, 1500);
+    later('hero', function () { acts.classList.add('in'); heroReady = true; lastMove = now(); }, 2200);
+  }
+
+  /* ───────── 3-3. 소개: 원이 글을 밝힌다, 둥근 창 ───────── */
+  var introH = $('.intro h2'), lens = $('.lens'), wds = [];
+  if (!reduce) {
+    introH.innerHTML = introH.textContent.trim().split(' ').map(function (w) { return '<span class="wd">' + w + '</span>'; }).join(' ');
+    wds = $$('.wd', introH);
+  }
+  var IN = { sweep: null, litAt: 0, demo: 0, demoDone: false, lx: 0, ly: 0, la: 0, R: 0, dim: false };
+  function introReset() {
+    clearT('intro'); IN.sweep = null; IN.litAt = 0; IN.demo = 0; IN.la = 0; IN.dim = false;
+    introH.classList.add('armed'); introH.classList.remove('dim');
+    wds.forEach(function (w) { w.classList.remove('on', 'lit'); });
+    lens.style.opacity = '0';
+    intro.classList.remove('title-on');
+  }
+  function introLit() { IN.litAt = now(); intro.classList.add('title-on'); }
+  function introPlay(instant) {
+    introReset();
+    if (instant) { wds.forEach(function (w) { w.classList.add('on'); }); introLit(); return; }
+    // 0.4초 뒤 문장 왼쪽 위에서 원 하나가 태어나 1.8초 동안 글 전체를 지나간다. 원의 앞머리가 닿는 낱말부터 밝아진다
+    later('intro', function () {
+      var r = introH.getBoundingClientRect(), ox = r.left - 24, oy = r.top - 12;
+      var R = Math.max(Math.hypot(r.right - ox, r.bottom - oy), Math.hypot(r.right - ox, r.top - oy)) * 1.12;
+      var g = ripple(ox, oy, 1.8, R, 0.8, { must: true, raw: true });
+      IN.sweep = { g: g, ox: ox, oy: oy, R: R, t0: now() };
+    }, 400);
+  }
+  function introFrame(t, dt) {
+    if (IN.sweep) {
+      var s = IN.sweep, p = clamp((t - s.t0) / 1800, 0, 1), rad = s.R * easeOut(p), all = true;
+      wds.forEach(function (w) {
+        if (w.classList.contains('on')) return;
+        var b = w.getBoundingClientRect();
+        if (p >= 1 || Math.hypot(b.left + b.width * 0.3 - s.ox, b.top + b.height / 2 - s.oy) <= rad) w.classList.add('on'); else all = false;
+      });
+      if (all) { IN.sweep = null; introLit(); }
+    }
+    // 둥근 창: 문장이 다 밝아지고 1.2초 뒤부터. 마우스가 움직이면 따라오고, 2.5초 쉬면 사라져 문장 전체가 다시 밝다.
+    // 처음 한 번은 마우스가 쉬고 있어도 창이 문장 위를 왼쪽에서 오른쪽으로 혼자 지나간다(반응을 찾을 수 있게)
+    if (D.flowOn()) return; // 휴대폰 스크롤 반응: 둥근 창은 스크롤이 움직인다(아래 D.flow)
+    var live = D.on ? onlyAt(INTRO) : false;
+    var want = 0, tx = IN.lx, ty = IN.ly;
+    IN.R = window.innerWidth * 0.12;
+    if (live && IN.litAt && t - IN.litAt > 1200 && fine) {
+      var M = D.mouse, b = introH.getBoundingClientRect();
+      if (M.at > IN.litAt && t - M.at < 2500) { want = 1; tx = M.x; ty = M.y; IN.demoDone = true; }
+      else if (!IN.demoDone) {
+        if (!IN.demo) { IN.demo = t; IN.lx = b.left - IN.R * 0.4; IN.ly = b.top + b.height * 0.35; }
+        var u = (t - IN.demo) / 2600;
+        if (u >= 1) IN.demoDone = true;
+        else { want = 1; tx = b.left + (b.width + IN.R * 0.4) * easeInOut(u) - IN.R * 0.2; ty = b.top + b.height * (0.3 + 0.4 * u); }
+      }
+    }
+    if (!IN.la && want) { IN.lx = tx; IN.ly = ty; }
+    IN.lx += (tx - IN.lx) * lag(dt, 0.12); IN.ly += (ty - IN.ly) * lag(dt, 0.12);
+    IN.la += (want - IN.la) * lag(dt, want ? 0.18 : 0.3);
+    if (IN.la < 0.01 && !want) IN.la = 0;
+    var dim = IN.la > 0.3;
+    if (dim !== IN.dim) { IN.dim = dim; introH.classList.toggle('dim', dim); }
+    if (IN.la > 0 || lens.style.opacity !== '0') {
+      lens.style.width = lens.style.height = (IN.R * 2).toFixed(1) + 'px';
+      lens.style.transform = 'translate3d(' + (IN.lx - IN.R).toFixed(1) + 'px,' + (IN.ly - IN.R).toFixed(1) + 'px,0)';
+      lens.style.opacity = IN.la.toFixed(3);
+    }
+    if (dim) wds.forEach(function (w) {
+      var r = w.getBoundingClientRect(), cx = clamp(IN.lx, r.left, r.right), cy = clamp(IN.ly, r.top, r.bottom);
+      var inside = Math.hypot(cx - IN.lx, cy - IN.ly) < IN.R * 0.82;
+      if (inside !== w.classList.contains('lit')) w.classList.toggle('lit', inside);
+    });
+  }
+
+  /* ───────── 3-4. 하는 일: 원 네 개 ───────── */
+  var ringBox = $('.what .rings'), rings = $$('.what .ring'), rows = $$('.what .row'), rowList = $('.what .row-list');
+  var W3 = { sel: -1, picked: false, hov: -1, hovAt: 0, flows: [], tilt: rings.map(function () { return { x: 0, y: 0, vx: 0, vy: 0 }; }) };
+  if (!reduce) {
+    rings.forEach(function (r, i) {
+      var n = '';
+      Array.prototype.slice.call(r.childNodes).forEach(function (c) { n += c.nodeName === 'BR' ? '\n' : c.textContent; });
+      var rn = document.createElement('span');
+      rn.className = 'rn';
+      while (r.firstChild) rn.appendChild(r.firstChild);
+      r.appendChild(rn);
+      r.insertAdjacentHTML('beforeend', '<svg class="rl" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" pathLength="1"/></svg><span class="rf" aria-hidden="true"></span>');
+      r.querySelector('.rf').setAttribute('data-n', n);
+      r.classList.remove('on');
+      r.setAttribute('role', 'button');
+      r.tabIndex = 0;
+      r.setAttribute('aria-label', n.replace('\n', ' '));
+      r.style.setProperty('--dd', (i * 0.12).toFixed(2) + 's');
+      r.addEventListener('click', function () { pickRing(i, true); });
+      r.addEventListener('focus', function () { if (D.on && W3.picked) select(i); });
+      r.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickRing(i, true); } });
+    });
+    ringBox.classList.add('armed');
+    // 제목 낱말을 감싼다(한 줄씩 올라오게, 글자는 그대로)
+    rows.forEach(function (row) {
+      var h = row.querySelector('h3');
+      h.innerHTML = h.textContent.trim().split(' ').map(function (w) { return '<span class="hw"><span>' + w + '</span></span>'; }).join(' ');
+    });
+  }
+  // 원의 자리(원 네 개 상자 기준, 크기 바꿈 없이)
+  function rg(i) { var r = rings[i]; return { x: r.offsetLeft + r.offsetWidth / 2, y: r.offsetTop + r.offsetHeight / 2, R: r.offsetWidth / 2 }; }
+  var SC = function (i) { return D.on && W3.picked ? (i === W3.sel ? 1.14 : 0.95) : 1; };
+  function stopFlows() { W3.flows.forEach(function (a) { if (a) a.cancel(); }); W3.flows = []; }
+  // 흰색이 옮겨 간다(0.55초): 앞 원의 흰색이 두 원이 겹친 자리로 빠져나가고, 새 원은 그 자리에서부터 찬다.
+  // 이웃이 아닌 원으로 건너뛸 때(한 화면씩 넘길 때)는 앞 원이 가운데로 줄어들고 새 원이 가운데에서 찬다.
+  function flow(a, b, dur) {
+    stopFlows();
+    dur = dur || 550;
+    var fa = a >= 0 ? rings[a].querySelector('.rf') : null, fb = rings[b].querySelector('.rf');
+    var gb = rg(b), sb = SC(b), lb, la, Ra = 0, Rb;
+    var through = a >= 0 && (!D.on || Math.abs(a - b) === 1);
+    if (a >= 0) {
+      var ga = rg(a), sa = SC(a), dx = gb.x - ga.x, dy = gb.y - ga.y, d = Math.hypot(dx, dy) || 1;
+      // 두 원 사이의 자리: 중심을 잇는 선 위, 겹친 부분(또는 틈)의 가운데
+      var u = (d + ga.R * sa - gb.R * sb) / 2, P = { x: ga.x + dx / d * u, y: ga.y + dy / d * u };
+      la = through ? { x: (P.x - ga.x) / sa + ga.R, y: (P.y - ga.y) / sa + ga.R } : { x: ga.R, y: ga.R };
+      lb = through ? { x: (P.x - gb.x) / sb + gb.R, y: (P.y - gb.y) / sb + gb.R } : { x: gb.R, y: gb.R };
+      Ra = Math.hypot(la.x - ga.R, la.y - ga.R) + ga.R + 2;
+      var cA = function (r) { return 'circle(' + r.toFixed(1) + 'px at ' + la.x.toFixed(1) + 'px ' + la.y.toFixed(1) + 'px)'; };
+      W3.flows.push(anim(fa, [{ clipPath: cA(Ra) }, { clipPath: cA(0) }], { duration: dur * (through ? 0.5 : 0.36), easing: 'cubic-bezier(0.55, 0, 1, 0.45)', fill: 'forwards' }));
+      rings[a].classList.remove('full');
+    } else lb = { x: gb.R, y: gb.R };
+    Rb = Math.hypot(lb.x - gb.R, lb.y - gb.R) + gb.R + 2;
+    var cB = function (r) { return 'circle(' + r.toFixed(1) + 'px at ' + lb.x.toFixed(1) + 'px ' + lb.y.toFixed(1) + 'px)'; };
+    var st = a >= 0 ? dur * (through ? 0.4 : 0.35) : 0;
+    var fb2 = anim(fb, [{ clipPath: cB(0) }, { clipPath: cB(Rb) }], { duration: dur - st, delay: st, easing: 'cubic-bezier(0, 0.55, 0.45, 1)', fill: 'both' });
+    W3.flows.push(fb2);
+    rings[b].classList.add('full');
+    if (fb2) fb2.onfinish = function () { if (W3.flows.indexOf(fb2) >= 0) stopFlows(); };
+  }
+  function setSel(i) {
+    W3.sel = i;
+    rings.forEach(function (r, k) { r.classList.toggle('sel', k === i); r.setAttribute('aria-pressed', String(k === i)); });
+  }
+  // 고른 것의 글: 앞 글이 위로 사라지고(0.25초), 새 제목이 한 줄씩 아래에서 올라오고(0.6초), 설명이 떠오르고, 낱말 다섯 개가 0.05초 간격으로 톡
+  function showRow(i, prev) {
+    rows.forEach(function (r, k) { if (k !== i && k !== prev) r.classList.remove('sel', 'out'); });
+    if (prev >= 0 && prev !== i) {
+      var old = rows[prev];
+      old.classList.remove('sel'); old.classList.add('out');
+      var outs = Array.prototype.map.call(old.children, function (c) { return anim(c, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-14px)' }], { duration: 250, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' }); });
+      later('row', function () { old.classList.remove('out'); outs.forEach(function (a) { if (a) a.cancel(); }); }, 260);
+    }
+    var row = rows[i];
+    row.classList.add('sel');
+    row.getAnimations && row.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
+    var base = prev >= 0 && prev !== i ? 240 : 0, o = { easing: EASE, fill: 'backwards' };
+    anim(row.querySelector('.row-label'), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 600, delay: base }, o));
+    var hws = $$('.hw > span', row), top0 = null, line = 0, lastTop = null;
+    hws.forEach(function (s) {
+      var tp = s.parentNode.offsetTop;
+      if (lastTop !== null && tp > lastTop + 4) line++;
+      lastTop = tp;
+      anim(s, [{ transform: 'translateY(108%)' }, { transform: 'none' }], Object.assign({ duration: 600, delay: base + 40 + line * 90 }, o));
+    });
+    anim(row.querySelector('.row-body p'), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 700, delay: base + 160 }, o));
+    $$('.keywords li', row).forEach(function (li, k) {
+      anim(li, [{ opacity: 0, transform: 'scale(0.9)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 360, delay: base + 340 + k * 50 }, o));
+    });
+  }
+  function select(i) {
+    if (i === W3.sel || i < 0 || i > 3) return;
+    var prev = W3.sel;
+    // 고른 뒤에는 마우스가 다른 원으로 옮겨 가기 전까지 올려 두기로 다시 고르지 않는다
+    // (대표 11-11: 원에 마우스를 둔 채 휠을 굴리면 휠이 고른 원과 마우스 아래 원 사이를 오갔다)
+    W3.hovDone = true;
+    setSel(i);
+    flow(prev, i);
+    if (D.on) showRow(i, prev);
+  }
+  // 누르거나 Enter: 한 화면씩 넘길 때는 그 원으로, 휴대폰·작은 창에서는 흰색이 차고 아래의 같은 줄로 내려가 그 줄이 잠깐 밝아진다
+  function pickRing(i, scroll) {
+    if (D.on) { if (W3.picked) select(i); return; }
+    if (!W3.picked) return;
+    clearT('pass');
+    select(i);
+    if (!scroll) return;
+    var row = rows[i];
+    later('pass', function () {
+      window.scrollTo({ top: row.getBoundingClientRect().top + window.pageYOffset - header.offsetHeight - 8, behavior: 'smooth' });
+      anim(row, [{ backgroundColor: 'rgba(255,255,255,0.09)' }, { backgroundColor: 'rgba(255,255,255,0)' }], { duration: 1400, delay: 500, easing: 'ease-out', fill: 'backwards' });
+    }, 260);
+  }
+  function whatReset() {
+    clearT('what'); clearT('pass'); clearT('row'); stopFlows();
+    snap(ringBox, function () {
+      ringBox.classList.remove('picked');
+      rings.forEach(function (r) { r.classList.remove('drawn', 'full', 'sel'); r.removeAttribute('aria-pressed'); });
+    });
+    W3.sel = -1; W3.picked = false; W3.hov = -1;
+    rows.forEach(function (r) { r.classList.remove('sel', 'out'); });
+  }
+  // 들어올 때: 원 네 개의 테두리가 왼쪽부터 0.12초 간격으로 한 바퀴씩 그려지고(0.7초), 첫 원(아래 화면에서 올라오면 마지막 원)에 가운데에서 흰색이 찬다. 그 뒤 글
+  function whatPlay(from, instant) {
+    whatReset();
+    var first = from > WHAT ? 3 : 0;
+    if (instant) {
+      snap(ringBox, function () { rings.forEach(function (r) { r.classList.add('drawn'); }); ringBox.classList.add('picked'); setSel(first); rings[first].classList.add('full'); });
+      W3.picked = true;
+      return;
+    }
+    rings.forEach(function (r) { r.classList.add('drawn'); });
+    later('what', function () { ringBox.classList.add('picked'); W3.picked = true; setSel(first); flow(-1, first, 600); }, 780);
+    later('what', function () { showRow(first, -1); }, 980);
+  }
+  // 휴대폰·작은 창(3-8): 그려진 뒤 흰색이 네 원을 한 번씩 지나간 뒤 첫 원에 머문다
+  function whatPass() {
+    whatReset();
+    rings.forEach(function (r) { r.classList.add('drawn'); });
+    later('what', function () { W3.picked = true; setSel(0); flow(-1, 0, 600); }, 780);
+    [1, 2, 3, 0].forEach(function (n, k) { later('pass', function () { select(n); }, 1480 + k * 650); });
+  }
+  // 원들이 마우스 쪽으로 최대 12px 기운다(가까운 원이 더 많이, 용수철처럼 돌아온다). 원에 0.11초 올려 두면 그 원으로
+  function whatFrame(t, dt) {
+    var live = onlyAt(WHAT) && W3.picked, M = D.mouse, box = ringBox.getBoundingClientRect(), k = K();
+    var hov = -1, best = 9;
+    rings.forEach(function (r, i) {
+      var g = rg(i), cx = box.left + g.x, cy = box.top + g.y, gx = 0, gy = 0, T = W3.tilt[i];
+      if (live && M.at && t - M.at < 4000) {
+        var dx = M.x - cx, dy = M.y - cy, d = Math.hypot(dx, dy);
+        if (d > 1) { var amt = 12 * k * Math.exp(-d / (g.R * 3.2)) * Math.min(1, d / 30); gx = dx / d * amt; gy = dy / d * amt; }
+        var q = d / (g.R * SC(i));
+        if (q < 1 && q < best) { best = q; hov = i; }
+      }
+      var ax = 120 * (gx - T.x) - 12 * T.vx, ay = 120 * (gy - T.y) - 12 * T.vy;
+      T.vx += ax * dt; T.vy += ay * dt; T.x += T.vx * dt; T.y += T.vy * dt;
+      if (Math.abs(T.x) < 0.02 && Math.abs(T.vx) < 0.02 && !gx) T.x = T.vx = 0;
+      if (Math.abs(T.y) < 0.02 && Math.abs(T.vy) < 0.02 && !gy) T.y = T.vy = 0;
+      r.style.translate = T.x || T.y ? T.x.toFixed(2) + 'px ' + T.y.toFixed(2) + 'px' : '';
+    });
+    if (hov !== W3.hov) { W3.hov = hov; W3.hovAt = t; W3.hovDone = false; }
+    if (live && hov >= 0 && !W3.hovDone && hov !== W3.sel && t - W3.hovAt >= 110 && M.at > W3.hovAt - 200) select(hov);
+  }
+
+  /* ───────── 3-5. 화면 4: 사진과 깊이가 다른 원 네 개, 넘김 3→4 ───────── */
+  var wImg = $('.wide img'), halos = $$('.halo'), WS = { ix: 0, iy: 0, h: [0, 0, 0, 0].map(function () { return { x: 0, y: 0 }; }) };
+  // 원 네 개 화면의 원 자리(창 기준, 크기 바꿈 없이). 화면 4의 가는 원도 같은 자리에 둔다
+  function ringSpots(visual) {
+    var box = ringBox.getBoundingClientRect();
+    return rings.map(function (r, i) {
+      if (visual) { var b = r.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, R: b.width / 2 }; }
+      var g = rg(i); return { x: box.left + g.x, y: box.top + g.y, R: g.R };
+    });
+  }
+  function placeHalos(spots) {
+    halos.forEach(function (h, i) {
+      var s = spots[i];
+      h.style.width = h.style.height = (s.R * 2).toFixed(1) + 'px';
+      h.style.left = (s.x - s.R).toFixed(1) + 'px'; h.style.top = (s.y - s.R).toFixed(1) + 'px';
+    });
+  }
+  function layoutHalos() {
+    rings.forEach(function (r) { var c = r.querySelector('.rl circle'); if (c && r.offsetWidth) c.style.strokeWidth = (100 / (r.offsetWidth + 2)).toFixed(3); });
+    if (D.on) { placeHalos(ringSpots(false)); return; }
+    // 스크롤하는 화면: 사진 띠 위에 가로로 네 개(지름 사진 폭의 22%)
+    var w = wide.clientWidth, h = wide.clientHeight;
+    placeHalos([0, 1, 2, 3].map(function (i) { return { x: w * (0.2 + 0.2 * i), y: h / 2, R: Math.min(w * 0.11, h * 0.42) }; }));
+  }
+  // 사진은 마우스 반대쪽으로 최대 12px, 원 네 개는 마우스 쪽으로 8, 14, 20, 26px
+  function wideFrame(t, dt) {
+    var M = D.mouse, live = D.on && D.cur === WIDE, mx = 0, my = 0, k = K();
+    if (live && M.at) { mx = M.x / window.innerWidth * 2 - 1; my = M.y / window.innerHeight * 2 - 1; }
+    var f = lag(dt, 0.5);
+    WS.ix += (-mx * 12 * k - WS.ix) * f; WS.iy += (-my * 12 * k - WS.iy) * f;
+    wImg.style.setProperty('--ix', WS.ix.toFixed(2) + 'px'); wImg.style.setProperty('--iy', WS.iy.toFixed(2) + 'px');
+    [8, 14, 20, 26].forEach(function (a, i) {
+      var H = WS.h[i], ff = lag(dt, 0.35 + i * 0.08);
+      H.x += (mx * a * k - H.x) * ff; H.y += (my * a * k - H.y) * ff;
+      halos[i].style.transform = 'translate3d(' + H.x.toFixed(2) + 'px,' + H.y.toFixed(2) + 'px,0)';
+    });
+  }
+  // 둥근 가림(mask) 네 겹. 반지름은 등록한 CSS 값(--w0~3)을 움직여 바꾼다. 못 쓰는 브라우저는 공통 넘김(아래에서 덮기)
+  var maskOK = false;
+  try {
+    var gm = 'radial-gradient(circle at 5px 5px, #000 4px, transparent 5px)';
+    if (window.CSS && CSS.registerProperty && (CSS.supports('mask-image', gm) || CSS.supports('-webkit-mask-image', gm))) {
+      ['--w0', '--w1', '--w2', '--w3', '--g0'].forEach(function (n) { CSS.registerProperty({ name: n, syntax: '<length>', inherits: false, initialValue: '0px' }); });
+      maskOK = true;
+    }
+  } catch (e) { maskOK = false; }
+  function setMask(el, m) { el.style.webkitMaskImage = m; el.style.maskImage = m; }
+  function hole(x, y, v) { return 'radial-gradient(circle at ' + x.toFixed(1) + 'px ' + y.toFixed(1) + 'px, #000 calc(' + v + ' - 1px), transparent ' + v + ')'; }
+  var cover = function (x, y) { var W = window.innerWidth, H = window.innerHeight; return Math.max(Math.hypot(x, y), Math.hypot(W - x, y), Math.hypot(x, H - y), Math.hypot(W - x, H - y)) + 4; };
+  // 넘김 3→4(1.2초): 화면 3의 원 네 개가 그 자리에 남고, 다음 화면의 사진이 그 원 안에서만 보이다가(0.15초) 원들이 제 가운데에서
+  // 커지며(0.9초, 0.05초 간격) 합쳐져 사진 전체가 드러난다. 돌아갈 때는 거꾸로: 사진이 원 네 개 안으로 닫히고 그 원들이 화면 3의 원이 된다
+  // 원 네 개가 함께 화면을 막 다 덮는 정도(0~1): 원마다 제 크기에서 혼자 덮는 크기까지 같은 비율로 커질 때, 화면 위 13×9 점이 모두 어느 원 안에 드는 가장 작은 비율.
+  // 혼자 덮는 크기까지 키우면 다 덮은 뒤에도 0.4초 동안 화면이 멈춰 보였다(되돌아갈 때는 처음 0.8초)
+  function unionK(spots, Rs) {
+    var W = window.innerWidth, H = window.innerHeight, lo = 0, hi = 1;
+    function covers(k) {
+      for (var gx = 0; gx <= 12; gx++) for (var gy = 0; gy <= 8; gy++) {
+        var x = W * gx / 12, y = H * gy / 8, ok = false;
+        for (var i = 0; i < spots.length && !ok; i++) ok = Math.hypot(x - spots[i].x, y - spots[i].y) <= spots[i].R + (Rs[i] - spots[i].R) * k;
+        if (!ok) return false;
+      }
+      return true;
+    }
+    for (var it = 0; it < 14; it++) { var mid = (lo + hi) / 2; if (covers(mid)) hi = mid; else lo = mid; }
+    return Math.min(1, hi * 1.04);
+  }
+  function windows(back) {
+    var spots = ringSpots(true), anims = [], masks = [];
+    var Rs = spots.map(function (s) { return cover(s.x, s.y); }), uk = unionK(spots, Rs);
+    spots.forEach(function (s, i) {
+      var n = '--w' + i, R = s.R + (Rs[i] - s.R) * uk, kf;
+      var px = function (v, o, e) { var f = { offset: o }; f[n] = v.toFixed(1) + 'px'; if (e) f.easing = e; return f; };
+      // 나아갈 때: 0.15초 원 안에 사진, 원마다 0.05초 간격으로 0.9초에 커진다.
+      // 되돌아갈 때: 바로 줄기 시작해(오른쪽 원부터 0.05초 간격) 0.9초 안에 원 자리로 닫히고, 마지막 0.15초에 원 안의 사진이 걷힌다
+      if (!back) kf = [px(s.R, 0), px(s.R, (150 + i * 50) / 1200, 'cubic-bezier(0.65, 0, 0.35, 1)'), px(R, (1050 + i * 50) / 1200), px(R, 1)];
+      else kf = [px(R, 0), px(R, (3 - i) * 50 / 1200, 'cubic-bezier(0.3, 0, 0.2, 1)'), px(s.R, (900 + (3 - i) * 50) / 1200), px(s.R, 1)];
+      if (kf[2].offset > 1) kf[2].offset = 1;
+      masks.push(hole(s.x, s.y, 'var(' + n + ')'));
+      anims.push(anim(wide, kf, { duration: 1200, fill: 'both' }));
+    });
+    setMask(wide, masks.join(', '));
+    wide.style.zIndex = '3';
+    // 사진은 원 안에서 0.15초에 나타난다(돌아갈 때는 마지막 0.15초에 원 안의 사진이 걷히며 화면 3의 원이 보인다)
+    anims.push(anim(wide, [{ opacity: 0 }, { opacity: 1, offset: 0.125 }, { opacity: 1 }], { duration: 1200, fill: 'both', direction: back ? 'reverse' : 'normal' }));
+    // 가는 원 네 개: 화면 3의 원 크기에서 제자리 크기로, 밝기 90% → 0(대표 11-11: 넘어간 뒤 사진 위에는 원을 남기지 않는다)
+    placeHalos(ringSpots(false));
+    var rest = ringSpots(false);
+    halos.forEach(function (h, i) {
+      var s = spots[i], r = rest[i], sc = s.R / r.R;
+      anims.push(anim(h, [{ scale: String(sc.toFixed(3)), borderColor: 'rgba(255,255,255,0.9)' }, { scale: '1', borderColor: 'rgba(255,255,255,0)' }], { duration: 1000, delay: 150 + i * 50, easing: EASE, fill: 'both', direction: back ? 'reverse' : 'normal' }));
+    });
+    // 앞 화면의 글은 0.25초에 사라진다(원만 남는다)
+    if (!back) [$('.what .section-title'), rowList].forEach(function (el) { anims.push(anim(el, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-out', fill: 'both' })); });
+    if (!back) later('mask', function () { setMask(wide, ''); }, 1210);
+    return anims;
+  }
+
+  /* ───────── 3-6. 과정: 겹 원 ───────── */
+  var steps = $$('.step'), stepList = $('.steps');
+  var orbits = steps.map(function (s) { var r = $$('.o', s).map(function (c) { return Number(c.getAttribute('r')); }); return { el: s, svg: s.querySelector('.orbit'), os: $$('.o', s), small: r, base: r, vb: 120, p: 0, hot: false, next: 0 }; });
+  // PC(한 화면씩)는 반지름 24·44·64·84(상자 200), 휴대폰·작은 창은 정지 시안과 같은 14·26·38·50(상자 120). 007 검토로 1.7배
+  var BIG = [24, 44, 64, 84];
+  function orbitMode() {
+    var big = D.on;
+    orbits.forEach(function (o) {
+      o.base = big ? BIG.slice(0, o.os.length) : o.small; o.vb = big ? 200 : 120;
+      o.svg.setAttribute('viewBox', big ? '-100 -100 200 200' : '-60 -60 120 120');
+      o.os.forEach(function (c, j) { c.setAttribute('r', o.base[j]); });
+    });
+  }
+  function procReset() {
+    clearT('proc');
+    snap(stepList, function () { steps.forEach(function (s) { s.classList.remove('on', 'hot'); }); });
+    stepList.classList.remove('focus');
+    orbits.forEach(function (o) { o.hot = false; });
+  }
+  // 들어올 때: 0.48초 뒤부터 0.36초 간격으로 한 단계씩. 원은 안쪽부터 한 바퀴씩(겹마다 0.7초, 0.08초 간격), 가로 선은 1.44초에 찬다
+  function procPlay(instant) {
+    procReset();
+    // 바로 다 켤 때(문의에서 되돌아올 때)는 가로 선도 바로 찬다
+    if (instant) { snap(proc, function () { proc.classList.add('in'); snap(stepList, function () { steps.forEach(function (s) { s.classList.add('on'); }); }); }); return; }
+    steps.forEach(function (s, i) { later('proc', function () { s.classList.add('on'); }, 480 + i * 360); });
+  }
+  function orbitCenter(i) { var b = orbits[i].svg.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2, s: b.width / orbits[i].vb }; }
+  // 마우스가 표시 가운데에서 294px 안이면(바깥 원 가장자리에서 210px, 처음 값 260px과 같은 거리) 그 단계의 원 사이가 벌어지고(최대 +20%, 원 크기에 비례) 밝아진다.
+  // 올려 두면 원이 퍼져 나가고(272px까지 0.9초, 1.2초마다. 처음 160px의 1.7배) 나머지는 38%.
+  // GROW 표시는 3초에 5%씩 커졌다 작아진다(다음 넘김의 예고)
+  function procFrame(t, dt) {
+    var live = D.on ? D.cur === PROC && !D.trans : true, M = D.mouse, k = K();
+    orbits.forEach(function (o, i) {
+      var c = orbitCenter(i), want = 0;
+      if (live && fine && M.at && t - M.at < 4000) { var d = Math.hypot(M.x - c.x, M.y - c.y); want = clamp(1 - d / (294 * k), 0, 1); }
+      o.p += (want - o.p) * lag(dt, 0.25);
+      var br = i === 3 ? 0.025 * (1 - Math.cos(t / 3000 * Math.PI * 2)) : 0;
+      o.os.forEach(function (circ, j) { circ.setAttribute('r', (o.base[j] * (1 + 0.2 * o.p * (j + 1) / o.os.length + br)).toFixed(2)); circ.style.strokeOpacity = (0.72 + 0.28 * o.p).toFixed(3); });
+      if (o.hot && live && t >= o.next) { o.next = t + 1200; ripple(c.x, c.y, 0.9, 272 * k, 0.7, { must: true, w: 1.2 }); }
+    });
+  }
+  steps.forEach(function (s, i) {
+    s.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse' || !D.on) return;
+      orbits[i].hot = true; orbits[i].next = 0; s.classList.add('hot'); stepList.classList.add('focus');
+    });
+    s.addEventListener('pointerleave', function () { orbits[i].hot = false; s.classList.remove('hot'); if (!orbits.some(function (o) { return o.hot; })) stepList.classList.remove('focus'); });
+    s.addEventListener('click', function () { if (!D.on) { var c = orbitCenter(i); ripple(c.x, c.y, 0.9, 160, 0.7, { must: true, w: 1.2 }); } });
+  });
+
+  /* ───────── 3-7. 넘김 5→6: GROW의 가장 바깥 원에 흰색이 차고, 그 원이 계속 커져 화면 전체를 덮는다 ───────── */
+  var trails = $$('.trail');
+  function clearGrow() { setMask(endScene, ''); clearT('grow'); }
+  function grow(back) {
+    clearGrow();
+    var c = orbitCenter(3), r0 = orbits[3].base[3] * c.s * (1 + 0.2 * orbits[3].p), R = cover(c.x, c.y), anims = [];
+    setMask(endScene, hole(c.x, c.y, 'var(--g0)'));
+    endScene.style.zIndex = '3';
+    // 처음 0.25초는 천천히(바깥 원 → 1.6배), 그 뒤 빠르게. 모두 1.1초
+    anims.push(anim(endScene, [
+      { '--g0': r0.toFixed(1) + 'px', easing: 'cubic-bezier(0.3, 0, 0.6, 1)' },
+      { '--g0': (r0 * 1.6).toFixed(1) + 'px', offset: 250 / 1100, easing: 'cubic-bezier(0.55, 0, 0.75, 1)' },
+      { '--g0': R.toFixed(0) + 'px' }
+    ], { duration: 1100, fill: 'both', direction: back ? 'reverse' : 'normal' }));
+    anims.push(anim(endScene, [{ opacity: 0 }, { opacity: 1, offset: 0.09 }, { opacity: 1 }], { duration: 1100, fill: 'both', direction: back ? 'reverse' : 'normal' }));
+    if (!back) {
+      // 흰 원 뒤로 0.15초, 0.3초 늦게 가는 회색 원 두 개(1px, 검정 14%)가 같은 자리에서 퍼져 나가며 사라진다
+      trails.forEach(function (tr, i) {
+        tr.style.width = tr.style.height = (r0 * 2).toFixed(1) + 'px';
+        tr.style.left = (c.x - r0).toFixed(1) + 'px'; tr.style.top = (c.y - r0).toFixed(1) + 'px';
+        anims.push(anim(tr, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(' + (R * 0.85 / r0).toFixed(2) + ')' }], { duration: 1100 - i * 120, delay: 150 + i * 150, easing: 'cubic-bezier(0.4, 0, 0.6, 1)', fill: 'both' }));
+      });
+      later('grow', function () { setMask(endScene, ''); }, 1110);
+    } else {
+      // 되돌아갈 때: 문의 문장·버튼이 0.25초에 사라진다. 검은 바닥글은 그대로 둔다(회사소개에서 지우면 번쩍였다)
+      Array.prototype.forEach.call(endScene.children, function (ch) { if (ch.matches('.cta')) anims.push(anim(ch, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-out', fill: 'both' })); });
+    }
+    return anims;
+  }
+
+  /* ───────── 스크롤하는 화면(휴대폰·작은 창, 3-8): 줄·단계·사진을 스크롤에 맞춰 ───────── */
+  function scrollFrame() {
+    var vh = window.innerHeight, hh = header.getBoundingClientRect().bottom;
+    rows.forEach(function (r) {
+      var b = r.getBoundingClientRect(), on = r.classList.contains('on');
+      if (!on && b.top < vh * 0.88 && b.bottom > hh) r.classList.add('on');
+      else if (on && (b.top >= vh || b.bottom <= hh)) r.classList.remove('on');
+    });
+    steps.forEach(function (s) {
+      var b = s.getBoundingClientRect(), on = s.classList.contains('on');
+      if (!on && b.top < vh * 0.8 && b.bottom > hh) s.classList.add('on');
+      else if (on && (b.top >= vh || b.bottom <= hh)) s.classList.remove('on');
+    });
+    // 사진: 사진 위쪽이 화면 90%에서 45% 높이까지 올라오는 동안 원 네 개가 커지며 사진이 드러난다(설계 12-3)
+    var b = wide.getBoundingClientRect();
+    if (b.bottom > 0 && b.top < vh) {
+      var p = D.span(wide, 0.9, 0.45, vh), w = b.width, h = b.height, m = [];
+      if (p >= 1) { if (wide.style.maskImage) setMask(wide, ''); }
+      else {
+        for (var i = 0; i < 4; i++) {
+          // 다 커졌을 때 네 원이 함께 사진을 막 덮는 크기(이웃 원 사이와 네 모서리까지). 그보다 크게 잡으면 절반쯤에서 이미 사진이 다 보였다
+          var x = w * (0.2 + 0.2 * i), y = h / 2, r0 = Math.min(w * 0.11, h * 0.42), R = Math.hypot(w * 0.2, h / 2) + 2;
+          var q = easeInOut(clamp(p * 1.15 - i * 0.05, 0, 1));
+          m.push(hole(x, y, (r0 + (R - r0) * q).toFixed(1) + 'px'));
+        }
+        setMask(wide, m.join(', '));
+      }
+    }
+  }
+
+  /* ───────── 한 화면에 한 번 그리는 고리 ───────── */
+  var lastT = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    var dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+    lastT = t;
+    rippleFrame(t);
+    if (!D.on || D.cur === INTRO || (D.trans && (D.trans.from === INTRO || D.trans.to === INTRO))) introFrame(t, dt);
+    if (D.on && (D.cur === WHAT || (D.trans && (D.trans.from === WHAT || D.trans.to === WHAT)))) whatFrame(t, dt);
+    if (D.on && (D.cur === WIDE || (D.trans && (D.trans.from === WIDE || D.trans.to === WIDE)))) wideFrame(t, dt);
+    if (!D.on || D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC))) procFrame(t, dt);
+    if (!D.on) scrollFrame();
+  }
+
+  // 키보드 좌우 화살표: 하는 일 화면에서 원을 바꾼다(위아래는 공통 틀이 화면을 넘긴다)
+  document.addEventListener('keydown', function (e) {
+    if (!onlyAt(WHAT) || !W3.picked || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); select(Math.min(3, W3.sel + 1)); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); select(Math.max(0, W3.sel - 1)); }
+  });
+
+  function sceneReset(n) {
+    if (n === HERO) { heroReset(); if (!D.on) heroSeen = false; }
+    if (n === INTRO && !D.flowOn()) introReset(); // 휴대폰 스크롤 반응은 스크롤 자리대로 둔다
+    if (n === WHAT) {
+      whatReset();
+      [$('.what .section-title'), rowList].forEach(function (el) { el.getAnimations && el.getAnimations().forEach(function (a) { a.cancel(); }); });
+    }
+    if (n === WIDE) { clearT('mask'); setMask(wide, ''); }
+    if (n === PROC) procReset();
+    if (n === END && !D.flowOn()) clearGrow(); // 휴대폰 스크롤 반응의 가림은 스크롤이 맡는다
+  }
+  if (!reduce) { introReset(); }
+  D.setup({
+    enter: function (n, scene, from) {
+      if (n === HERO) heroPlay(false);
+      if (n === INTRO) introPlay(false);
+      if (n === WHAT) { if (from === WIDE && W3.picked) showRow(W3.sel, -1); else whatPlay(from, false); }
+      if (n === WIDE) layoutHalos();
+      if (n === PROC) procPlay(from === END);
+    },
+    reset: sceneReset,
+    // 하는 일: 휠 한 번에 다음 원(네 개를 다 지나면 다음 화면). 원이 그려지는 동안(첫 원이 차기 전) 굴린 휠은 버린다.
+    // 키보드 위아래는 화면을 넘긴다(원은 좌우 화살표)
+    step: function (n, d, src) {
+      if (n !== WHAT || src === 'key') return false;
+      if (!W3.picked) return true;
+      var t = W3.sel + d;
+      if (t < 0 || t > 3) return false;
+      select(t);
+      return true;
+    },
+    // 스크롤하는 화면(설계 1-4): 구역이 화면 밖으로 완전히 나가면 처음 상태로 돌려, 다시 보일 때 원·낱말이 처음부터 다시 펼쳐진다
+    unseen: sceneReset,
+    seen: function (n, scene, instant) {
+      if (n === HERO) { heroSeen = true; heroPlay(instant); }
+      if (D.flowOn() && (n === INTRO || n === WHAT)) { if (n === WHAT) { rings.forEach(function (r) { r.classList.add('drawn'); }); flowRing(window.innerHeight); } return; } // 휴대폰 스크롤 반응(설계 12-3)이 맡는다
+      if (n === INTRO) introPlay(instant);
+      if (n === WHAT) { if (instant) { whatReset(); rings.forEach(function (r) { r.classList.add('drawn'); }); W3.picked = true; setSel(0); rings[0].classList.add('full'); } else whatPass(); }
+      if (n === WIDE) layoutHalos();
+    },
+    move: function (from, to, fromEl, toEl) {
+      if (!maskOK) return null;
+      if (from === WHAT && to === WIDE) { layoutHalos(); return { dur: 1200, anims: windows(false), light: 600, enter: 700 }; }
+      if (from === WIDE && to === WHAT) {
+        // 화면 3을 마지막 원이 골라진 상태로 먼저 놓고, 그 원 자리로 사진이 닫힌다
+        whatPlay(WIDE, true);
+        return { dur: 1200, anims: windows(true), light: 600, enter: 650 };
+      }
+      if (from === PROC && to === END) return { dur: 1100, anims: grow(false), light: 700, enter: 560 };
+      if (from === END && to === PROC) { procPlay(true); return { dur: 1100, anims: grow(true), light: 420, enter: 380 }; }
+      return null;
+    },
+    start: function () { startGL(); clearGrow(); orbitMode(); rsize(); layoutHalos(); },
+    stop: function () {
+      clearGrow(); setMask(wide, '');
+      rings.forEach(function (r, i) { var T = W3.tilt[i]; T.x = T.y = T.vx = T.vy = 0; r.style.translate = ''; });
+      wImg.style.removeProperty('--ix'); wImg.style.removeProperty('--iy');
+      halos.forEach(function (h) { h.style.transform = ''; });
+      lens.style.opacity = '0';
+      orbitMode(); startGL(); rsize(); layoutHalos();
+    }
+  });
+  orbitMode();
+
+  /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-3, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
+     소개: 소개 구역 위쪽 85% → 35% 동안 둥근 창 하나가 문장 왼쪽 위에서 오른쪽 아래로 지나가고, 창이 지나간 낱말부터 밝아진다
+     하는 일: 네 줄 가운데 화면 가운데에 가장 가까운 줄의 원에 흰색이 찬다. 줄이 바뀌면 흰색이 겹친 자리를 지나 옮겨 간다(PC와 같은 모양)
+     흰 문의 구역: 구역 위쪽 92% → 40% 동안 과정 마지막 단계(GROW) 표시의 바깥 원 자리에서 흰 원이 커져 덮는다. 뒤로 0.15·0.3 늦게 가는 회색 원 두 겹
+     (사진의 "원 네 개가 창이 된다"는 위 scrollFrame이 한다) */
+  function flowGrow(q, vh) {
+    if (q >= 1) { setMask(endScene, ''); trails.forEach(function (tr) { tr.style.opacity = '0'; }); return; }
+    var e = endScene.getBoundingClientRect(), c = orbitCenter(3), r0 = orbits[3].base[3] * c.s;
+    var x = c.x - e.left, y = c.y - e.top, W = e.width, Hv = vh * 0.6 - y;
+    var R = Math.hypot(Math.max(x, W - x), Math.max(0, Hv)) + 4;
+    var u = function (d) { return q <= d ? 0 : easeInOut(clamp((q - d) / (1 - d), 0, 1)); };
+    var rw = q <= 0 ? 0 : r0 + (R - r0) * q; // 흰 원은 고르게 커진다(처음이 느리면 원이 구역 위쪽 가장자리에 닿기 전이라 한참 안 보였다)
+    setMask(endScene, hole(x, y, Math.max(0.5, rw).toFixed(1) + 'px'));
+    // 회색 원 두 겹(1px, 검정 14%): 흰 원보다 0.15·0.3 늦게 커지며 흐려진다
+    var pb = trails[0] && trails[0].offsetParent ? trails[0].offsetParent.getBoundingClientRect() : { left: 0, top: 0 };
+    trails.forEach(function (tr, i) {
+      var k = u(0.15 * (i + 1)), r = r0 + (R * 0.85 - r0) * k;
+      if (k <= 0 || k >= 1) { tr.style.opacity = '0'; return; }
+      tr.style.width = tr.style.height = (r * 2).toFixed(1) + 'px';
+      tr.style.left = (c.x - pb.left - r).toFixed(1) + 'px'; tr.style.top = (c.y - pb.top - r).toFixed(1) + 'px';
+      tr.style.opacity = (1 - k).toFixed(3);
+    });
+  }
+  function flowRing(vh) {
+    var hh = header.getBoundingClientRect().bottom, mid = hh + (vh - hh) / 2, best = -1, bd = 1e9;
+    var box = rowList.getBoundingClientRect();
+    if (box.bottom < hh || box.top > vh) return;
+    rows.forEach(function (r, i) { var b = r.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - mid); if (d < bd) { bd = d; best = i; } });
+    if (best < 0) return;
+    if (!W3.picked) { W3.picked = true; rings.forEach(function (r) { r.classList.add('drawn'); }); setSel(best); flow(-1, best, 600); }
+    else if (best !== W3.sel) select(best);
+  }
+  function flowIntro(vh) {
+    var p = D.span(intro, 0.85, 0.35, vh), r = introH.getBoundingClientRect();
+    var ox = r.left - 24, oy = r.top - 12, dx = r.right - ox, dy = r.bottom - oy, L2 = dx * dx + dy * dy;
+    var c = -0.08 + 1.16 * p; // 둥근 창 가운데의 자리(문장 대각선 위의 비율)
+    wds.forEach(function (w) {
+      var b = w.getBoundingClientRect(), t = ((b.left + b.width * 0.3 - ox) * dx + (b.top + b.height / 2 - oy) * dy) / L2;
+      w.classList.toggle('on', p >= 1 || (p > 0 && t <= c + 0.04));
+    });
+    if (p >= 0.8) introLit();
+    var R = Math.max(40, window.innerWidth * 0.13), a = p <= 0 || p >= 1 ? 0 : Math.min(1, p / 0.1, (1 - p) / 0.1);
+    lens.style.opacity = a.toFixed(3);
+    if (a > 0) {
+      var pr = lens.offsetParent ? lens.offsetParent.getBoundingClientRect() : { left: 0, top: 0 };
+      lens.style.width = lens.style.height = (R * 2).toFixed(1) + 'px';
+      lens.style.transform = 'translate3d(' + (ox + dx * c - pr.left - R).toFixed(1) + 'px,' + (oy + dy * c - pr.top - R).toFixed(1) + 'px,0)';
+    }
+  }
+  D.flow(function (vh, on) {
+    if (!on) { lens.style.opacity = '0'; trails.forEach(function (tr) { tr.style.opacity = '0'; }); return; }
+    flowIntro(vh);
+    flowRing(vh);
+    flowGrow(D.spanEnd(endScene, 0.92, 0.4, vh), vh);
+  });
+
+  if (reduce) return;
+  rsize();
+  layoutHalos();
+  startGL();
+  var rt = 0;
+  window.addEventListener('resize', function () { rsize(); clearTimeout(rt); rt = setTimeout(layoutHalos, 120); });
+  requestAnimationFrame(frame);
+})();
+</script>
+<script src="site-menu.js"></script>
+<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
+<!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
+</body>
+</html>

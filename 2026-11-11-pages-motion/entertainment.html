@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ASTRA 엔터테인먼트 움직이는 시안</title>
+<script>/* 첫 화면 글은 움직임 준비(.fx)와 글꼴(.fonts, 최대 1.5초)이 둘 다 될 때까지 감춘다: 준비 전에 글이 먼저 보였다가 사라지고 LED 점으로 다시 맺혔다(대표 11-12). 움직임 줄이기에서는 감추지 않는다 */
+(function () { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; var r = document.documentElement; r.classList.add('pre');
+  function ok() { r.classList.add('fonts'); } setTimeout(ok, 1500);
+  document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(function () { if (document.fonts && document.fonts.ready) document.fonts.ready.then(ok); else ok(); }); });
+})();</script>
+<style>html.pre:not(.fx) .hero > .eyebrow, html.pre:not(.fx) .hero h1, html.pre:not(.fx) .hero-actions, html.pre:not(.fonts) .hero > .eyebrow, html.pre:not(.fonts) .hero h1, html.pre:not(.fonts) .hero-actions { visibility: hidden; }</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../2026-11-10-pages/pages.css">
+<link rel="stylesheet" href="deck.css">
+<link rel="stylesheet" href="ent-reel.css">
+<style>
+/* 엔터테인먼트 2판 — LED 무대 (설계 pages-motion-design.md 4절, 지시서 008).
+   하나의 생각: 이 쪽 전체가 LED 무대다. 마우스가 지나간 자리의 LED가 켜진다. 회사소개는 별과 선, MCN은 원, 엔터테인먼트는 점(LED 화소).
+   화면 6개: 첫 화면(스튜디오 둘러보기) → 소개 → ENTERTAINMENT NETWORK → 숏폼(카드 모션, 1판 그대로) → 과정 → 문의 + 바닥글.
+   문구·순서·배치·색·글꼴·사진은 정지 시안(../2026-11-10-pages/entertainment.html) 그대로다. 과정의 단계 표시만 LED 무리로 바꿨다(설계 4-11).
+   크기는 큰 창 배율 --k(공통 틀)를 쓴다. 값은 README.md */
+
+/* ── LED 점 층(4-1): 화면에 고정된 그림판 하나. 꺼진 점 결과 켜진 점을 그린다. 흰 화면에서는 검은 점 ── */
+.led { display: none; }
+html.fx .led { display: block; position: fixed; inset: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; }
+
+/* ── 전광판처럼 켜지는 글(4-2): 글자마다 꺼짐 → 켜짐 → 잠깐 꺼짐 → 켜짐(0.09초씩). 순서는 낱말 안에서 무작위, 한 줄 0.7초 ── */
+html.fx .mq .c { opacity: 0; }
+html.deck .scene.in .mq .c, html.fx:not(.deck) .scene.seen .mq .c { animation: flick 0.27s steps(1, end) calc(var(--md, 0.3s) + var(--fd, 0s)) both; }
+@keyframes flick { 0% { opacity: 0; } 33.33% { opacity: 1; } 66.66% { opacity: 0.16; } 100% { opacity: 1; } }
+
+/* ── 화면 1 첫 화면(4-3): 스튜디오 둘러보기 다섯 장면(1판). 배경은 마우스에 반응하지 않는다. 떠나 있는 동안은 멈추고, 돌아오면 첫 장면부터 ── */
+html.deck .hero-tour .hero-bg .t1 { animation: tour1 9s linear infinite; }
+html.deck .hero-tour .hero-bg .t2 { animation: tour2 9s linear infinite; }
+html.deck .hero-tour .hero-bg .t3 { animation: tour3 9s linear infinite; }
+html.deck .hero-tour .hero-bg .t4 { animation: tour4 9s linear infinite; }
+html.deck .hero-tour .hero-bg .t5 { animation: tour5 9s linear infinite; }
+html.fx .hero-tour.tour-off .hero-bg img[class] { animation: none; }
+html.fx .hero-tour.tour-off .hero-bg .t1 { opacity: 1; transform: scale(1.02); }
+/* 제목은 다른 쪽과 같은 크기(1440×900에서 66px) */
+html.deck .hero h1 { font-size: max(32px, min(4.6vw, 8.4vh, calc(66px * var(--k, 1)))); }
+html.deck .hero .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(20px * var(--k, 1)))); }
+html.deck .hero .btn { min-height: calc(56px * var(--k, 1)); padding: 0 calc(32px * var(--k, 1)); font-size: calc(17px * var(--k, 1)); }
+.hero .eyebrow { --md: 0.25s; }
+/* 제목이 LED 화소로 켜졌다가 글자로 맺힌다(4-3, 대표 결정 11-11). 실제 글은 그동안 투명하게만 두고, 점은 제목 위에 겹친 그림판에 그린다.
+   한 번만 나오고 멈춘다. 버튼은 제목이 다 맺힌 뒤 떠오른다 */
+.hero-px { display: none; }
+html.fx .hero-px { display: block; position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; filter: drop-shadow(0 2px 10px rgba(10, 10, 10, 0.55)); }
+html.fx .hero h1.px .mask > span { opacity: 0; transform: none; transition: none; }
+html.fx .hero h1.px .mask.lit > span { opacity: 1; transition: opacity 0.25s linear; }
+html.fx .hero h1.px .mask.lit.now > span { transition: none; }
+/* 버튼은 제목의 마지막 줄이 글자로 바뀌기 시작할 때 떠오른다(스크립트가 px-done을 붙인다. 처음 열 때도 미리 보이지 않게) */
+html.fx .hero.px-on .hero-actions.rise { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); transition-delay: 0s; }
+html.fx .hero.px-on.px-done .hero-actions.rise { opacity: 1; transform: none; }
+/* 글자가 맺히기 전에 버튼을 감출 때는 움직이지 않고 바로(버튼이 흐릿하게 한 번 비쳤다 사라졌다, 대표 11-12) */
+html.fx .hero.px-on:not(.px-done) .hero-actions.rise { transition: none; }
+
+/* ── 화면 2 소개(4-4): 뒤의 LED 벽에 영문 한 줄이 점 글자로 흐른다(그림판). 앞의 글은 늘 또렷하다 ── */
+html.deck .intro { height: 100%; align-content: center; padding: calc(var(--header-h) + 2vh) var(--gutter) 6vh; }
+html.deck .intro-head .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(20px * var(--k, 1)))); }
+html.deck .intro h2 { font-size: max(26px, min(3.2vw, 6.2vh, calc(46px * var(--k, 1)))); }
+html.deck .intro-text p { font-size: max(15px, min(1.25vw, 2.5vh, calc(18px * var(--k, 1)))); }
+/* 큰 문장은 한 줄씩 올라온다(줄은 스크립트가 나눈다. 휴대폰은 문장 전체가 떠오른다) */
+html.deck .intro h2.rise { opacity: 1; transform: none; }
+html.deck .intro h2 .ln { display: block; overflow: hidden; padding-bottom: 0.08em; }
+html.deck .intro h2 .ln > span { display: block; transform: translateY(108%); transition: transform 1s var(--ease); }
+html.deck .intro.in h2 .ln > span { transform: none; transition-delay: calc(0.62s + var(--li, 0) * 0.12s); }
+
+/* ── 화면 3 ENTERTAINMENT NETWORK(4-5): 네 칸이 모두 보인다. 올린 칸 뒤의 LED가 아래에서 위로 켜지고(그림판), 칸 위쪽 선이 그어지고, 나머지 칸은 45% ── */
+html.deck .rows { display: flex; flex-direction: column; justify-content: center; padding: calc(var(--header-h) + 1vh) var(--gutter) 3vh; }
+html.deck .row-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: clamp(18px, 2.2vw, 44px); margin-top: clamp(14px, 3.6vh, calc(44px * var(--k, 1))); }
+html.deck .row { position: relative; display: block; padding: clamp(14px, 2.8vh, calc(30px * var(--k, 1))) 0 0; }
+html.deck .row::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--paper); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
+html.deck .row.hot::before { transform: scaleX(1); }
+html.deck .row > * { transition: opacity 0.4s; }
+html.deck .row-list.focus .row:not(.hot) > :not(.row-arrow) { opacity: 0.45; }
+html.deck .row-label { font-size: max(14px, min(1.3vw, 2.5vh, calc(19px * var(--k, 1)))); }
+html.deck .row h3 { margin-top: clamp(8px, 1.7vh, 18px); font-size: max(18px, min(1.75vw, 3.3vh, calc(27px * var(--k, 1)))); }
+html.deck .row-body { margin-top: clamp(8px, 1.9vh, 20px); }
+html.deck .row-body p { font-size: max(14px, min(1.15vw, 2.35vh, calc(17px * var(--k, 1)))); line-height: 1.7; }
+html.deck .keywords { gap: 6px; margin-top: clamp(10px, 2.1vh, 20px); }
+html.deck .keywords li { padding: 2px 11px; font-size: max(12px, min(1vw, 2vh, calc(14px * var(--k, 1)))); }
+/* 칸 전체가 숏폼 화면으로 가는 링크다(글 없음, 이름은 aria-label). 올린 칸 아래에 작은 아래 화살표 */
+.row { position: relative; }
+.row-go { position: absolute; inset: 0; z-index: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.row-go:focus { outline: none; }
+.row-go:focus-visible { outline: 1px solid rgba(255, 255, 255, 0.55); outline-offset: 8px; }
+.row-arrow { display: none; }
+html.deck .row-arrow { display: block; position: absolute; left: 0; top: calc(100% + clamp(4px, 1vh, 12px)); width: calc(18px * var(--k, 1)); height: calc(18px * var(--k, 1)); opacity: 0; transform: translateY(-6px); transition: opacity 0.3s, transform 0.5s var(--ease); pointer-events: none; }
+html.deck .row-arrow svg { display: block; width: 100%; height: 100%; }
+html.deck .row.hot .row-arrow { opacity: 1; transform: none; }
+/* 휴대폰·작은 창: 줄마다 화면에 들어오면 글이 떠오른다(4-9). 보이는 동안 꺼지지 않는다 */
+html.fx:not(.deck) .scene.rows .row.rise:not(.on) { opacity: 0; transform: translateY(20px); }
+html.fx:not(.deck) .scene.rows .row.rise.on { opacity: 1; transform: none; transition-delay: 0.1s; }
+
+/* 화면 4: 숏폼 카드 모션은 ent-reel.css(1판 그대로) */
+
+/* ── 화면 5 과정(4-7): 단계 표시는 마름모꼴 LED 무리(5, 13, 25, 41개). 점 간격 12px, 반지름 2.4px × 배율 ── */
+.leds { display: block; width: 120px; height: 120px; overflow: visible; }
+.leds circle { fill: #fff; }
+.leds .cl { transform-box: view-box; transform-origin: 50% 50%; }
+.leds .x { opacity: 0; }
+.leds .x.flash { animation: ledx 0.5s ease-out both; }
+@keyframes ledx { 0% { opacity: 0; } 18% { opacity: 0.9; } 100% { opacity: 0; } }
+.steps::before { top: 60px; }
+html.fx .leds .d { opacity: 0; transform: scale(0.2); transform-box: fill-box; transform-origin: center; transition: opacity 0.16s linear calc(var(--o) * 0.03s), transform 0.3s var(--ease) calc(var(--o) * 0.03s); }
+html.fx .step.on .leds .d { opacity: 1; transform: none; }
+html.fx .step .step-text > * { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.fx .step.on .step-text > * { opacity: 1; transform: none; transition-delay: 0.2s; }
+html.fx .step.on .step-text > :nth-child(2) { transition-delay: 0.28s; }
+html.fx .step.on .step-text > :nth-child(3) { transition-delay: 0.36s; }
+html.fx .steps.snap .step *, html.fx .process.snap .steps::before { transition: none !important; }
+.step { transition: opacity 0.4s; }
+/* 휴대폰 스크롤 반응(설계 12-4, 지시서 015) */
+/* 네 분야: 화면 가운데에 가장 가까운 줄만 또렷하고 나머지 줄은 55% */
+html.fx:not(.deck) .scene.rows .row.rise.on.dim { opacity: 0.55; transition: opacity 0.35s, transform 0.8s var(--ease); }
+/* 과정 LED 무리: 스크롤만큼 가운데 점부터 바깥으로(점마다 늦추지 않는다) */
+html.fx .steps.flowled .step.on .leds .d { transition: opacity 0.12s linear, transform 0.2s var(--ease); transition-delay: 0s; }
+html.fx .steps.flowled .step.on .leds .d:not(.lit) { opacity: 0; transform: scale(0.2); }
+/* 흰 문의 구역: LED 벽이 켜진다. 구역 위에 어두운 판을 깔고 점 모양 구멍이 커져 붙으며 흰 면이 드러난다 */
+html.fx:not(.deck) .scene-end { position: relative; overflow: hidden; overflow: clip; }
+.wallc { display: none; position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; }
+html.fx:not(.deck) .wallc.on { display: block; }
+.steps.focus .step:not(.hot) { opacity: 0.38; }
+/* 표시·가로 선·글 묶음은 제목 아래 남은 높이의 세로 가운데(MCN 과정에서 아래가 비어 보였던 것을 되풀이하지 않는다) */
+html.deck .process { --ob: min(calc(120px * var(--k, 1)), 20vh); display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(16px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 88px); }
+html.deck .process .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
+html.deck .steps { margin-top: 0; align-self: center; }
+html.deck .leds { width: var(--ob); height: var(--ob); }
+html.deck .steps::before { top: calc(var(--ob) / 2); transform: scaleX(0); transform-origin: left; transition: transform 1.44s cubic-bezier(0.65, 0, 0.35, 1) 0.48s; }
+html.deck .process.in .steps::before { transform: none; }
+html.deck .step-name { margin-top: calc(var(--ob) * 0.12); font-size: max(15px, min(1.25vw, 2.4vh, calc(18px * var(--k, 1)))); }
+html.deck .step h3 { font-size: max(17px, min(1.45vw, 2.9vh, calc(21px * var(--k, 1)))); }
+html.deck .step-text p:last-child { font-size: max(14px, min(1.1vw, 2.2vh, calc(16px * var(--k, 1)))); }
+
+/* ── 화면 6 문의(4-8): LED 벽 전체가 켜져 흰 화면이 된다(그림판). 큰 글자·버튼도 배율만큼 ── */
+html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1))); }
+html.deck .cta-row p { font-size: max(20px, min(2vw, 4vh, calc(28.8px * var(--k, 1)))); }
+html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
+
+@media (max-width: 900px) {
+  /* 휴대폰: 정지 시안의 솔잎 표시와 같은 자리·폭(72px) */
+  .leds { width: 72px; height: 72px; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
+  <a class="quick-apply" href="contact.html#apply">빠른 지원하기</a>
+  <button class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu-panel"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h18M3 12h18M3 17.5h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <nav class="nav" aria-label="주 메뉴"><a href="home.html">홈</a><a href="about.html">회사소개</a><a href="mcn.html">MCN</a><a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a><a href="entertainment.html" aria-current="page">엔터테인먼트</a><a href="media.html">미디어</a><a href="partners.html">협력사</a><a href="contact.html">CONTACT</a><a class="btn btn-solid" href="contact.html#apply">지원하기</a></nav>
+</header>
+<nav class="menu-panel" id="menu-panel" aria-label="주 메뉴 (펼침)" hidden>
+  <button class="menu-close" type="button" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <div class="menu-list">
+    <a href="home.html">홈</a>
+    <a href="about.html">회사소개</a>
+    <a href="mcn.html">MCN</a>
+    <a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a>
+    <a href="entertainment.html" aria-current="page">엔터테인먼트</a>
+    <a href="media.html">미디어</a>
+    <a href="partners.html">협력사</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+</nav>
+<main>
+<section class="hero hero-tour scene" data-name="첫 화면">
+  <div class="hero-bg" aria-hidden="true"><img class="t1" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t2" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t3" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t4" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t5" src="../2026-11-10-pages/img/ent-studio.webp" alt=""></div>
+  <p class="eyebrow mq">TALENT. PLATFORMS. INFLUENCE.</p>
+  <h1 data-lines="2">사람의 가능성을 발견하고,<br>플랫폼을 넘어 영향력으로 확장합니다.</h1>
+  <div class="hero-actions rise" style="--i:6"><a class="btn btn-solid" href="contact.html#apply">크리에이터 지원하기</a></div>
+  <button class="scroll-hint" type="button" aria-label="아래 내용으로 이동"><span class="wheel" aria-hidden="true"></span><span class="arrow" aria-hidden="true"></span></button>
+</section>
+<section class="intro scene" id="page-content" data-name="소개">
+  <div class="intro-head"><p class="eyebrow mq">A NEW STAGE FOR EVERY TALENT</p><h2 class="rise" style="--i:1">각자의 개성과 재능은 저마다 다른 방식으로 빛납니다.</h2></div>
+  <div class="intro-text rise" style="--i:5"><p>ASTRA는 개인방송부터 유튜브와 틱톡까지, 아티스트와 크리에이터가 자신에게 맞는 무대와 콘텐츠를 찾도록 함께합니다. 활동 방향 설정부터 콘텐츠 기획·제작, 채널 성장과 브랜드 협업까지 각자의 가능성이 더 큰 영향력으로 이어지도록 지원합니다.</p></div>
+</section>
+<section class="rows scene" data-name="ENTERTAINMENT NETWORK">
+  <h2 class="display section-title mq">ENTERTAINMENT NETWORK</h2>
+  <div class="row-list"><article class="row rise" style="--i:3"><p class="row-label"><i>01 —</i> PERSONAL BROADCASTING</p><h3>개인의 매력을 방송만의 색으로 만듭니다.</h3><div class="row-body"><p>방송인의 개성과 강점을 살펴 활동 방향과 방송 콘셉트를 설정합니다. 안정적인 방송 운영과 지속적인 콘텐츠 활동을 통해 시청자와의 관계를 넓혀갑니다.</p><ul class="keywords"><li>방송인 발굴</li><li>방송 콘셉트</li><li>활동 방향</li><li>방송 운영</li><li>팬 커뮤니케이션</li></ul></div><a class="row-go" href="#reel" data-field="0" aria-label="PERSONAL BROADCASTING 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article><article class="row rise" style="--i:4"><p class="row-label"><i>02 —</i> YOUTUBE</p><h3>채널의 개성을 콘텐츠와 성장으로 연결합니다.</h3><div class="row-body"><p>채널의 정체성과 시청자에 맞는 콘텐츠를 기획하고 제작합니다. 반복해서 찾고 싶은 콘텐츠와 일관된 채널 이미지를 만들어 지속적인 성장을 돕습니다.</p><ul class="keywords"><li>채널 브랜딩</li><li>콘텐츠 기획</li><li>영상 제작</li><li>시리즈 개발</li><li>채널 성장</li></ul></div><a class="row-go" href="#reel" data-field="1" aria-label="YOUTUBE 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article><article class="row rise" style="--i:5"><p class="row-label"><i>03 —</i> TIKTOK</p><h3>짧은 순간에 크리에이터의 매력을 선명하게 담습니다.</h3><div class="row-body"><p>크리에이터의 개성과 플랫폼의 흐름을 반영해 숏폼 콘텐츠를 기획합니다. 트렌드에 맞는 콘텐츠 형식과 운영 방향을 찾아 더 많은 사람과 만날 기회를 넓힙니다.</p><ul class="keywords"><li>숏폼 콘텐츠</li><li>포맷 기획</li><li>트렌드 콘텐츠</li><li>채널 운영</li><li>캠페인</li></ul></div><a class="row-go" href="#reel" data-field="2" aria-label="TIKTOK 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article><article class="row rise" style="--i:6"><p class="row-label"><i>04 —</i> INFLUENCER</p><h3>영향력과 브랜드의 만남을 기획합니다.</h3><div class="row-body"><p>인플루언서의 이미지와 활동 분야에 맞는 브랜드 협업과 캠페인을 연결합니다. 크리에이터와 브랜드의 이야기가 자연스럽게 전해지는 콘텐츠를 함께 만듭니다.</p><ul class="keywords"><li>인플루언서 발굴</li><li>매니지먼트</li><li>브랜드 협업</li><li>캠페인 기획</li><li>콘텐츠 제작</li></ul></div><a class="row-go" href="#reel" data-field="3" aria-label="INFLUENCER 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article></div>
+</section>
+<section class="reel scene" id="reel" data-name="숏폼" aria-label="숏폼 영상" data-open-img="img/ent-reel-space.webp">
+  <div class="reel-grid" id="reel-grid" aria-hidden="true"></div>
+  <div class="reel-rows" aria-hidden="true"><div class="reel-row"></div><div class="reel-row"></div><div class="reel-row"></div></div>
+  <div class="reel-vignette" aria-hidden="true"></div>
+  <div class="reel-stage" id="reel-stage"></div>
+  <div class="reel-copy" id="reel-copy" aria-live="off"><p class="reel-title"><span></span></p><p class="reel-sub"><span></span></p></div>
+  <div class="reel-end" aria-hidden="true">
+    <p class="big"><b>TALENT.</b> <b>PLATFORMS.</b> <b>INFLUENCE.</b></p>
+    <p class="ko">사람의 가능성을 발견하고, 플랫폼을 넘어 영향력으로 확장합니다.</p>
+    <img src="../2026-11-10-pages/img/logo-mark-white.webp" alt="" width="54" height="49">
+  </div>
+  <div class="reel-segs" id="reel-segs" role="group" aria-label="분야 고르기"></div>
+</section>
+<section class="process scene" data-name="FROM TALENT TO INFLUENCE">
+  <h2 class="display section-title mq">FROM TALENT TO INFLUENCE</h2>
+  <ol class="steps"><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">DISCOVER</p><h3>가능성과 개성을 발견합니다.</h3><p>각자의 재능과 강점, 활동 목표를 살펴봅니다.</p></div></li><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">POSITION</p><h3>나만의 무대와 방향을 찾습니다.</h3><p>방송과 채널의 정체성, 콘텐츠 방향을 구체화합니다.</p></div></li><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">CREATE</p><h3>아이디어를 콘텐츠로 만듭니다.</h3><p>플랫폼과 크리에이터의 특성에 맞는 콘텐츠를 기획하고 제작합니다.</p></div></li><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">EXPAND</p><h3>더 넓은 기회와 영향력으로 연결합니다.</h3><p>채널 성장과 팬덤, 브랜드 협업을 통해 활동 영역을 확장합니다.</p></div></li></ol>
+</section>
+<div class="scene scene-end" data-name="문의" data-light>
+<section class="cta">
+  <p class="display" data-words>WE MAKE NEXT.</p>
+  <div class="cta-row rise" style="--i:3"><p>당신의 재능을 들려주세요. 맞는 무대를 함께 찾습니다.</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#apply">크리에이터 지원하기</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
+</section>
+<footer class="site-footer">
+  <div>
+    <img class="footer-logo" src="../2026-11-10-pages/img/logo-astra.webp" alt="ASTRA ENTERTAINMENT" width="87" height="81">
+    <p class="slot">사업자 정보 자리 (상호, 대표자, 사업자번호, 주소, 전화, 이메일)</p>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+    <p class="slot">인스타그램 링크 자리</p>
+  </div>
+</footer>
+</div>
+</main>
+<canvas class="led" aria-hidden="true"></canvas>
+<div class="fab-anchor">
+  <div class="fab">
+    <ul class="fab-menu" id="fab-menu">
+      <li><a href="#">카카오톡 상담</a></li>
+      <li><a href="#">인스타그램</a></li>
+      <li><a href="#">블로그</a></li>
+      <li><a class="main" href="contact.html#apply">지원하기</a></li>
+    </ul>
+    <button class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="상담·지원 바로가기 열기">
+      <svg class="talk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10.5H10.5L6 19.5V16H4z"/><path d="M8.5 10.8h.01M12 10.8h.01M15.5 10.8h.01" stroke-width="2.2"/></svg>
+      <svg class="x" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+</div>
+<script src="deck.js"></script>
+<script src="ent-reel.js"></script>
+<script>
+/* 엔터테인먼트 2판 — LED 무대(설계 4절). 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js), 숏폼 카드 모션은 ent-reel.js(1판 그대로).
+   이 쪽이 하는 일: LED 점 층(마우스 둘레가 켜짐, 쉬면 빛 하나가 돎), 전광판 글자, 소개 뒤 흐르는 점 글자, 네 분야 세로 무대와 칸 누르기,
+   과정 LED 무리, 과정 → 문의 LED 벽 넘김. 값은 README.md */
+(function () {
+  var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim;
+  var HERO = 0, INTRO = 1, NET = 2, REEL = 3, PROC = 4, END = 5;
+  var scenes = $$('.scene');
+  var hero = scenes[HERO], intro = scenes[INTRO], net = scenes[NET], reelSc = scenes[REEL], proc = scenes[PROC], endScene = scenes[END];
+  var header = $('.site-header');
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var lag = function (dt, tau) { return 1 - Math.exp(-dt / tau); };
+  var easeOut = function (u) { return 1 - Math.pow(1 - u, 3); };
+  var easeInOut = function (u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+  var now = function () { return performance.now(); };
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var K = function () { return D.k || 1; };
+  var rnd = function (i, k) { var v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
+  var timers = {};
+  function later(name, fn, ms) { (timers[name] = timers[name] || []).push(setTimeout(fn, ms)); }
+  function clearT(name) { (timers[name] || []).forEach(clearTimeout); timers[name] = []; }
+  function snap(el, fn) { el.classList.add('snap'); fn(); void el.offsetWidth; el.classList.remove('snap'); }
+
+  /* ───────── 4-2. 전광판 글자: 글자마다 감싼다(글자는 그대로). 순서는 낱말 안에서 무작위, 낱말은 왼쪽부터. 한 줄 0.7초 ───────── */
+  $$('.mq').forEach(function (el, n) {
+    var words = el.textContent.trim().split(' '), span = 0.7 - 0.27;
+    el.innerHTML = words.map(function (w, wi) {
+      return w.split('').map(function (ch, ci) {
+        var d = span * (wi + rnd(n * 31 + wi, ci + 1)) / words.length;
+        return '<span class="c" style="--fd:' + d.toFixed(3) + 's">' + ch + '</span>';
+      }).join('');
+    }).join(' ');
+  });
+
+  /* ───────── 화면 1: 스튜디오 둘러보기(1판) ───────── */
+  function tour(on) { hero.classList.toggle('tour-off', !on); }
+
+  /* ───────── 화면 1 제목: LED 화소로 켜졌다가 또렷한 글자로 맺힌다(4-3, 한 번만) ─────────
+     글자마다 실제 자리를 재서 보이지 않는 그림판에 같은 글꼴로 그리고, 점 간격 칸마다 글자가 덮은 넓이를 읽어 점을 만든다.
+     PC: 굵은 점(간격 = 글자 크기의 21%)이 왼쪽부터 0.35초에 켜짐 → 0.8초 동안 두 번 쪼개짐(1/2, 1/4, 단계마다 0.25초 겹침) → 0.25초에 실제 글자로.
+     줄마다, 둘째 줄은 0.18초 늦게. 휴대폰은 한 번만 쪼개지고 0.9초 */
+  var h1 = $('h1', hero), pxMasks = [], pxCv = document.createElement('canvas'), pc = pxCv.getContext('2d');
+  pxCv.className = 'hero-px'; pxCv.setAttribute('aria-hidden', 'true'); hero.appendChild(pxCv);
+  var PXT = {
+    pc: { delay: 800, lag: 180, reveal: 350, splits: [[450, 700], [850, 1100]], fade: [1150, 1400], ks: [1, 0.5, 0.25] },
+    mobile: { delay: 500, lag: 120, reveal: 300, splits: [[330, 580]], fade: [650, 900], ks: [1, 0.5] }
+  };
+  var PX = { run: 0, t0: 0, T: null, levels: null, rows: null, ox: 0, oy: 0, fontOK: false, raf: 0 };
+  if (!reduce) { h1.classList.add('px'); hero.classList.add('px-on'); }
+  var pxFont = (document.fonts && document.fonts.load) ? document.fonts.load('500 66px "Noto Serif KR"', h1.textContent).then(function () { PX.fontOK = true; }, function () { PX.fontOK = true; }) : (PX.fontOK = true, null);
+  function pxLit(on, instant) { pxMasks.forEach(function (m) { m.classList.toggle('lit', on); m.classList.toggle('now', !!instant); }); hero.classList.toggle('px-done', on); }
+  function pxStop() { PX.run++; cancelAnimationFrame(PX.raf); pc.setTransform(1, 0, 0, 1, 0, 0); pc.clearRect(0, 0, pxCv.width, pxCv.height); pxCv.style.visibility = 'hidden'; }
+  function pxReset() { pxStop(); pxLit(false); }
+  function pxShow() { pxStop(); pxLit(true, true); }
+  function smooth(u) { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); }
+  function pxBuild(T) {
+    var cs = getComputedStyle(h1), fs = parseFloat(cs.fontSize), s0 = fs * 0.21;
+    var font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily;
+    var hb = hero.getBoundingClientRect(), hr = h1.getBoundingClientRect(), pad = Math.ceil(s0);
+    var cw = Math.ceil(hr.width + pad * 2), ch = Math.ceil(hr.height + pad * 2), ox = hr.left - pad, oy = hr.top - pad;
+    // 글자마다 자리(화면에 실제로 놓인 곳)를 재서 줄(보이는 줄)로 묶는다
+    var rng = document.createRange(), rows = [];
+    pxMasks.forEach(function (m, li) {
+      var w = document.createTreeWalker(m, NodeFilter.SHOW_TEXT), node;
+      while ((node = w.nextNode())) {
+        for (var i = 0; i < node.data.length; i++) {
+          if (/\s/.test(node.data[i])) continue;
+          rng.setStart(node, i); rng.setEnd(node, i + 1);
+          var r = rng.getBoundingClientRect(); if (!r.width) continue;
+          var row = null;
+          for (var k = 0; k < rows.length; k++) if (rows[k].li === li && Math.abs(rows[k].top - r.top) < fs * 0.5) { row = rows[k]; break; }
+          if (!row) { row = { li: li, top: r.top, bottom: r.bottom, left: r.left, right: r.right, ch: [] }; rows.push(row); }
+          row.left = Math.min(row.left, r.left); row.right = Math.max(row.right, r.right); row.bottom = Math.max(row.bottom, r.bottom);
+          row.ch.push({ c: node.data[i], x: r.left, y: r.top });
+        }
+      }
+    });
+    // 보이지 않는 그림판(2배)에 같은 글꼴로 글자마다 그 자리에 그린다
+    var q = 2, c = document.createElement('canvas'), x = c.getContext('2d');
+    c.width = cw * q; c.height = ch * q;
+    x.scale(q, q); x.font = font; x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
+    var mt = x.measureText('가'), asc = mt.fontBoundingBoxAscent || fs * 1.16;
+    rows.forEach(function (row) { row.ch.forEach(function (o) { x.fillText(o.c, o.x - ox, o.y - oy + asc); }); });
+    var d = x.getImageData(0, 0, c.width, c.height).data, iw = c.width + 1, sat = new Float32Array(iw * (c.height + 1));
+    for (var yy = 0; yy < c.height; yy++) {
+      var run = 0;
+      for (var xx = 0; xx < c.width; xx++) { run += d[(yy * c.width + xx) * 4 + 3] / 255; sat[(yy + 1) * iw + xx + 1] = sat[yy * iw + xx + 1] + run; }
+    }
+    function area(x0, y0, x1, y1) {
+      x0 = clamp(Math.round(x0 * q), 0, c.width); x1 = clamp(Math.round(x1 * q), 0, c.width); y0 = clamp(Math.round(y0 * q), 0, c.height); y1 = clamp(Math.round(y1 * q), 0, c.height);
+      var n = (x1 - x0) * (y1 - y0); if (n <= 0) return 0;
+      return (sat[y1 * iw + x1] - sat[y0 * iw + x1] - sat[y1 * iw + x0] + sat[y0 * iw + x0]) / n;
+    }
+    // 단계마다 점 격자. 칸을 글자가 덮은 넓이로 점을 켠다. 가장 굵은 단계는 켜짐·꺼짐만(멀리서 본 LED 글자처럼 거칠게)
+    var levels = T.ks.map(function (kk, li) {
+      var sp = s0 * kk, dots = [], first = li === 0;
+      for (var gy = sp / 2; gy < ch; gy += sp) for (var gx = sp / 2; gx < cw; gx += sp) {
+        var a = area(gx - sp / 2, gy - sp / 2, gx + sp / 2, gy + sp / 2);
+        if (a < (first ? 0.2 : 0.12)) continue;
+        var ry = gy + oy, ri = 0, best = 1e9;
+        rows.forEach(function (row, k) { var m = ry < row.top ? row.top - ry : ry > row.bottom ? ry - row.bottom : 0; if (m < best) { best = m; ri = k; } });
+        var row = rows[ri], u = (gx + ox - row.left) / Math.max(1, row.right - row.left);
+        dots.push(gx, gy, first ? 1 : Math.min(1, a * 2.6), ri, clamp(u, 0, 1));
+      }
+      return { r: sp * 0.36, dots: dots };
+    });
+    var dpr2 = Math.min(window.devicePixelRatio || 1, 2);
+    pxCv.width = Math.round(cw * dpr2); pxCv.height = Math.round(ch * dpr2);
+    pxCv.style.width = cw + 'px'; pxCv.style.height = ch + 'px';
+    pxCv.style.transform = 'translate(' + (ox - hb.left).toFixed(1) + 'px,' + (oy - hb.top).toFixed(1) + 'px)';
+    PX.levels = levels; PX.rows = rows; PX.dpr = dpr2;
+  }
+  // 단계 k의 세기: 들어와서(0단계는 왼쪽부터 켜짐) 다음 단계가 들어오는 동안 빠지고, 마지막 단계는 실제 글자가 나오는 동안 빠진다
+  //   겹쳐 바뀔 때 새 단계가 먼저 다 켜지고(구간의 앞 60%) 앞 단계가 늦게 빠진다(뒤 60%). 둘이 같이 반쯤 흐려져 제목이 어두워 보이지 않게
+  function pxLevelA(T, k, u) {
+    var w;
+    var a = k === 0 ? 1 : (w = T.splits[k - 1], smooth((u - w[0]) / ((w[1] - w[0]) * 0.6)));
+    var out = k < T.splits.length ? (w = T.splits[k], smooth((u - w[0] - (w[1] - w[0]) * 0.4) / ((w[1] - w[0]) * 0.6))) : clamp((u - T.fade[0]) / (T.fade[1] - T.fade[0]), 0, 1);
+    return a * (1 - out);
+  }
+  var BK = 10, buckets = [];
+  function pxFrame(id) {
+    if (id !== PX.run) return;
+    while (buckets.length <= BK) buckets.push([]);
+    var T = PX.T, t = now() - PX.t0, done = true;
+    var lineU = pxMasks.map(function (m, li) { return t - li * T.lag; });
+    lineU.forEach(function (u, li) {
+      if (u < T.fade[1] + 40) done = false;
+      if (u >= T.fade[0] && !pxMasks[li].classList.contains('lit')) { pxMasks[li].classList.add('lit'); pxMasks[li].classList.remove('now'); }
+    });
+    if (pxMasks.every(function (m) { return m.classList.contains('lit'); })) hero.classList.add('px-done');
+    pc.setTransform(PX.dpr, 0, 0, PX.dpr, 0, 0);
+    pc.clearRect(0, 0, pxCv.width, pxCv.height);
+    pc.fillStyle = '#fff';
+    PX.levels.forEach(function (L, k) {
+      var dots = L.dots, j, n;
+      for (j = 0; j <= BK; j++) buckets[j].length = 0;
+      for (n = 0; n < dots.length; n += 5) {
+        var u = lineU[PX.rows[dots[n + 3]].li];
+        if (u <= 0) continue;
+        var la = pxLevelA(T, k, u);
+        if (k === 0) la *= clamp((u / T.reveal - dots[n + 4] * 0.85) / 0.15, 0, 1);
+        var a = la * dots[n + 2];
+        if (a < 0.03) continue;
+        buckets[Math.round(a * BK)].push(dots[n], dots[n + 1]);
+      }
+      for (j = 1; j <= BK; j++) {
+        var b = buckets[j]; if (!b.length) continue;
+        pc.globalAlpha = j / BK; pc.beginPath();
+        for (n = 0; n < b.length; n += 2) { pc.moveTo(b[n] + L.r, b[n + 1]); pc.arc(b[n], b[n + 1], L.r, 0, 6.2832); }
+        pc.fill();
+      }
+    });
+    pc.globalAlpha = 1;
+    if (done) { pxStop(); pxLit(true); return; }
+    PX.raf = requestAnimationFrame(function () { pxFrame(id); });
+  }
+  function pxPlay(mobile) {
+    if (reduce) return;
+    pxMasks = $$('.mask', h1);
+    pxReset();
+    var id = PX.run, T = PX.T = mobile ? PXT.mobile : PXT.pc, at = now();
+    function go() {
+      if (id !== PX.run) return;
+      try { pxBuild(T); } catch (e) { pxShow(); return; }
+      PX.t0 = at + T.delay; pxCv.style.visibility = '';
+      PX.raf = requestAnimationFrame(function () { pxFrame(id); });
+    }
+    if (PX.fontOK || !pxFont) go();
+    else {
+      // 글꼴이 늦으면 2.5초까지 기다리고, 그래도 없으면 글을 그냥 보인다
+      var giveUp = setTimeout(function () { if (id === PX.run) pxShow(); }, 2500);
+      pxFont.then(function () { clearTimeout(giveUp); if (id === PX.run) { at = Math.max(at, now() - T.delay + 200); go(); } });
+    }
+  }
+
+  /* ───────── 화면 2: 큰 문장을 줄마다 나눈다(한 화면씩 넘길 때만. 휴대폰은 문장 전체가 떠오른다) ───────── */
+  var introH = $('.intro h2'), introText = introH.textContent;
+  function splitIntro() {
+    if (!D.on || reduce) { if (introH.querySelector('.ln')) introH.textContent = introText; return; }
+    introH.innerHTML = introText.split(' ').map(function (w) { return '<span class="wq">' + w + '</span>'; }).join(' ');
+    var lines = [], top = null;
+    $$('.wq', introH).forEach(function (s) { var t = s.offsetTop; if (top === null || Math.abs(t - top) > 4) { lines.push([]); top = t; } lines[lines.length - 1].push(s.textContent); });
+    introH.innerHTML = lines.map(function (l, i) { return '<span class="ln" style="--li:' + i + '"><span>' + l.join(' ') + '</span></span>'; }).join(' ');
+  }
+
+  /* ───────── 화면 3: 네 분야. 칸에 올리거나 Tab으로 고르면 그 칸이 "무대"가 되고, 누르면 숏폼 화면이 그 분야부터 돈다 ───────── */
+  var rowList = $('.row-list'), rowEls = $$('.row'), NETS = { hot: -1 }, pendingField = null;
+  var cols = rowEls.map(function () { return { v: 0, front: 0, fs: 0, fe: 0 }; });
+  function setHot(i) {
+    if (NETS.hot === i) return;
+    NETS.hot = i;
+    rowEls.forEach(function (r, k) { r.classList.toggle('hot', k === i); });
+    rowList.classList.toggle('focus', i >= 0);
+  }
+  rowEls.forEach(function (r, i) {
+    r.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && D.on) setHot(i); });
+    r.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && NETS.hot === i && !r.contains(document.activeElement)) setHot(-1); });
+    r.addEventListener('focusin', function () { if (D.on) setHot(i); });
+    r.addEventListener('focusout', function () { if (NETS.hot === i) setHot(-1); });
+  });
+  $$('.row-go').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var k = Number(a.getAttribute('data-field'));
+      pendingField = k;
+      if (D.on) return; // 한 화면씩 넘길 때는 공통 틀이 #reel 화면으로 넘긴다. 들어갈 때 그 분야부터 돈다
+      e.preventDefault();
+      window.scrollTo({ top: reelSc.getBoundingClientRect().top + window.pageYOffset - header.offsetHeight, behavior: reduce ? 'auto' : 'smooth' });
+      if (window.EntReel && EntReel.running()) { EntReel.start(k); pendingField = null; }
+    });
+  });
+  // 들어올 때: 네 칸의 LED가 왼쪽부터 0.12초 간격으로 한 번 켜졌다(0.35초) 꺼진다
+  function netFlash(t0) { cols.forEach(function (c, i) { c.fs = t0 + 300 + i * 120; c.fe = c.fs + 350; }); }
+  function netReset() { setHot(-1); cols.forEach(function (c) { c.v = c.front = 0; c.fs = c.fe = 0; }); }
+
+  /* ───────── 화면 4: 숏폼 ───────── */
+  function reelStart() { var k = pendingField; pendingField = null; EntReel.start(k); }
+
+  /* ───────── 4-7. 과정: 마름모꼴 LED 무리. 바깥 한 겹(.x)은 올렸을 때만 켜졌다 꺼진다 ───────── */
+  var stepList = $('.steps'), stepEls = $$('.step');
+  var CL = stepEls.map(function (s, i) {
+    var svg = $('.leds', s), n = i + 1, pts = [], dots = '', extra = '', o = 0;
+    for (var x = -n - 1; x <= n + 1; x++) for (var y = -n - 1; y <= n + 1; y++) {
+      var m = Math.abs(x) + Math.abs(y);
+      if (m <= n + 1) pts.push({ x: x, y: y, m: m, a: Math.atan2(y, x) });
+    }
+    pts.sort(function (a, b) { return a.m - b.m || a.a - b.a; });
+    pts.forEach(function (p) {
+      var c = '<circle cx="' + p.x * 12 + '" cy="' + p.y * 12 + '" r="2.4"';
+      if (p.m <= n) dots += c + ' class="d" style="--o:' + (o++) + '"/>'; else extra += c + '/>';
+    });
+    svg.innerHTML = '<g class="cl"><g class="dots">' + dots + '</g><g class="x">' + extra + '</g></g>';
+    return { svg: svg, cl: $('.cl', svg), x: $('.x', svg), p: 0, hot: false, next: 0 };
+  });
+  function flash(i) { var x = CL[i].x; x.classList.remove('flash'); void x.getBoundingClientRect(); x.classList.add('flash'); }
+  function procReset() {
+    clearT('proc');
+    snap(stepList, function () { stepEls.forEach(function (s) { s.classList.remove('on', 'hot'); }); });
+    stepList.classList.remove('focus');
+    CL.forEach(function (c) { c.hot = false; c.x.classList.remove('flash'); });
+  }
+  // 들어올 때: 0.48초 뒤부터 0.36초 간격으로 한 단계씩, 가운데 점부터 바깥으로 0.03초 간격. 가로 선은 1.44초에 찬다
+  function procPlay(instant) {
+    procReset();
+    if (instant) { snap(proc, function () { proc.classList.add('in'); snap(stepList, function () { stepEls.forEach(function (s) { s.classList.add('on'); }); }); }); return; }
+    stepEls.forEach(function (s, i) { later('proc', function () { s.classList.add('on'); }, 480 + i * 360); });
+  }
+  function clCenter(i) { var b = CL[i].svg.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }
+  // 마우스가 표시에서 260px 안이면 그 무리가 밝아지고 커진다(72% → 100%, 최대 1.15배). 올려 두면 바깥 한 겹이 1.2초마다 켜졌다 0.5초에 꺼지고, 나머지 단계는 38%
+  function procFrame(t, dt) {
+    var live = D.on && D.cur === PROC && !D.trans, M = D.mouse, k = K();
+    CL.forEach(function (c, i) {
+      var want = 0;
+      if (live && fine && M.at && t - M.at < 4000) { var q = clCenter(i); want = clamp(1 - Math.hypot(M.x - q.x, M.y - q.y) / (260 * k), 0, 1); }
+      c.p += (want - c.p) * lag(dt, 0.25);
+      c.cl.style.transform = 'scale(' + (1 + 0.15 * c.p).toFixed(4) + ')';
+      c.cl.style.opacity = (0.72 + 0.28 * c.p).toFixed(3);
+      if (c.hot && live && t >= c.next) { c.next = t + 1200; flash(i); }
+    });
+  }
+  stepEls.forEach(function (s, i) {
+    s.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse' || !D.on) return;
+      CL[i].hot = true; CL[i].next = 0; s.classList.add('hot'); stepList.classList.add('focus');
+    });
+    s.addEventListener('pointerleave', function () { CL[i].hot = false; s.classList.remove('hot'); if (!CL.some(function (c) { return c.hot; })) stepList.classList.remove('focus'); });
+    // 휴대폰: 누르면 한 겹 더 켜진다
+    s.addEventListener('click', function () { if (!D.on) flash(i); });
+  });
+  function clStyle(on) { CL.forEach(function (c) { c.p = 0; c.cl.style.transform = ''; c.cl.style.opacity = on ? '0.72' : ''; }); }
+
+  /* ───────── 4-1. LED 점 층 ─────────
+     점: 22px 간격(배율을 따름), 반지름 1px, 꺼진 점 4%. 마우스 둘레(창 가로 10.5%) 안의 점이 켜진다(가운데 60%, 반지름 2.2px까지), 지나가면 0.7초에 꺼진다.
+     2.5초 쉬면 같은 빛이 세기 40%로 화면 가운데 둘레를 28초에 한 바퀴. 첫 화면은 꺼진 점 없이 45%, 숏폼은 감춤, 흰 화면은 검정 14%.
+     꺼진 점 격자는 그림 하나로 그려 두고 매 화면에 한 번 붙인다. 켜진 점만 하나씩 그린다(밝기가 같은 것끼리 한 번에). */
+  var led = $('.led'), g = led.getContext('2d'), dpr = 1, W = 0, H = 0, S = 22, NC = 0, NR = 0, OX = 0, OYD = 0, rowBase = 0;
+  var offW = document.createElement('canvas'), offB = document.createElement('canvas');
+  var Mv = new Float32Array(0), Vv = new Float32Array(0), LT = new Uint8Array(0), ZA = new Float32Array(0), ZI = new Int8Array(0);
+  // 화면마다: 꺼진 점 밝기(흰·검정), 마우스 빛 가운데 밝기, 검은 점인지
+  // 첫 화면은 점을 그리지 않는다(대표 결정 11-11: 배경 영상 위에서 거의 보이지 않았다. 대신 제목이 LED 화소로 맺힌다)
+  var OFFW = [0, 0.04, 0.04, 0, 0.04, 0], OFFB = [0, 0, 0, 0, 0, 0.04], AMP = [0, 0.6, 0.6, 0, 0.6, 0.14];
+  function ledSize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    W = window.innerWidth; H = window.innerHeight; S = 22 * K();
+    led.width = Math.round(W * dpr); led.height = Math.round(H * dpr);
+    NC = Math.floor(W / S); OX = (W - NC * S) / 2 + S / 2;
+    if (D.on) { NR = Math.floor(H / S); OYD = (H - NR * S) / 2 + S / 2; }
+    else { NR = Math.ceil(H / S) + 2; rowBase = Math.floor(window.pageYOffset / S); }
+    var n = NC * NR;
+    Mv = new Float32Array(n); Vv = new Float32Array(n); LT = new Uint8Array(n); ZA = new Float32Array(NR); ZI = new Int8Array(NR);
+    [[offW, '#fff'], [offB, '#000']].forEach(function (o) {
+      var c = o[0], x = c.getContext('2d');
+      c.width = Math.round(W * dpr); c.height = Math.round((NR + 1) * S * dpr);
+      x.setTransform(dpr, 0, 0, dpr, 0, 0); x.fillStyle = o[1]; x.beginPath();
+      for (var r = 0; r <= NR; r++) for (var q = 0; q < NC; q++) { var px = OX + q * S, py = S / 2 + r * S; x.moveTo(px + K(), py); x.arc(px, py, K(), 0, Math.PI * 2); }
+      x.fill();
+    });
+    letters.rows = 0;
+  }
+  // 스크롤하는 화면에서는 점이 쪽에 붙어 같이 움직인다. 줄이 바뀌면 남아 있던 빛도 같이 옮긴다
+  function shiftRows(d) {
+    if (!d) return;
+    if (Math.abs(d) >= NR) { Mv.fill(0); return; }
+    if (d > 0) { Mv.copyWithin(0, d * NC); Mv.fill(0, (NR - d) * NC); } else { Mv.copyWithin(-d * NC, 0, (NR + d) * NC); Mv.fill(0, 0, -d * NC); }
+  }
+
+  // 마우스·손가락 자리(손가락은 대고 있는 동안만)
+  var ptr = { x: -9999, y: -9999, at: 0, down: false, touch: false };
+  function setPtr(x, y, touch) { ptr.x = x; ptr.y = y; ptr.at = now(); ptr.touch = touch; }
+  window.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || ptr.down) setPtr(e.clientX, e.clientY, e.pointerType !== 'mouse'); }, { passive: true });
+  window.addEventListener('pointerdown', function (e) { ptr.down = e.pointerType !== 'mouse'; setPtr(e.clientX, e.clientY, ptr.down); }, { passive: true });
+  ['pointerup', 'pointercancel'].forEach(function (n) { window.addEventListener(n, function () { ptr.down = false; }, { passive: true }); });
+  window.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) setPtr(t.clientX, t.clientY, true); }, { passive: true });
+  window.addEventListener('touchend', function () { ptr.down = false; }, { passive: true });
+
+  // 빛 하나: 마우스가 움직이면 마우스 자리, 2.5초 쉬면 화면 가운데 둘레를 도는 자리로 옮겨 간다(한 화면씩 넘길 때만)
+  var L = { x: 0, y: 0, s: 0, idle: false }, killAt = 0, wasTrans = false;
+
+  // 4-4. 점 글자: 글꼴을 작은 그림판에 그린 뒤 점 격자 칸마다 채워졌는지를 읽는다
+  var WALL_TEXT = 'A NEW STAGE FOR EVERY TALENT', letters = { rows: 0, cols: 0, bits: null, period: 0 }, introAt = 0, fontOK = false;
+  function buildLetters(rows) {
+    var q = 4, c = document.createElement('canvas'), x = c.getContext('2d'), font = '700 100px "Bodoni Moda", serif';
+    x.font = font;
+    var asc = x.measureText('ANEWSTGFORVYL').actualBoundingBoxAscent || 70;
+    var fs = 100 * rows * q / asc;
+    x.font = '700 ' + fs.toFixed(1) + 'px "Bodoni Moda", serif';
+    if ('letterSpacing' in x) x.letterSpacing = (fs * 0.14).toFixed(1) + 'px';
+    var tw = Math.ceil(x.measureText(WALL_TEXT).width / q) + 2;
+    c.width = tw * q; c.height = rows * q;
+    x.font = '700 ' + fs.toFixed(1) + 'px "Bodoni Moda", serif';
+    if ('letterSpacing' in x) x.letterSpacing = (fs * 0.14).toFixed(1) + 'px';
+    x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
+    x.fillText(WALL_TEXT, q, rows * q);
+    var data = x.getImageData(0, 0, c.width, c.height).data, bits = new Uint8Array(tw * rows);
+    for (var r = 0; r < rows; r++) for (var cc = 0; cc < tw; cc++) {
+      var sum = 0;
+      for (var yy = 0; yy < q; yy++) for (var xx = 0; xx < q; xx++) sum += data[((r * q + yy) * c.width + cc * q + xx) * 4 + 3];
+      bits[r * tw + cc] = sum / (q * q * 255) > 0.38 ? 1 : 0;
+    }
+    letters = { rows: rows, cols: tw, bits: bits, period: tw + Math.max(12, Math.round(NC * 0.35)) };
+  }
+
+  // 4-8. 넘김 5 → 6: 화면 전체의 LED 점이 EXPAND 표시에서 가까운 순서로 켜지며 커진다(점마다 0.35초에 반지름 1px → 간격의 0.75배, 끝에 닿는 데 0.75초, 모두 1.1초)
+  var WL = null;
+  function wall(back) {
+    var c = clCenter(3), f = $('.site-footer', endScene).getBoundingClientRect();
+    WL = { t0: now(), back: back, cx: c.x, cy: c.y, ft: f.top, dmax: Math.max(Math.hypot(c.x, c.y), Math.hypot(W - c.x, c.y), Math.hypot(c.x, H - c.y), Math.hypot(W - c.x, H - c.y)) };
+    var anims = [];
+    if (back) anims.push(anim(endScene, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-out', fill: 'both' }));
+    return { dur: 1100, anims: anims, light: back ? 420 : 700, enter: back ? 380 : 900 };
+  }
+  function drawWall(t) {
+    var e = (t - WL.t0) / 1000, tt = WL.back ? 1.1 - e : e, buckets = [], i, q;
+    g.save(); g.beginPath(); g.rect(0, 0, W, WL.ft); g.clip();
+    if (tt >= 1.1) { g.fillStyle = '#fff'; g.fillRect(0, 0, W, WL.ft); g.restore(); return; }
+    for (var r = -1; r <= NR; r++) for (var cc = -1; cc <= NC; cc++) {
+      var x = OX + cc * S, y = OYD + r * S;
+      if (y - S > WL.ft) continue;
+      var p = clamp((tt - 0.75 * Math.hypot(x - WL.cx, y - WL.cy) / WL.dmax) / 0.35, 0, 1);
+      if (p <= 0) continue;
+      q = Math.round(p * 40);
+      (buckets[q] = buckets[q] || []).push(x, y);
+    }
+    g.fillStyle = '#fff';
+    for (q = 0; q <= 40; q++) {
+      var b = buckets[q]; if (!b) continue;
+      var rad = Math.max(1, (1 + (0.75 * S - 1) * easeInOut(q / 40)));
+      g.beginPath();
+      for (i = 0; i < b.length; i += 2) { g.moveTo(b[i] + rad, b[i + 1]); g.arc(b[i], b[i + 1], rad, 0, Math.PI * 2); }
+      g.fill();
+    }
+    g.restore();
+  }
+
+  // 스크롤하는 화면: 그 높이에 있는 구역(첫 화면·소개·네 분야·과정만 빛이 켜진다. 숏폼과 흰 문의는 그리지 않는다)
+  var rects = [];
+  function zoneOf(y) { for (var i = 0; i < rects.length; i++) if (y >= rects[i].top && y < rects[i].bottom) return i; return -1; }
+
+  var buckets = [];
+  function ledFrame(t, dt) {
+    var deck = D.on, tr = deck ? D.trans : null, k = K(), i, r, c, n;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, H);
+    // 줄의 시작 높이
+    var oy;
+    if (deck) oy = OYD;
+    else {
+      var base = Math.floor(window.pageYOffset / S);
+      if (base !== rowBase) { shiftRows(base - rowBase); rowBase = base; }
+      oy = S / 2 - (window.pageYOffset - base * S);
+      rects = scenes.map(function (s) { return s.getBoundingClientRect(); });
+    }
+    // 넘기는 동안: 켜져 있던 점은 0.3초에 꺼진다. 넘김이 끝나면 새 화면에서 다시 시작
+    if (tr && !wasTrans) killAt = t;
+    if (!tr && wasTrans) { Mv.fill(0); L.s = 0; }
+    wasTrans = !!tr;
+    var kf = tr ? clamp(1 - (t - killAt) / 300, 0, 1) : 1;
+    if (tr && WL) { var pT = clamp((t - tr.t0) / tr.dur, 0, 1); offLayer(OFFW[tr.from] * (1 - pT) + OFFW[tr.to] * pT, OFFB[tr.from] * (1 - pT) + OFFB[tr.to] * pT, oy); drawWall(t); return; }
+    if (!tr) WL = null;
+    // 꺼진 점 결
+    if (deck) {
+      if (tr) { var pt = clamp((t - tr.t0) / tr.dur, 0, 1); offLayer(OFFW[tr.from] * (1 - pt) + OFFW[tr.to] * pt, OFFB[tr.from] * (1 - pt) + OFFB[tr.to] * pt, oy); }
+      else offLayer(OFFW[D.cur], OFFB[D.cur], oy);
+    } else {
+      [INTRO, NET, PROC].forEach(function (z) {
+        var b = rects[z]; if (b.bottom <= 0 || b.top >= H) return;
+        g.save(); g.beginPath(); g.rect(0, b.top, W, b.height); g.clip(); offLayer(0.04, 0, oy); g.restore();
+      });
+    }
+    // 줄마다 그 자리 구역의 빛 세기
+    for (r = 0; r < NR; r++) {
+      if (deck) { ZI[r] = tr ? tr.from : D.cur; ZA[r] = AMP[ZI[r]]; }
+      else { var z = zoneOf(oy + r * S); ZI[r] = z; ZA[r] = z === HERO || z === INTRO || z === NET || z === PROC ? AMP[z] : 0; }
+    }
+    // 빛의 자리와 세기
+    // 소개 화면만 빛이 크다(창 가로의 15.3%, 1440에서 220px. 008 검토: 150px에서는 점 글자를 훑는 것이 잘 안 보였다)
+    var R = deck ? W * ((tr ? tr.from : D.cur) === INTRO ? 0.153 : 0.105) : Math.min(150, W * 0.3), want = 0, tx = L.x, ty = L.y;
+    if (!reduce && !tr) {
+      if (deck) {
+        if (fine && ptr.at && t - ptr.at < 2500 && !ptr.touch) { want = 1; tx = ptr.x; ty = ptr.y; L.idle = false; }
+        else { var a = t / 28000 * Math.PI * 2; want = 0.4 / 0.6; tx = W / 2 + W * 0.26 * Math.cos(a); ty = H / 2 + H * 0.24 * Math.sin(a); L.idle = true; }
+      } else if (ptr.at && (ptr.down || (!ptr.touch && t - ptr.at < 2500))) { want = 1; tx = ptr.x; ty = ptr.y; L.idle = false; }
+    }
+    if (want && !L.idle) { L.x = tx; L.y = ty; } else { L.x += (tx - L.x) * lag(dt, 0.9); L.y += (ty - L.y) * lag(dt, 0.9); }
+    if (!L.s && want) { L.x = tx; L.y = ty; }
+    L.s += (want - L.s) * lag(dt, want ? 0.12 : 0.2);
+    if (L.s < 0.004 && !want) L.s = 0;
+    // 남아 있던 빛이 0.7초에 꺼지고, 빛 둘레의 점이 켜진다
+    var dec = dt / 0.7;
+    for (r = 0; r < NR; r++) { var dd = dec * Math.max(ZA[r], 0.3); for (c = 0; c < NC; c++) { n = r * NC + c; if (Mv[n] > 0) Mv[n] = Math.max(0, Mv[n] - dd); } }
+    if (L.s > 0) {
+      var c0 = Math.max(0, Math.floor((L.x - R - OX) / S)), c1 = Math.min(NC - 1, Math.ceil((L.x + R - OX) / S));
+      var r0 = Math.max(0, Math.floor((L.y - R - oy) / S)), r1 = Math.min(NR - 1, Math.ceil((L.y + R - oy) / S));
+      for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+        var d = Math.hypot(OX + c * S - L.x, oy + r * S - L.y) / R;
+        if (d >= 1) continue;
+        var f = (1 - d * d); f *= f;
+        n = r * NC + c;
+        var v = L.s * ZA[r] * f;
+        if (v > Mv[n]) Mv[n] = v;
+      }
+    }
+    LT.fill(0);
+    // 소개 화면은 글자가 없는 자리의 빛을 35%로 줄인다(설계 시작 값 그대로 60%이면 빛 안에서 점 글자가 묻혀 손전등처럼 보이지 않았다)
+    for (r = 0; r < NR; r++) { var zb = (ZI[r] === INTRO ? 0.35 : 1) * kf; for (c = 0; c < NC; c++) { n = r * NC + c; Vv[n] = Mv[n] * zb; } }
+
+    // 소개: 뒤의 LED 벽에 흐르는 점 글자. 평소 14%, 빛 둘레에서는 80%까지(008 검토: 8%·55%는 줄이지 않은 화면에서 거의 안 보였다)
+    var ib = deck ? null : rects[INTRO];
+    if (fontOK && ((deck && (D.cur === INTRO || (tr && tr.from === INTRO)) && introAt) || (!deck && introAt && ib.bottom > 0 && ib.top < H))) {
+      var LR = deck ? Math.round(H * 0.46 / S) : Math.round(ib.height * 0.3 / S);
+      if (letters.rows !== LR) buildLetters(LR);
+      var ap = clamp((t - introAt) / 600, 0, 1) * kf;
+      var rTop = deck ? Math.round((H / 2 - oy) / S - LR / 2) : Math.round((ib.top + ib.height / 2 - oy) / S - LR / 2);
+      var shift = Math.floor((t - introAt) / 60000 * letters.period) - 2;
+      var flowing = !deck && D.flowOn();
+      if (flowing) shift += Math.floor(window.pageYOffset / S * 0.6); // 휴대폰 스크롤 반응(12-4): 내리는 만큼 옆으로 더 흐른다
+      for (r = 0; r < LR; r++) {
+        var rr = rTop + r; if (rr < 0 || rr >= NR) continue;
+        var amp = ZA[rr] || AMP[INTRO];
+        for (c = 0; c < NC; c++) {
+          var lc = ((c + shift) % letters.period + letters.period) % letters.period;
+          if (lc >= letters.cols || !letters.bits[r * letters.cols + lc]) continue;
+          n = rr * NC + c;
+          var lit2 = Math.min(1, Mv[n] / amp);
+          if (flowing) lit2 = Math.max(lit2, 0.5 * (1 - clamp(Math.abs(oy + rr * S - H / 2) / (H * 0.22), 0, 1))); // 화면 가운데 높이의 띠가 가장 밝다
+          var lv = (0.14 + 0.66 * lit2) * ap;
+          if (lv > Vv[n]) { Vv[n] = lv; LT[n] = 1; }
+        }
+      }
+    }
+
+    // 네 분야: 올린 칸 뒤의 LED가 아래에서 위로 0.5초에 켜진다(22%, 위로 갈수록 옅게). 나가면 0.4초에 꺼진다
+    if ((deck && D.cur === NET && !tr) || (!deck && rects[NET].bottom > 0 && rects[NET].top < H)) {
+      var hb = header.getBoundingClientRect().bottom;
+      cols.forEach(function (cs, i) {
+        var flashOn = t >= cs.fs && t < cs.fe, on = (deck && NETS.hot === i) || flashOn || (!deck && FLOW.hot === i);
+        if (on) { cs.v = 1; cs.front = Math.min(1, cs.front + dt / (flashOn && NETS.hot !== i ? 0.35 : 0.5)); }
+        else { cs.v = Math.max(0, cs.v - dt / 0.4); if (!cs.v) cs.front = 0; }
+        if (!cs.v) return;
+        var b = rowEls[i].getBoundingClientRect(), x0, x1, yb, yt;
+        if (deck) {
+          var gap = i < 3 ? rowEls[i + 1].getBoundingClientRect().left - b.right : b.left - rowEls[i - 1].getBoundingClientRect().right;
+          x0 = b.left - gap / 2; x1 = b.right + gap / 2; yb = H; yt = hb;
+        } else { x0 = 0; x1 = W; yb = b.bottom; yt = Math.max(b.top, hb); }
+        var cA = Math.max(0, Math.ceil((x0 - OX) / S)), cB = Math.min(NC - 1, Math.floor((x1 - OX) / S));
+        for (var rr2 = 0; rr2 < NR; rr2++) {
+          var y = oy + rr2 * S; if (y > yb || y < yt) continue;
+          var yf = (yb - y) / Math.max(1, yb - yt);
+          if (yf > cs.front) continue;
+          var cv = 0.22 * cs.v * (1 - 0.8 * yf) * kf;
+          for (var c2 = cA; c2 <= cB; c2++) { var nn = rr2 * NC + c2; if (cv > Vv[nn]) Vv[nn] = cv; }
+        }
+      });
+    }
+
+    // 켜진 점 그리기: 밝기가 같은 것끼리 한 번에. 흰 화면은 검은 점
+    // 점 글자의 점은 조금 크다(반지름 1.6px → 2.4px, 80%에서 가장 큼). 8%에서 1px이면 글자 모양이 거의 보이지 않았다
+    for (i = 0; i <= 129; i++) if (buckets[i]) buckets[i].length = 0;
+    for (r = 0; r < NR; r++) for (c = 0; c < NC; c++) {
+      n = r * NC + c; var vv = Vv[n];
+      if (vv < 0.008) continue;
+      var qq = Math.min(64, Math.round(vv * 64)) + (LT[n] ? 65 : 0);
+      (buckets[qq] = buckets[qq] || []).push(OX + c * S, oy + r * S);
+    }
+    var ink = deck && (tr ? tr.from : D.cur) === END;
+    for (i = 1; i <= 129; i++) {
+      var bk = buckets[i]; if (!bk || !bk.length || i === 65) continue;
+      var vq = (i % 65) / 64, rad = (i > 65 ? 1.6 + 0.8 * Math.min(1, vq / 0.8) : 1 + 1.2 * Math.min(1, vq / 0.45)) * k;
+      g.fillStyle = (ink ? 'rgba(0,0,0,' : 'rgba(255,255,255,') + vq.toFixed(3) + ')';
+      g.beginPath();
+      for (var j = 0; j < bk.length; j += 2) { g.moveTo(bk[j] + rad, bk[j + 1]); g.arc(bk[j], bk[j + 1], rad, 0, Math.PI * 2); }
+      g.fill();
+    }
+    // 글 위에는 점을 거의 그리지 않는다(대표 11-11: 네 분야 칸의 글이 위에 켜진 점에 가려 잘 안 보였다). 글 줄마다 둘레까지 점을 88% 지운다
+    var tx = textRects(t), sy = deck ? 0 : window.pageYOffset;
+    if (tx.length) {
+      g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,0.88)'; g.beginPath();
+      var px = 5 * k, py = 3 * k;
+      for (i = 0; i < tx.length; i++) { var q4 = tx[i], ty = q4[1] - sy; if (ty + q4[3] < 0 || ty > H) continue; g.rect(q4[0] - px, ty - py, q4[2] + px * 2, q4[3] + py * 2); }
+      g.fill(); g.restore();
+    }
+  }
+  // 점을 지울 글 줄의 자리(0.2초마다 다시 잰다. 스크롤 방식은 문서 기준으로 적어 두고 그릴 때 스크롤만큼 뺀다). 한 화면씩일 때는 지금 화면의 글만
+  var TXT = { at: -1e9, cur: -2, rects: [] };
+  function textRects(t) {
+    var deck = D.on, cur = deck ? D.cur : -1;
+    if (t - TXT.at < 200 && TXT.cur === cur) return TXT.rects;
+    TXT.at = t; TXT.cur = cur;
+    var list = deck ? ([INTRO, NET, PROC].indexOf(cur) >= 0 ? [scenes[cur]] : []) : [intro, net, proc], out = [], rg = document.createRange(), sy = deck ? 0 : window.pageYOffset;
+    list.forEach(function (sc) {
+      var w = document.createTreeWalker(sc, NodeFilter.SHOW_TEXT), nd;
+      while ((nd = w.nextNode())) {
+        if (!nd.data.trim()) continue;
+        rg.selectNodeContents(nd);
+        var rs = rg.getClientRects();
+        for (var i = 0; i < rs.length; i++) { var r = rs[i]; if (r.width > 0 && r.height > 0) out.push([r.left, r.top + sy, r.width, r.height]); }
+      }
+    });
+    TXT.rects = out; return out;
+  }
+  function offLayer(aw, ab, oy) {
+    if (aw > 0.001) { g.globalAlpha = aw; g.drawImage(offW, 0, oy - S / 2, W, offW.height / dpr); }
+    if (ab > 0.001) { g.globalAlpha = ab; g.drawImage(offB, 0, oy - S / 2, W, offB.height / dpr); }
+    g.globalAlpha = 1;
+  }
+
+  /* ───────── 스크롤하는 화면(휴대폰·작은 창, 4-9): 줄·단계를 스크롤에 맞춰 ───────── */
+  function scrollFrame(t) {
+    var vh = window.innerHeight, hh = header.getBoundingClientRect().bottom;
+    rowEls.forEach(function (r, i) {
+      var b = r.getBoundingClientRect(), on = r.classList.contains('on');
+      if (!on && b.top < vh * 0.88 && b.bottom > hh) { r.classList.add('on'); if (!D.flowOn()) { cols[i].fs = t + 120; cols[i].fe = t + 470; } }
+      else if (on && (b.top >= vh || b.bottom <= hh)) r.classList.remove('on');
+    });
+    stepEls.forEach(function (s) {
+      var b = s.getBoundingClientRect(), on = s.classList.contains('on');
+      if (!on && b.top < vh * 0.8 && b.bottom > hh) s.classList.add('on');
+      else if (on && (b.top >= vh || b.bottom <= hh)) s.classList.remove('on');
+    });
+  }
+
+  /* ───────── 한 화면에 한 번 그리는 고리 ───────── */
+  var lastT = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    var dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+    lastT = t;
+    ledFrame(t, dt);
+    if (D.on && (D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC)))) procFrame(t, dt);
+    if (!D.on) scrollFrame(t);
+  }
+
+  function sceneReset(n) {
+    if (n === HERO) { tour(false); pxReset(); }
+    if (n === INTRO) introAt = 0;
+    if (n === NET) { netReset(); if (!D.on) rowEls.forEach(function (r) { r.classList.remove('on'); }); }
+    if (n === REEL) EntReel.stop();
+    if (n === PROC) procReset();
+  }
+  D.setup({
+    // PC(한 화면씩)
+    enter: function (n, scene, from) {
+      if (n === HERO) { tour(true); pxPlay(false); }
+      if (n === INTRO) introAt = now();
+      if (n === NET) netFlash(now());
+      if (n === REEL) reelStart();
+      if (n === PROC) procPlay(from === END);
+      // 바닥글의 글·로고는 흰 벽이 걷힌 뒤 떠오른다(바닥글 바탕까지 흐리게 하면 그 밑의 흰 바탕이 비쳐 번쩍였다)
+      if (n === END && from === PROC && !reduce) $$('.site-footer > *', endScene).forEach(function (el) { anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 360, delay: 260, easing: 'ease-out', fill: 'backwards' }); });
+    },
+    reset: sceneReset,
+    // 휴대폰·작은 창(스크롤): 보이면 펼치고, 화면 밖으로 완전히 나가면 처음 상태로(다시 보이면 또 펼친다)
+    seen: function (n, scene, instant) {
+      if (n === HERO) { tour(true); if (instant) pxShow(); else pxPlay(true); }
+      if (n === INTRO) introAt = instant ? now() - 600 : now();
+      if (n === REEL && !EntReel.running()) reelStart();
+    },
+    unseen: sceneReset,
+    move: function (from, to) {
+      if (reduce) return null;
+      if (from === PROC && to === END) return wall(false);
+      if (from === END && to === PROC) { procPlay(true); return wall(true); }
+      return null;
+    },
+    start: function () { ledSize(); splitIntro(); clStyle(true); netReset(); },
+    stop: function () { ledSize(); splitIntro(); clStyle(false); netReset(); WL = null; }
+  });
+  /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-4, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
+     소개 점 글자: 위 ledFrame에서 스크롤만큼 더 흐르고 화면 가운데 띠가 밝다
+     네 분야: 화면 가운데에 가장 가까운 줄 뒤의 LED가 아래에서 위로 켜지고(위 ledFrame), 그 줄만 100%, 나머지 줄은 55%
+     과정 LED 무리: 단계마다 단계 위쪽 85% -> 55% 동안 가운데 점부터 바깥으로 켜진다
+     흰 문의 구역: 구역 위쪽 92% -> 40% 동안 점들이 커져 붙어 흰 면이 된다. 켜지는 물결이 위에서 아래로. 점마다 반지름 1px -> 간격의 0.75배는 PC 넘김과 같고, 물결은 PC(1.1)보다 빠른 1.35배라 반쯤 멈춰도 위쪽 글이 먼저 다 드러난다 */
+  var FLOW = { hot: -1, wall: 0 };
+  var wallc = document.createElement('canvas'), wg = wallc.getContext('2d');
+  wallc.className = 'wallc'; wallc.setAttribute('aria-hidden', 'true');
+  endScene.insertBefore(wallc, endScene.firstChild);
+  var INK = getComputedStyle(document.body).backgroundColor || '#0a0a0a';
+  var procDots = CL.map(function (c) { return $$('.d', c.svg); });
+  function flowWall(q, vh) {
+    FLOW.wall = q;
+    if (q >= 1) { wallc.classList.remove('on'); return; }
+    var w = endScene.clientWidth, h = Math.min(endScene.offsetHeight, Math.ceil(vh * 0.62) + S), d2 = Math.min(1.5, window.devicePixelRatio || 1);
+    if (wallc.width !== Math.round(w * d2) || wallc.height !== Math.round(h * d2)) {
+      wallc.width = Math.round(w * d2); wallc.height = Math.round(h * d2);
+      wallc.style.width = w + 'px'; wallc.style.height = h + 'px';
+    }
+    wallc.classList.add('on');
+    wg.setTransform(d2, 0, 0, d2, 0, 0);
+    wg.globalCompositeOperation = 'source-over';
+    wg.fillStyle = INK; wg.fillRect(0, 0, w, h);
+    if (q <= 0) return;
+    var tt = q * 1.35, depth = vh * 0.6, nc = Math.floor(w / S), ox = (w - nc * S) / 2 + S / 2, bk = [];
+    for (var r = 0; r * S < h + S; r++) for (var c = -1; c <= nc; c++) {
+      var x = ox + c * S, y = S / 2 + r * S;
+      var p = clamp((tt - 0.75 * Math.min(1, y / depth)) / 0.35, 0, 1);
+      if (p <= 0) continue;
+      var k = Math.round(p * 24);
+      (bk[k] = bk[k] || []).push(x, y);
+    }
+    wg.globalCompositeOperation = 'destination-out';
+    wg.fillStyle = '#000';
+    for (var j = 1; j <= 24; j++) {
+      var b = bk[j]; if (!b) continue;
+      var rad = Math.max(1, 1 + (0.75 * S - 1) * easeInOut(j / 24));
+      wg.beginPath();
+      for (var i = 0; i < b.length; i += 2) { wg.moveTo(b[i] + rad, b[i + 1]); wg.arc(b[i], b[i + 1], rad, 0, Math.PI * 2); }
+      wg.fill();
+    }
+  }
+  D.flow(function (vh, on) {
+    stepList.classList.toggle('flowled', on);
+    if (!on) {
+      FLOW.hot = -1; wallc.classList.remove('on');
+      rowEls.forEach(function (r) { r.classList.remove('dim'); });
+      return;
+    }
+    var hh = header.getBoundingClientRect().bottom, mid = hh + (vh - hh) / 2, nb = rowList.getBoundingClientRect(), best = -1, bd = 1e9;
+    if (nb.bottom > hh && nb.top < vh) rowEls.forEach(function (r, i) { var b = r.getBoundingClientRect(), dd = Math.abs(b.top + b.height / 2 - mid); if (dd < bd) { bd = dd; best = i; } });
+    FLOW.hot = best;
+    rowEls.forEach(function (r, i) { r.classList.toggle('dim', best >= 0 && i !== best); });
+    stepEls.forEach(function (st, i) {
+      var p = D.span(st, 0.85, 0.55, vh), n = Math.round(p * procDots[i].length);
+      procDots[i].forEach(function (d, k) { d.classList.toggle('lit', k < n); });
+    });
+    flowWall(D.spanEnd(endScene, 0.92, 0.4, vh), vh);
+  });
+  window.__entFlow = FLOW;
+
+  // 검사 도구가 읽는 값(tools/check-ent.mjs, film-ent.mjs)
+  window.__ent = {
+    state: function () {
+      var lit = 0; for (var n = 0; n < Vv.length; n++) if (Vv[n] >= 0.008) lit++;
+      return { px: { lines: pxMasks.map(function (m) { return m.classList.contains('lit'); }), dots: PX.levels ? PX.levels.map(function (L) { return L.dots.length / 5; }) : [], drawing: pxCv.style.visibility !== 'hidden' && !!PX.T, t0: PX.t0 ? PX.t0 + performance.timeOrigin : 0 }, S: S, NC: NC, NR: NR, lit: lit, font: fontOK, letters: { rows: letters.rows, cols: letters.cols, on: letters.bits ? letters.bits.reduce(function (a, b) { return a + b; }, 0) : 0 }, hot: NETS.hot, cols: cols.map(function (c) { return +c.v.toFixed(2) + '/' + +c.front.toFixed(2); }), wall: !!WL, L: { s: +L.s.toFixed(2), idle: L.idle } };
+    }
+  };
+  // 움직임 줄이기: 공통 틀이 아무것도 부르지 않는다. 카드는 첫 분야 무리에 멈춰 두고, 그림판은 쓰지 않는다
+  if (reduce) { EntReel.start(); return; }
+  ledSize();
+  if (document.fonts && document.fonts.load) document.fonts.load('700 100px "Bodoni Moda"').then(function () { fontOK = true; letters.rows = 0; splitIntro(); }, function () { fontOK = true; });
+  else fontOK = true;
+  var rt = 0;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { ledSize(); splitIntro(); }, 120); if (PX.T && pxCv.style.visibility !== 'hidden') pxShow(); });
+  requestAnimationFrame(frame);
+})();
+</script>
+<script src="site-menu.js"></script>
+<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
+<!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
+</body>
+</html>

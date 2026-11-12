@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ASTRA 홈 움직이는 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../2026-11-10-pages/pages.css">
+<style>
+/* 홈은 확정된 것을 그대로 한 파일로 모았다(대표 11-12 "홈은 저게 끝이야"). 값은 캔버스 홈 PC 판(DesignHome.dc.html)과 확정 시험본 그대로다.
+   움직이는 배경: ../../home-hero-motion.html → home-motion.js. 굵기가 숨 쉬는 ASTRA: ../../astra-wordmark.html */
+.home-gl { display: none; }
+.home-gl.ready { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+.astra { font-weight: 400; }
+.astra-letter { animation: astra-breath 1.5s cubic-bezier(.37,0,.63,1) infinite alternate both; }
+@keyframes astra-breath { from { font-variation-settings: "wght" 100; } to { font-variation-settings: "wght" 900; } }
+@media (prefers-reduced-motion: reduce) { .astra-letter { animation: none; font-variation-settings: "wght" 600; } }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
+  <a class="quick-apply" href="contact.html#apply">빠른 지원하기</a>
+  <button class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu-panel"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h18M3 12h18M3 17.5h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <nav class="nav" aria-label="주 메뉴"><a href="home.html" aria-current="page">홈</a><a href="about.html">회사소개</a><a href="mcn.html">MCN</a><a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a><a href="entertainment.html">엔터테인먼트</a><a href="media.html">미디어</a><a href="partners.html">협력사</a><a href="contact.html">CONTACT</a><a class="btn btn-solid" href="contact.html#apply">지원하기</a></nav>
+</header>
+<nav class="menu-panel" id="menu-panel" aria-label="주 메뉴 (펼침)" hidden>
+  <button class="menu-close" type="button" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <div class="menu-list">
+    <a href="home.html" aria-current="page">홈</a>
+    <a href="about.html">회사소개</a>
+    <a href="mcn.html">MCN</a>
+    <a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a>
+    <a href="entertainment.html">엔터테인먼트</a>
+    <a href="media.html">미디어</a>
+    <a href="partners.html">협력사</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+</nav>
+<main class="home">
+  <div class="home-bg" aria-hidden="true"><picture style="display: contents"><source media="(max-width: 900px)" srcset="../2026-11-10-pages/img/home-bg-m.webp"><img src="../2026-11-10-pages/img/home-bg.webp" alt="" style="object-position: 50% 50%"></picture><canvas class="home-gl"></canvas></div>
+  <h1 class="astra" aria-label="ASTRA"><span class="astra-letter" aria-hidden="true" style="animation-delay: -12s">A</span><span class="astra-letter" aria-hidden="true" style="animation-delay: -11.75s">S</span><span class="astra-letter" aria-hidden="true" style="animation-delay: -11.5s">T</span><span class="astra-letter" aria-hidden="true" style="animation-delay: -11.25s">R</span><span class="astra-letter" aria-hidden="true" style="animation-delay: -11s">A</span></h1>
+  <p class="home-tag">WE MAKE NEXT</p>
+</main>
+<div class="fab-anchor">
+  <div class="fab">
+    <ul class="fab-menu" id="fab-menu">
+      <li><a href="#">카카오톡 상담</a></li>
+      <li><a href="#">인스타그램</a></li>
+      <li><a href="#">블로그</a></li>
+      <li><a class="main" href="contact.html#apply">지원하기</a></li>
+    </ul>
+    <button class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="상담·지원 바로가기 열기">
+      <svg class="talk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10.5H10.5L6 19.5V16H4z"/><path d="M8.5 10.8h.01M12 10.8h.01M15.5 10.8h.01" stroke-width="2.2"/></svg>
+      <svg class="x" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+</div>
+<script src="home-motion.js"></script>
+<script>
+/* 홈: 움직이는 배경, 굵기가 숨 쉬는 ASTRA, 떠 있는 버튼, 마우스 반응(대표 11-12 "홈에서도 마우스 인터랙티브") */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cv = document.querySelector('.home-gl');
+  // 마우스 반응: 회사소개 첫 화면과 같은 값. 마우스 둘레(창 가로의 18%)에서 별이 켜지고 소나무가 더 흔들리고
+  // 기와·문양에 빛이 스치고 달빛이 밝아진다. 빛줄기는 마우스 쪽으로 기울며 밝아진다. 0.18초 늦게 따라오고,
+  // 2.5초 쉬면 30% 세기로 24초에 한 바퀴 돈다. 그림 전체가 마우스 반대쪽으로 최대 10px(0.8초 늦게) 움직인다.
+  // 마우스가 있는 PC에서만. 휴대폰은 전과 같다
+  var hover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var M = { x: 0, y: 0, at: 0 }, HS = { x: 0.5, y: 0.45, i: 0, px: 0, py: 0, last: 0 };
+  var lag = function (dt, s) { return 1 - Math.exp(-dt / 1000 / s); };
+  window.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') { M.x = e.clientX; M.y = e.clientY; M.at = performance.now(); } }, { passive: true });
+  function mouse() {
+    var t = performance.now(), dt = Math.min(t - (HS.last || t), 100); HS.last = t;
+    var W = window.innerWidth, H = window.innerHeight, live = M.at && t - M.at < 2500, tx, ty, ti, k;
+    if (live) { tx = M.x / W; ty = M.y / H; ti = 1; k = lag(dt, 0.18); }
+    else { var a = t / 24000 * 6.283; tx = 0.5 + 0.3 * Math.cos(a); ty = 0.42 + 0.18 * Math.sin(a); ti = 0.3; k = lag(dt, 0.6); }
+    HS.x += (tx - HS.x) * k; HS.y += (ty - HS.y) * k; HS.i += (ti - HS.i) * lag(dt, 0.5);
+    var mx = M.at ? M.x / W * 2 - 1 : 0, my = M.at ? M.y / H * 2 - 1 : 0;
+    HS.px += (-mx * 10 - HS.px) * lag(dt, 0.8); HS.py += (-my * 10 - HS.py) * lag(dt, 0.8);
+    cv.style.transform = 'translate3d(' + HS.px.toFixed(2) + 'px,' + HS.py.toFixed(2) + 'px,0) scale(1.03)';
+    return [HS.x, HS.y, HS.i, 0.18];
+  }
+  // 배경: 확정 시험본처럼 늘 움직이고, 움직임 줄이기 설정이면 한 장만 그린다. 창이 안 보이면 쉰다
+  if (cv && window.HomeMotion) window.HomeMotion.start(cv, function () { return !reduce && !document.hidden; }, hover && !reduce ? mouse : null);
+  if (reduce && cv) window.addEventListener('resize', function () { if (cv.__draw) cv.__draw(0); });
+  // ASTRA: 글자마다 0.25초씩 늦게 가늘어졌다 두꺼워진다(캔버스 홈 판과 같은 값)
+  if (!reduce) document.querySelectorAll('.astra-letter').forEach(function (el, i) {
+    el.animate([{ fontVariationSettings: '"wght" 100' }, { fontVariationSettings: '"wght" 900' }],
+      { duration: 1500, delay: -12000 + i * 250, iterations: Infinity, direction: 'alternate', easing: 'cubic-bezier(.37,0,.63,1)' });
+  });
+  // 떠 있는 버튼: 누르면 네 개가 펼쳐지고 다시 누르면 닫힌다(다른 쪽과 같다)
+  var button = document.querySelector('.fab-button'), box = document.querySelector('.fab');
+  function setFab(open, refocus) {
+    if (document.body.classList.contains('fab-open') === open) return;
+    document.body.classList.toggle('fab-open', open);
+    button.setAttribute('aria-expanded', String(open));
+    button.setAttribute('aria-label', open ? '상담·지원 바로가기 닫기' : '상담·지원 바로가기 열기');
+    if (refocus) button.focus();
+  }
+  button.addEventListener('click', function () { setFab(!document.body.classList.contains('fab-open')); });
+  document.addEventListener('click', function (e) { if (!box.contains(e.target)) setFab(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fab-open')) setFab(false, true); });
+})();
+</script>
+<script src="site-menu.js"></script>
+<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
+<!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
+</body>
+</html>

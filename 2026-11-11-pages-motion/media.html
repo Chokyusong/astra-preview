@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ASTRA 미디어 움직이는 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../2026-11-10-pages/pages.css">
+<link rel="stylesheet" href="deck.css">
+<!-- 처음 그리는 순간부터 숨길 것을 숨긴다(첫 화면 버튼이 잠깐 보였다 사라지던 것). 움직임 줄이기는 그대로 다 보인다 -->
+<script>if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('fx');</script>
+<style>
+/* 미디어 2판 — 카메라 (설계 pages-motion-design.md 5절, 지시서 009).
+   하나의 생각: 마우스가 카메라다. 가리키는 것에 초점이 맞는다. 화면에 깔리는 무늬는 없고, 마우스에 답하는 것은 초점 틀 하나다.
+   화면 6개: 첫 화면 → 소개 → 스튜디오 카드 → 하는 일(휠 다섯 번) → 과정 → 문의 + 바닥글.
+   문구·순서·색·글꼴·사진은 정지 시안(../2026-11-10-pages/media.html) 그대로다. 과정의 단계 표시만 화면 틀로 바꿨다(설계 5-11).
+   크기는 큰 창 배율 --k(공통 틀)를 쓴다. 값은 README.md */
+
+/* ── 5-1. 초점 틀: ㄱ자 모서리 네 개. 한 화면씩 넘길 때만 보인다(마우스가 없는 화면에는 없다) ── */
+.vf { display: none; }
+html.deck .vf { display: block; position: fixed; left: 0; top: 0; z-index: 33; width: 84px; height: 56px; pointer-events: none; opacity: 0; color: #fff; --arm: calc(12px * var(--k, 1)); will-change: transform, opacity; }
+.vf i { position: absolute; width: var(--arm); height: var(--arm); border: 0 solid currentColor; }
+.vf .tl { left: 0; top: 0; border-top-width: 1.25px; border-left-width: 1.25px; }
+.vf .tr { right: 0; top: 0; border-top-width: 1.25px; border-right-width: 1.25px; }
+.vf .bl { left: 0; bottom: 0; border-bottom-width: 1.25px; border-left-width: 1.25px; }
+.vf .br { right: 0; bottom: 0; border-bottom-width: 1.25px; border-right-width: 1.25px; }
+
+/* ── 5-8. 조리개(넘김 5→6): 화면 전체를 덮는 그림. 육각형 구멍 밖은 짙은 회색 날 ── */
+.iris { display: none; position: fixed; inset: 0; width: 100%; height: 100%; z-index: 29; pointer-events: none; }
+.iris.on { display: block; }
+.iris .blades { fill: #161616; fill-rule: evenodd; }
+.iris .edge { fill: none; stroke: #fff; stroke-width: 1; }
+/* 휴대폰 스크롤 반응(설계 12-5, 지시서 015): 흰 문의 구역 위에 같은 조리개(날 #161616)를 깔고, 스크롤만큼 육각형 구멍이 60° 돌며 열린다 */
+html.fx:not(.deck) .scene-end { position: relative; overflow: hidden; overflow: clip; }
+.iris-end { display: none; position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; }
+html.fx:not(.deck) .iris-end.on { display: block; }
+.iris-end .blades { fill: #161616; fill-rule: evenodd; }
+.iris-end .edge { fill: none; stroke: #fff; stroke-width: 1; }
+
+/* ── 5-2. 초점이 맞으며 나타나는 글: 낱말마다 감싸고, 같은 줄의 낱말은 함께 흐림 → 또렷 ── */
+.fw { display: inline-block; }
+html.fx .fz .fw { opacity: 0; }
+
+/* ── 화면 1 첫 화면(5-3): 배경은 손님 영상(대표 11-12, 19초 이어 돎). 들어올 때 한 번 초점이 맞는다. 영상이 스스로 움직이므로 천천히 커졌다 작아지기·빛 먼지는 뺐다. 마우스에는 반응하지 않는다 ── */
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #0a0a0a; }
+html.fx .hero.fz-bg .hero-bg .hero-video { filter: blur(10px); }
+/* 영상이 밝은 장면(흰 대리석·금·하늘)에서도 글이 읽히게 글 자리 뒤에만 옅은 어둠을 더 깐다(나머지 덮개는 공통 그대로) */
+.hero .hero-bg::after { background: radial-gradient(ellipse 38% 24% at 50% 44%, rgba(10, 10, 10, 0.42), rgba(10, 10, 10, 0) 100%), linear-gradient(to bottom, rgba(10, 10, 10, 0.5) 0, rgba(10, 10, 10, 0) 170px), linear-gradient(to top, #0a0a0a 0, rgba(10, 10, 10, 0) 34%), radial-gradient(ellipse 70% 60% at 50% 50%, rgba(10, 10, 10, 0.66), rgba(10, 10, 10, 0.4) 100%); }
+@media (max-width: 900px) { .hero .hero-bg::after { background: radial-gradient(ellipse 60% 26% at 50% 46%, rgba(10, 10, 10, 0.42), rgba(10, 10, 10, 0) 100%), linear-gradient(to bottom, rgba(10, 10, 10, 0.5) 0, rgba(10, 10, 10, 0) 170px), linear-gradient(to top, #0a0a0a 0, rgba(10, 10, 10, 0) 34%), radial-gradient(ellipse 70% 60% at 50% 50%, rgba(10, 10, 10, 0.66), rgba(10, 10, 10, 0.4) 100%); } }
+html.deck .hero h1 { font-size: max(27px, min(3.5vw, 6.6vh, calc(54px * var(--k, 1)))); }
+html.deck .hero .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(21px * var(--k, 1)))); }
+html.deck .hero .btn { min-height: calc(56px * var(--k, 1)); padding: 0 calc(32px * var(--k, 1)); font-size: calc(17px * var(--k, 1)); }
+
+/* ── 화면 2 소개(5-4) ── */
+html.deck .intro { height: 100%; align-content: center; padding: calc(var(--header-h) + clamp(18px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 96px); }
+html.deck .intro .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(21px * var(--k, 1)))); }
+html.deck .intro h2 { font-size: max(26px, min(3.2vw, 6vh, calc(46px * var(--k, 1)))); }
+html.deck .intro-text p { font-size: max(16px, min(1.25vw, 2.5vh, calc(18px * var(--k, 1)))); }
+
+/* ── 3판 보강(설계 5-14): 글 화면(소개·하는 일·과정) 뒤에 사진을 깐다. 깔린 층(.bgl)은 스크립트가 넣고, 글은 그 위에 둔다.
+   스크롤하는 화면에서는 깔린 층 안쪽(.bgl-in)이 화면 높이로 붙어 있어 구역을 지나는 동안 사진이 화면에 머문다 ── */
+.bgl { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #0a0a0a; }
+.bgl-in { position: absolute; inset: 0; overflow: hidden; }
+html:not(.deck) .bgl-in { position: sticky; top: 0; height: 100vh; max-height: 100%; }
+.bgl img, .bgl canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* 글 뒤 어두운 번짐이 화면 옆으로 넘치지 않게 잘라 둔다(clip은 스크롤 상자를 만들지 않아 붙어 있는 층이 그대로 붙는다) */
+html:not(.deck) .intro, html:not(.deck) .rows, html:not(.deck) .process { position: relative; overflow-x: clip; }
+.intro > :not(.bgl), .rows > :not(.bgl), .process > :not(.bgl) { position: relative; z-index: 1; }
+
+/* 소개(5-4): 글 뒤로 스튜디오 사진 여섯 장의 필름 띠가 흐른다. 평소 밝기 38%, 마우스 아래 틀만 80%·또렷, 나머지는 흐림(미리 흐리게 한 겹) */
+.film { position: absolute; left: 0; top: 50%; height: 58%; display: flex; will-change: transform; }
+html:not(.deck) .film { height: 62%; }
+.ff { position: relative; flex: none; height: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 6px; }
+.ff .soft { opacity: 0; transition: opacity 0.3s ease; }
+.ff i { position: absolute; inset: 0; background: #000; opacity: 0.55; transition: opacity 0.3s ease; }
+.film.has-fo .ff:not(.fo) .soft { opacity: 1; }
+.ff.fo i { opacity: 0.2; }
+/* 글 덩어리 뒤 어두운 번짐: 글은 늘 읽힌다 */
+.intro-head::before, .intro-text::before { content: ""; position: absolute; inset: -16% -10%; z-index: -1; background: radial-gradient(farthest-side, rgba(0, 0, 0, 0.72) 45%, rgba(0, 0, 0, 0)); pointer-events: none; }
+
+/* ── 화면 3 스튜디오 카드(5-5): 확정된 캐러셀(client/design-refs/media-carousel.html)의 모양·값 그대로.
+   더한 것: 뒤 카드의 얕은 초점(한 겹마다 흐림 2px, 밝기 -18%), 끌어서 넘기기(--drag), 들어올 때 모였다 펼쳐짐 ── */
+.cards { user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+.cards .card { transform: translateX(calc(-50% + var(--x, 0px) + var(--drag, 0px))) perspective(calc(var(--w) * 2.5)) rotateY(var(--r, 0deg)) scale(var(--s, 1)); transition: transform 0.6s var(--ease), box-shadow 0.6s ease; }
+.cards .card img { transition: opacity 0.45s ease, filter 0.5s ease, transform 1.2s var(--ease); -webkit-user-drag: none; }
+/* ── 캐러셀 개선(대표 지시 2026-11-12 "미디어 캐러셀 UI/UX 개선 지시서"): 시네마틱 쇼케이스 ──
+   앞 카드는 그림자로 앞에 떠 있고, 도착하면 사진이 1.2초에 1.02배로 살짝 다가온다(카드 이동과 따로, 사진에만). 옆 카드는 더 보이고 거리만큼 어둡다 */
+.cards .card[data-off="0"] { box-shadow: 0 0 0 1px var(--thread), 0 34px 70px -24px rgba(0, 0, 0, 0.9), 0 60px 120px -40px rgba(0, 0, 0, 0.75); }
+.cards .card[data-off="1"], .cards .card[data-off="-1"] { box-shadow: 0 0 0 1px var(--thread), 0 24px 50px -24px rgba(0, 0, 0, 0.8); }
+.cards .card[data-off="0"] img { transform: scale(1.02); transition-delay: 0s, 0s, 0.25s; }
+html.deck .cards .card[data-off="1"] { --x: calc(var(--w) * 0.29); }
+html.deck .cards .card[data-off="-1"] { --x: calc(var(--w) * -0.29); }
+html.deck .cards .card[data-off="2"] { --x: calc(var(--w) * 0.46); }
+html.deck .cards .card[data-off="-2"] { --x: calc(var(--w) * -0.46); }
+/* 배경광: 앞 카드 사진의 색을 낮은 채도로 뒤에 은은하게 퍼뜨린다(14%). 사진이 바뀌면 1.2초에 색이 옮겨 간다 */
+.cglow { position: absolute; z-index: 0; left: 50%; top: calc(20px + var(--h) / 2); width: calc(var(--w) * 1.9); height: calc(var(--h) * 2.1); transform: translate(-50%, -50%); pointer-events: none; background-color: rgb(150, 122, 84); opacity: 0.14; transition: background-color 1.2s ease;
+  -webkit-mask-image: radial-gradient(closest-side, #000 0%, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0) 100%); mask-image: radial-gradient(closest-side, #000 0%, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0) 100%); }
+/* 아래 썸네일과 위치 표시: 카드 아래(스크롤 화면에서는 구역 아래 여백 안에 놓여 배치가 바뀌지 않는다) */
+.cards { --tn: 34px; --gold: #c9ad80; }
+.cnav { position: absolute; z-index: 5; left: 50%; top: calc(var(--h) + 36px); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: calc(100vw - 32px); }
+.cthumbs { display: flex; gap: 10px; max-width: 100%; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.cthumbs::-webkit-scrollbar { display: none; }
+.cthumb { position: relative; flex: none; width: calc(var(--tn) * 1.6); height: var(--tn); padding: 0; border: 0; border-radius: 6px; overflow: hidden; background: var(--tile); cursor: pointer; opacity: 0.42; box-shadow: 0 0 0 1px var(--thread); transition: opacity 0.4s ease, box-shadow 0.4s ease; }
+.cthumb img { display: block; width: 100%; height: 100%; object-fit: cover; -webkit-user-drag: none; }
+.cthumb:hover { opacity: 0.75; }
+.cthumb.on { opacity: 1; box-shadow: 0 0 0 1px var(--gold); }
+.cthumb:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+/* 자동 넘김 시간: 고른 썸네일 아래 얇은 선이 4초에 찬다(위치 표시와 따로) */
+.cthumb::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left; opacity: 0; }
+.cthumb.on.run::after { opacity: 0.9; animation: cthumb-run 4s linear forwards; }
+@keyframes cthumb-run { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.cprog { display: flex; align-items: center; gap: 12px; font-size: 12px; line-height: 1; letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.5); font-variant-numeric: tabular-nums; }
+.cprog::before { content: attr(data-cur); color: rgba(255, 255, 255, 0.92); }
+.cprog::after { content: attr(data-total); }
+.cprog i { position: relative; display: block; width: clamp(96px, 10vw, 160px); height: 1px; background: rgba(255, 255, 255, 0.18); }
+.cprog b { position: absolute; inset: 0; background: var(--gold); transform-origin: left; transform: scaleX(var(--p, 0.2)); transition: transform 0.6s var(--ease); }
+html:not(.fx) .cards .card[data-off="0"] img { transform: none; }
+html:not(.fx) .cglow, html:not(.fx) .cprog b, html:not(.fx) .cthumb { transition: none; }
+/* 뒤 카드 밝기: 정지 시안은 사진을 50%·25%로 비춰 뒤 카드가 거의 보이지 않았다. 확정본(media-carousel.html)처럼 사진은 다 보이게 하고,
+   설계 5-5대로 흐림과 밝기로만 뒤로 보낸다(그래야 얕은 초점이 보인다) */
+.cards .card[data-off="1"], .cards .card[data-off="-1"], .cards .card[data-off="2"], .cards .card[data-off="-2"] { --o: 1; }
+.cards .card[data-off="far"] { --o: 0; --s: 0.7; --z: 0; }
+.cards .card[data-off="1"] img, .cards .card[data-off="-1"] img { filter: blur(2px) brightness(0.82); }
+.cards .card[data-off="2"] img, .cards .card[data-off="-2"] img { filter: blur(4px) brightness(0.64); }
+/* 초점 옮기기(대표 11-12): 마우스를 올린 카드에 초점이 옮겨 가 그 카드만 또렷하고, 나머지는 그 카드에서 멀수록 더 흐리고 어둡다(앞 카드도).
+   카드에서 마우스를 떼면 앞 카드로 초점이 돌아온다. 한 화면씩 넘길 때(PC)만 */
+.cards.rack .card img { transition: opacity 0.45s ease, filter 0.35s ease, transform 1.2s var(--ease); }
+.cards.rack .card[data-fd="0"] img { filter: none; }
+.cards.rack .card[data-fd="1"] img { filter: blur(6px) brightness(0.62); }
+.cards.rack .card[data-fd="2"] img { filter: blur(10px) brightness(0.45); }
+.cards.rack .card[data-fd="3"] img, .cards.rack .card[data-fd="4"] img { filter: blur(13px) brightness(0.36); }
+/* 초점이 맞은 뒤 카드는 바깥으로 미끄러져 나오며 커지고(0.5초), 0.15초 뒤 앞 카드 위로 올라온다. 앞 카드는 살짝 물러난다 */
+.cards.rack .card { transition: transform 0.5s var(--ease), z-index 0s linear 0.15s; }
+.cards.rack .card[data-off="0"]:not([data-fd="0"]) { --s: 0.94; }
+.cards.rack .card[data-fd="0"]:not([data-off="0"]) { --z: 4; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), 0 24px 70px rgba(0, 0, 0, 0.7); cursor: pointer; }
+.cards.rack .card[data-fd="0"][data-off="1"] { --x: calc(var(--w) * 0.3); --r: 9deg; --s: 0.97; }
+.cards.rack .card[data-fd="0"][data-off="-1"] { --x: calc(var(--w) * -0.3); --r: -9deg; --s: 0.97; }
+.cards.rack .card[data-fd="0"][data-off="2"] { --x: calc(var(--w) * 0.4); --r: 14deg; --s: 0.92; }
+.cards.rack .card[data-fd="0"][data-off="-2"] { --x: calc(var(--w) * -0.4); --r: -14deg; --s: 0.92; }
+.cards.rack .card[data-fd="0"][data-off="0"] { cursor: zoom-in; }
+/* 들어가 보기(대표 11-12): 앞 카드를 누르면 사진이 화면 가득 커지며 스튜디오 안으로 들어간다. 마우스로 둘러보고, 좌우로 다음 스튜디오, 누르기·Esc·휠로 돌아온다 */
+.cards { transition: opacity 0.3s ease; }
+.cards.away { opacity: 0; pointer-events: none; }
+.stage { position: absolute; z-index: 6; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background: #050505; cursor: zoom-out; }
+.stage-pics { position: absolute; inset: 0; will-change: transform; }
+.stage-pics img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
+.stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.45)); }
+.stage > button { position: absolute; z-index: 2; cursor: pointer; padding: 0; border: 0; font: inherit; }
+/* 버튼과 표시는 다 커진 뒤에 나타나고, 닫기 시작하면 먼저 사라진다 */
+.stage > button { opacity: 0; transition: opacity 0.25s ease; pointer-events: none; }
+.stage.ready > button { opacity: 1; pointer-events: auto; }
+.stage > button:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+.stage .stage-prev { left: clamp(20px, 3vw, 56px); right: auto; }
+.stage .stage-next { right: clamp(20px, 3vw, 56px); left: auto; }
+.stage .stage-close { top: calc(var(--header-h) + 20px); right: clamp(20px, 3vw, 56px); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(10, 10, 10, 0.55); color: var(--paper); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.cards.dragging .card { transition: none; }
+.cards.gather .card { --x: 0px; --r: 0deg; --s: 0.94; transition: none; }
+.cards.spread .card { transition: transform 0.8s var(--ease); }
+.cards.spread .card[data-off="2"], .cards.spread .card[data-off="-2"] { transition-delay: 0.06s; }
+html.fx .cards.mouse { cursor: grab; }
+html.fx .cards.dragging { cursor: grabbing; }
+button.card-arrow { padding: 0; border: 0; cursor: pointer; font: inherit; }
+button.card-arrow:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+html.deck .studio { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: var(--header-h) 0 clamp(16px, 3vh, 40px); }
+/* 3판(5-5): 카드를 키운다. 앞 카드 가로 창의 58%, 카드 높이는 창 높이의 62%까지, 그리고 아래 표시·버튼이 들어가게(전에는 640px × 배율, 1440에서 44%) */
+/* 캐러셀 개선: 아래 썸네일·위치 표시 자리(썸네일 높이 + 42px)만큼 카드 높이를 덜고, 그 자리를 아래에 둔다 */
+html.deck .studio .cards { --tn: clamp(34px, 5vh, 50px); --w: min(58vw, calc(62vh / 0.625), calc((100vh - var(--header-h) - 152px - var(--tn)) * 1.6)); margin-bottom: calc(var(--tn) + 42px); }
+
+/* ── 화면 4 하는 일(5-6): 다섯 이름은 늘 보이고 고른 줄만 펼쳐진다. 줄 높이는 스크립트가 잰다 ── */
+/* 3판(5-6): 고른 줄의 화면이 구역 전체 뒤에 깔린다. 줄이 바뀌면 컷(앞 화면 0.12초에 꺼짐, 새 화면이 흐림·밝음에서 0.45초에 초점) */
+.rshot { position: absolute; inset: 0; opacity: 0; }
+.rshot.on { opacity: 1; }
+.rshot .rz { position: absolute; inset: 0; }
+.rshot .soft { opacity: 0; }
+.rdim { position: absolute; inset: 0; background: #000; opacity: 0.5; }
+/* 줄 이름 자리(왼쪽 30%)만 가린다. 사진 위에 올라야 하므로 겹 순서는 스크립트가 사진보다 위로 둔다(014 검토: 밝은 사진 위 줄 이름이 안 읽힘) */
+.rscrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.62) 24%, rgba(0, 0, 0, 0.3) 32%, rgba(0, 0, 0, 0) 40%); }
+/* 다섯 줄 묶음은 제목 아래 남은 높이의 세로 가운데. 묶음 높이는 가장 긴 줄이 펼쳐졌을 때로 고정해(스크립트) 줄이 바뀌어도 위치가 흔들리지 않는다 */
+html.deck .rows { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(10px, 2.6vh, 36px)) var(--gutter) clamp(12px, 3vh, 40px); }
+html.deck .rows .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
+html.deck .rows .row-list { margin-top: clamp(8px, 2.2vh, 30px); align-self: center; }
+/* 줄 간격: 1100×620에서 10px, 1440×900에서 25px, 큰 창 30px(설계에 값이 없어 화면을 보고 정함) */
+html.deck .row { padding: clamp(9px, calc(5.2vh - 22px), 30px) 0; overflow: hidden; align-items: start; cursor: pointer; transition: height 0.5s var(--ease); }
+html.deck .row-label { font-size: max(14px, min(1.3vw, 2.4vh, calc(19px * var(--k, 1)))); transition: opacity 0.5s; }
+html.deck .row:not(.sel) .row-label { opacity: 0.7; }
+html.deck .row h3 { font-size: max(17px, min(1.8vw, 3.2vh, calc(28px * var(--k, 1)))); }
+html.deck .row-body p { font-size: max(13px, min(1.12vw, 2.15vh, calc(17px * var(--k, 1)))); line-height: 1.65; }
+html.deck .keywords { margin-top: clamp(8px, 1.5vh, 16px); }
+html.deck .keywords li { font-size: max(12px, min(1vw, 1.9vh, calc(14px * var(--k, 1)))); }
+html.deck .row h3, html.deck .row-body { transition: opacity 0.3s; }
+html.deck .row:not(.sel) h3, html.deck .row:not(.sel) .row-body { opacity: 0; }
+/* 오른쪽 아래 상담 버튼(오른쪽 28px + 60px)에 낱말이 가리지 않게 설명 칸 오른쪽을 비운다 */
+html.deck .row-body { padding-right: max(0px, calc(100px - var(--gutter))); }
+html.deck .row:focus { outline: none; }
+.rows.snap .row, .rows.snap .row * { transition: none !important; }
+/* 휴대폰·작은 창: 다섯 줄이 다 펼쳐져 있다. 줄마다 화면에 들어오면 위쪽 선이 그어지고 글이 떠오른다(5-9) */
+html.fx:not(.deck) .row { position: relative; border-top-color: transparent; }
+html.fx:not(.deck) .row::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--thread); transform: scaleX(0); transform-origin: left; transition: transform 0.9s var(--ease); }
+html.fx:not(.deck) .row > * { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.fx:not(.deck) .row.on::before { transform: none; }
+html.fx:not(.deck) .row.on > * { opacity: 1; transform: none; }
+html.fx:not(.deck) .row.on > :nth-child(2) { transition-delay: 0.1s; }
+html.fx:not(.deck) .row.on > :nth-child(3) { transition-delay: 0.2s; }
+
+/* ── 화면 5 과정(5-7): 단계 표시는 화면 틀. 모서리 → 구도 선 → 테두리와 초점 네모 → 채워진 화면 ── */
+.burst.frame { overflow: visible; transform-origin: 72px 100%; }
+.burst.frame .d { fill: none; stroke: #fff; stroke-width: 1.25; }
+.burst.frame .g { stroke-opacity: 0.5; }
+.burst.frame .fill { fill: #fff; }
+.burst.frame .flash { fill: #fff; opacity: 0; }
+.step:last-child .burst.frame .flash { fill: #0a0a0a; }
+html.fx .burst.frame .d { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.7s cubic-bezier(0.65, 0, 0.35, 1) var(--dd, 0s), opacity 0.25s ease; }
+html.fx .burst.frame .fill { opacity: 0; transition: opacity 0.5s ease 0.45s; }
+html.fx .step.on .burst.frame .d { stroke-dashoffset: 0; }
+html.fx .step.on .burst.frame .fill { opacity: 1; }
+html.fx .step .step-text > * { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.fx .step.on .step-text > * { opacity: 1; transform: none; transition-delay: 0.2s; }
+html.fx .step.on .step-text > :nth-child(2) { transition-delay: 0.28s; }
+html.fx .step.on .step-text > :nth-child(3) { transition-delay: 0.36s; }
+html.fx .steps.snap .step *, html.fx .process.snap .steps::before { transition: none !important; }
+.step { transition: opacity 0.4s; }
+.steps.focus .step:not(.hot) { opacity: 0.38; }
+/* 3판(5-7): 구역 전체 뒤에 사진 한 장이 단계만큼 현상돼 있다. 단계마다 미리 만든 한 겹(흑백·흐림·밝기)을 겹치고 투명도만 바꾼다 */
+.pl { opacity: 0; }
+.pgrid, .pfocus { position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s ease; }
+.pgrid { background: linear-gradient(90deg, transparent calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% + 0.5px), transparent calc(33.333% + 0.5px), transparent calc(66.667% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.667% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.667% + 0.5px), transparent calc(66.667% + 0.5px)), linear-gradient(180deg, transparent calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% - 0.5px), rgba(255, 255, 255, 0.22) calc(33.333% + 0.5px), transparent calc(33.333% + 0.5px), transparent calc(66.667% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.667% - 0.5px), rgba(255, 255, 255, 0.22) calc(66.667% + 0.5px), transparent calc(66.667% + 0.5px)); }
+.pfocus b { position: absolute; left: 50%; top: 50%; width: 12vw; height: calc(12vw * 0.5625); transform: translate(-50%, -50%); --c: rgba(255, 255, 255, 0.75); --l: calc(12vw * 0.16);
+  background: linear-gradient(var(--c), var(--c)) left top / var(--l) 1.5px, linear-gradient(var(--c), var(--c)) left top / 1.5px var(--l), linear-gradient(var(--c), var(--c)) right top / var(--l) 1.5px, linear-gradient(var(--c), var(--c)) right top / 1.5px var(--l), linear-gradient(var(--c), var(--c)) left bottom / var(--l) 1.5px, linear-gradient(var(--c), var(--c)) left bottom / 1.5px var(--l), linear-gradient(var(--c), var(--c)) right bottom / var(--l) 1.5px, linear-gradient(var(--c), var(--c)) right bottom / 1.5px var(--l); background-repeat: no-repeat; }
+.process.st-1 .pgrid, .process.st-2 .pfocus { opacity: 1; }
+.pflash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+/* 글 뒤 어두운 번짐: 위 제목과 단계 글 자리 */
+.pscrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.5) 70%, rgba(0, 0, 0, 0) 100%); }
+html.deck .process { display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(16px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 88px); }
+html.deck .process .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
+html.deck .steps { margin-top: 0; align-self: center; }
+html.deck .burst.frame { width: calc(144px * var(--k, 1)); height: calc(72px * var(--k, 1)); transform-origin: calc(72px * var(--k, 1)) 100%; }
+html.deck .steps::before { top: calc(72px * var(--k, 1) - 0.5px); transform: scaleX(0); transform-origin: left; transition: transform 1.44s cubic-bezier(0.65, 0, 0.35, 1) 0.48s; }
+html.deck .process.in .steps::before { transform: none; }
+html.deck .step-name { margin-top: calc(28px * var(--k, 1)); font-size: max(15px, min(1.25vw, 2.4vh, calc(18px * var(--k, 1)))); }
+html.deck .step h3 { font-size: max(18px, min(1.5vw, 2.9vh, calc(21px * var(--k, 1)))); }
+html.deck .step-text p:last-child { font-size: max(14px, min(1.12vw, 2.2vh, calc(16px * var(--k, 1)))); }
+@media (max-width: 900px) {
+  .burst.frame { transform-origin: 36px 100%; }
+  .burst.frame .d { stroke-width: 2.4; }
+}
+
+/* ── 화면 6 문의(5-8) ── */
+html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1))); }
+html.deck .cta-row p { font-size: max(20px, min(2vw, 4vh, calc(28.8px * var(--k, 1)))); }
+html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
+  <a class="quick-apply" href="contact.html#apply">빠른 지원하기</a>
+  <button class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu-panel"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h18M3 12h18M3 17.5h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <nav class="nav" aria-label="주 메뉴"><a href="home.html">홈</a><a href="about.html">회사소개</a><a href="mcn.html">MCN</a><a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a><a href="entertainment.html">엔터테인먼트</a><a href="media.html" aria-current="page">미디어</a><a href="partners.html">협력사</a><a href="contact.html">CONTACT</a><a class="btn btn-solid" href="contact.html#apply">지원하기</a></nav>
+</header>
+<nav class="menu-panel" id="menu-panel" aria-label="주 메뉴 (펼침)" hidden>
+  <button class="menu-close" type="button" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <div class="menu-list">
+    <a href="home.html">홈</a>
+    <a href="about.html">회사소개</a>
+    <a href="mcn.html">MCN</a>
+    <a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a>
+    <a href="entertainment.html">엔터테인먼트</a>
+    <a href="media.html" aria-current="page">미디어</a>
+    <a href="partners.html">협력사</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+</nav>
+<main>
+<section class="hero scene" data-name="첫 화면">
+  <div class="hero-bg" aria-hidden="true"><style>@media (max-width: 900px) { .hero-bg video, .home-bg img { object-position: 62% 40% !important; } }</style><video class="hero-video" muted loop playsinline preload="none" poster="../2026-11-10-pages/img/media-hero-poster.webp" style="object-position: 60% 40%"></video></div>
+  <p class="eyebrow">STUDIO. BROADCAST. PRODUCTION.</p>
+  <h1>공간과 방송 환경을 만들고,<br>아이디어를 영상·이미지·효과로 완성합니다.</h1>
+  <div class="hero-actions late"><a class="btn btn-line" href="contact.html">블로그 바로가기</a></div>
+  <button class="scroll-hint" type="button" aria-label="아래 내용으로 이동"><span class="wheel" aria-hidden="true"></span><span class="arrow" aria-hidden="true"></span></button>
+</section>
+<section class="intro scene" id="page-content" data-name="소개">
+  <div class="intro-head"><p class="eyebrow">MEDIA, BUILT FOR YOUR VISION</p><h2>좋은 콘텐츠는 아이디어뿐 아니라, 그것을 구현할 수 있는 환경과 제작 과정에서 완성됩니다.</h2></div>
+  <div class="intro-text late"><p>ASTRA MEDIA는 스튜디오와 개인방송 환경을 목적에 맞게 구성하고, 영상·이미지·효과 콘텐츠를 기획하고 제작합니다. 필요한 공간과 장비부터 최종 결과물까지, 미디어 제작의 흐름을 함께 설계합니다.</p></div>
+</section>
+<section class="studio scene" data-name="스튜디오"><div class="cards" aria-roledescription="carousel" aria-label="설치 스튜디오 사진"><div class="card" data-off="-2"><img src="../2026-11-10-pages/img/media-studio-4.webp" alt="" draggable="false"></div><div class="card" data-off="-1"><img src="../2026-11-10-pages/img/media-studio-5.webp" alt="" draggable="false"></div><div class="card" data-off="0"><img src="../2026-11-10-pages/img/media-studio-1.webp" alt="설치 스튜디오 예시" draggable="false"></div><div class="card" data-off="1"><img src="../2026-11-10-pages/img/media-studio-2.webp" alt="" draggable="false"></div><div class="card" data-off="2"><img src="../2026-11-10-pages/img/media-studio-3.webp" alt="" draggable="false"></div><button type="button" class="card-arrow prev" aria-label="이전 사진"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button type="button" class="card-arrow next" aria-label="다음 사진"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div></section>
+<section class="rows scene" data-name="하는 일">
+  <h2 class="display section-title">WHAT WE DO</h2>
+  <div class="row-list"><article class="row"><p class="row-label"><i>01 —</i> STUDIO SETUP</p><h3>공간을 확인하고, 목적에 맞는 스튜디오를 설계합니다.</h3><div class="row-body"><p>방송과 촬영 목적, 공간의 크기와 구조를 확인한 뒤 조명·배경·장비 배치까지 고려해 최적의 스튜디오 환경을 구성합니다.</p><ul class="keywords"><li>공간 확인</li><li>레이아웃 설계</li><li>장비 배치</li><li>조명 세팅</li><li>배경 연출</li></ul></div></article><article class="row"><p class="row-label"><i>02 —</i> PERSONAL BROADCAST SETUP</p><h3>안정적인 개인방송 환경을 세팅합니다.</h3><div class="row-body"><p>방송 방식과 공간에 맞춰 카메라와 음향, 송출 장비와 프로그램을 구성합니다. 화면과 소리를 점검하고, 실제 방송에 필요한 기본 환경을 맞춥니다.</p><ul class="keywords"><li>카메라 세팅</li><li>음향 구성</li><li>송출 장비</li><li>방송 프로그램</li><li>화면 설정</li></ul></div></article><article class="row"><p class="row-label"><i>03 —</i> VIDEO PRODUCTION</p><h3>아이디어를 영상 콘텐츠로 완성합니다.</h3><div class="row-body"><p>영상의 목적과 플랫폼에 맞춰 콘셉트와 구성을 기획하고, 촬영과 편집을 진행합니다. 브랜드 영상부터 홍보 영상과 숏폼까지 다양한 형식으로 이야기를 전달합니다.</p><ul class="keywords"><li>영상 기획</li><li>촬영</li><li>편집</li><li>홍보 영상</li><li>숏폼 콘텐츠</li></ul></div></article><article class="row"><p class="row-label"><i>04 —</i> IMAGE PRODUCTION</p><h3>한 장의 이미지로 콘텐츠와 브랜드를 표현합니다.</h3><div class="row-body"><p>사용 목적에 맞는 이미지와 그래픽을 기획하고 제작합니다. 채널과 방송, 캠페인에 활용할 수 있도록 콘셉트와 디자인을 조율합니다.</p><ul class="keywords"><li>이미지 기획</li><li>썸네일</li><li>배너</li><li>포스터</li><li>홍보 그래픽</li></ul></div></article><article class="row"><p class="row-label"><i>05 —</i> EFFECTS PRODUCTION</p><h3>화면에 기억에 남는 움직임과 분위기를 더합니다.</h3><div class="row-body"><p>방송과 영상의 콘셉트에 맞춰 시각 효과와 모션 그래픽을 제작합니다. 로고와 타이틀, 전환 화면 등에 개성을 더해 콘텐츠의 완성도를 높입니다.</p><ul class="keywords"><li>모션 그래픽</li><li>타이틀 효과</li><li>전환 화면</li><li>방송 효과</li><li>인트로·아웃트로</li></ul></div></article></div>
+</section>
+<section class="process scene" data-name="과정">
+  <h2 class="display section-title">FROM IDEA TO PRODUCTION</h2>
+  <ol class="steps"><li class="step"><svg class="burst frame" viewBox="-72 -72 144 72" aria-hidden="true"><rect class="flash" x="-64" y="-72" width="128" height="72"/><path class="d" pathLength="1" d="M-64 -58V-72H-50M50 -72H64V-58M64 -14V0H50M-50 0H-64V-14"/></svg><div class="step-text"><p class="step-name">PLAN</p><h3>목적과 필요한 결과물을 정합니다.</h3><p>방송, 촬영, 콘텐츠의 목적과 사용 환경을 파악합니다.</p></div></li><li class="step"><svg class="burst frame" viewBox="-72 -72 144 72" aria-hidden="true"><rect class="flash" x="-64" y="-72" width="128" height="72"/><path class="d" pathLength="1" d="M-64 -58V-72H-50M50 -72H64V-58M64 -14V0H50M-50 0H-64V-14"/><path class="d g" pathLength="1" style="--dd: 0.25s" d="M-21.33 -72V0M21.33 -72V0M-64 -48H64M-64 -24H64"/></svg><div class="step-text"><p class="step-name">DESIGN</p><h3>공간과 제작 방향을 설계합니다.</h3><p>장비 구성과 화면 연출, 콘텐츠의 콘셉트를 구체화합니다.</p></div></li><li class="step"><svg class="burst frame" viewBox="-72 -72 144 72" aria-hidden="true"><rect class="flash" x="-64" y="-72" width="128" height="72"/><rect class="d" pathLength="1" x="-64" y="-72" width="128" height="72"/><path class="d" pathLength="1" style="--dd: 0.3s" d="M-9 -38V-42H-5M5 -42H9V-38M9 -34V-30H5M-5 -30H-9V-34"/></svg><div class="step-text"><p class="step-name">SETUP &amp; CREATE</p><h3>방송 환경을 세팅하고 결과물을 만듭니다.</h3><p>스튜디오와 개인방송 환경을 구성하거나 영상·이미지·효과를 제작합니다.</p></div></li><li class="step"><svg class="burst frame" viewBox="-72 -72 144 72" aria-hidden="true"><rect class="d" pathLength="1" x="-64" y="-72" width="128" height="72"/><rect class="fill" x="-64" y="-72" width="128" height="72"/><rect class="flash" x="-64" y="-72" width="128" height="72"/></svg><div class="step-text"><p class="step-name">TEST &amp; DELIVER</p><h3>최종 결과를 확인하고 전달합니다.</h3><p>세팅 상태와 제작물을 점검해 실제 사용에 맞게 마무리합니다.</p></div></li></ol>
+</section>
+<div class="scene scene-end" data-name="문의" data-light>
+<section class="cta">
+  <p class="display" data-words>WE MAKE NEXT.</p>
+  <div class="cta-row rise" style="--i:3"><p>만들고 싶은 장면을 들려주세요. 공간부터 결과물까지 함께합니다.</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#business">비즈니스 문의</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
+</section>
+<footer class="site-footer">
+  <div>
+    <img class="footer-logo" src="../2026-11-10-pages/img/logo-astra.webp" alt="ASTRA ENTERTAINMENT" width="87" height="81">
+    <p class="slot">사업자 정보 자리 (상호, 대표자, 사업자번호, 주소, 전화, 이메일)</p>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+    <p class="slot">인스타그램 링크 자리</p>
+  </div>
+</footer>
+</div>
+</main>
+<div class="vf" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+<svg class="iris" aria-hidden="true"><path class="blades"/><path class="edge"/></svg>
+<div class="fab-anchor">
+  <div class="fab">
+    <ul class="fab-menu" id="fab-menu">
+      <li><a href="#">카카오톡 상담</a></li>
+      <li><a href="#">인스타그램</a></li>
+      <li><a href="#">블로그</a></li>
+      <li><a class="main" href="contact.html#apply">지원하기</a></li>
+    </ul>
+    <button class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="상담·지원 바로가기 열기">
+      <svg class="talk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10.5H10.5L6 19.5V16H4z"/><path d="M8.5 10.8h.01M12 10.8h.01M15.5 10.8h.01" stroke-width="2.2"/></svg>
+      <svg class="x" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+</div>
+<script src="deck.js"></script>
+<script>
+/* 미디어 2판 — 마우스가 카메라다(설계 5절). 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js)이 한다.
+   이 쪽이 하는 일: 초점 틀, 초점이 맞으며 나타나는 글, 첫 화면 배경의 초점, 캐러셀(확정본 + 얕은 초점·끌기·들어올 때 펼침),
+   하는 일 다섯 줄(휠 다섯 번), 과정의 화면 틀과 셔터, 조리개 넘김. 값은 README.md */
+(function () {
+  var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim, EASE = D.EASE;
+  var HERO = 0, INTRO = 1, STUDIO = 2, WHAT = 3, PROC = 4, END = 5;
+  var scenes = $$('.scene');
+  var hero = scenes[HERO], intro = scenes[INTRO], studio = scenes[STUDIO], what = scenes[WHAT], proc = scenes[PROC], endScene = scenes[END];
+  var header = $('.site-header');
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var lag = function (dt, tau) { return 1 - Math.exp(-dt / tau); };
+  var easeOut = function (u) { return 1 - Math.pow(1 - u, 3); };
+  var easeInOut = function (u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var now = function () { return performance.now(); };
+  var K = function () { return D.k || 1; };
+  var timers = {};
+  function later(name, fn, ms) { (timers[name] = timers[name] || []).push(setTimeout(fn, ms)); }
+  function clearT(name) { (timers[name] || []).forEach(clearTimeout); timers[name] = []; }
+  var onlyAt = function (n) { return D.on && D.cur === n && !D.trans; };
+  function snap(el, fn) { el.classList.add('snap'); fn(); void el.offsetWidth; el.classList.remove('snap'); }
+  function cancelIn(el) { if (el && el.getAnimations) el.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); }); }
+
+  /* ───────── 5-2. 초점이 맞으며 나타나는 글 ─────────
+     글자는 그대로 두고 낱말마다 감싼다(줄바꿈 표시도 그대로). 같은 줄의 낱말은 함께, 줄마다 0.14초 간격으로 흐림 14px → 또렷(0.9초). */
+  function wrapWords(el) {
+    Array.prototype.slice.call(el.childNodes).forEach(function (n) {
+      if (n.nodeType !== 3 || !n.textContent.trim()) return;
+      var frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(function (w) {
+        if (!w) return;
+        if (/^\s+$/.test(w)) { frag.appendChild(document.createTextNode(w)); return; }
+        var s = document.createElement('span'); s.className = 'fw'; s.textContent = w; frag.appendChild(s);
+      });
+      el.replaceChild(frag, n);
+    });
+    return el;
+  }
+  function lines(el) {
+    var out = [], top = null;
+    $$('.fw', el).forEach(function (w) {
+      var t = w.offsetTop;
+      if (top === null || t > top + 4) { out.push([]); top = t; }
+      out[out.length - 1].push(w);
+    });
+    return out;
+  }
+  var FOCUS = [{ opacity: 0, filter: 'blur(14px)' }, { opacity: 1, filter: 'blur(0px)' }];
+  // 첫 화면 제목만: 자동 초점이 한 번 헤맸다가 맞는다(흐림 16 → 0 → 1.5 → 0px, 1.2초)
+  var HUNT = [{ opacity: 0, filter: 'blur(16px)' }, { opacity: 1, filter: 'blur(0px)', offset: 0.5 }, { opacity: 1, filter: 'blur(1.5px)', offset: 0.72 }, { opacity: 1, filter: 'blur(0px)' }];
+  function fzReset(el) { cancelIn(el); el.classList.add('fz'); }
+  function fzShow(el) { cancelIn(el); el.classList.remove('fz'); }
+  // 줄마다(each가 있으면 낱말마다) 차례로 초점이 맞는다. 다 맞는 데 걸리는 ms를 돌려준다
+  function focusIn(el, delay, opt) {
+    opt = opt || {};
+    cancelIn(el);
+    el.classList.remove('fz');
+    var groups = opt.each ? $$('.fw', el).map(function (w) { return [w]; }) : lines(el), gap = opt.each || 140, dur = opt.hunt ? 1200 : 900;
+    groups.forEach(function (g, i) {
+      g.forEach(function (w) { anim(w, opt.hunt ? HUNT : FOCUS, { duration: dur, delay: delay + i * gap, easing: opt.hunt ? 'ease-out' : 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' }); });
+    });
+    return delay + (groups.length - 1) * gap + dur;
+  }
+
+  /* ───────── 5-1. 초점 틀 ─────────
+     마우스 자리를 가운데로 0.16초 늦게 따라온다(84×56px × 배율, 70%). 초점 대상에 올리면 0.28초에 그 테두리(바깥 8px)로 늘어나 맞춰지고 100%,
+     맞춰진 순간 4px 줄었다 돌아온다(0.15초). 2.5초 쉬면 35%. 화면을 넘기면 0.2초에 사라졌다 새 화면에서 다시 나타난다. 흰 화면에서는 검정 */
+  var vf = $('.vf'), VF = { x: 0, y: 0, w: 84, h: 56, a: 0, tgt: null, tw: null, pulse: 0, kbd: null, kbdAt: 0, dur: 280 };
+  var TARGETS = '.btn, .card-arrow, .cthumb, .stage-close, .intro h2, .intro-text p, .step';
+  function hoverTarget(n) {
+    var M = D.mouse;
+    if (!M.at) return null;
+    var el = document.elementFromPoint(M.x, M.y);
+    if (!el || !el.closest || !scenes[n].contains(el)) return null;
+    if (n === STUDIO && el.closest('.cards') && !el.closest('.card-arrow') && !el.closest('.cnav')) return el.closest('.card') || front();
+    if (n === INTRO) return el.closest(TARGETS) || FILM.fo;
+    return el.closest(TARGETS);
+  }
+  function vfFrame(t, dt) {
+    var M = D.mouse, k = K(), n = D.cur;
+    var show = D.on && fine && !D.trans;
+    var tg = null;
+    if (show) {
+      if (VF.kbd && document.activeElement === VF.kbd && M.at < VF.kbdAt && scenes[n].contains(VF.kbd)) tg = VF.kbd.closest('.row, .step') || VF.kbd;
+      else if (n === WHAT && W.sel >= 0) tg = rows[W.sel];
+      else tg = hoverTarget(n);
+      if (!tg && !M.at) show = false;
+    }
+    var gx, gy, gw, gh;
+    if (tg) {
+      var r = tg.getBoundingClientRect(), pad = 8 * k;
+      gx = r.left + r.width / 2; gy = r.top + r.height / 2; gw = r.width + pad * 2; gh = r.height + pad * 2;
+    } else { gx = M.x; gy = M.y; gw = 84 * k; gh = 56 * k; }
+    // 보이지 않다가 나타날 때는 그 자리에 바로 놓는다
+    if (VF.a < 0.02 && show) { VF.x = gx; VF.y = gy; VF.w = gw; VF.h = gh; VF.tgt = tg; VF.tw = null; }
+    else if (tg !== VF.tgt) {
+      VF.tw = tg ? { x: VF.x, y: VF.y, w: VF.w, h: VF.h, t0: t, dur: n === WHAT ? 500 : 280 } : null;
+      VF.tgt = tg; VF.pulse = 0;
+    }
+    if (tg) {
+      if (VF.tw) {
+        var u = clamp((t - VF.tw.t0) / VF.tw.dur, 0, 1), e = easeOut(u);
+        VF.x = VF.tw.x + (gx - VF.tw.x) * e; VF.y = VF.tw.y + (gy - VF.tw.y) * e; VF.w = VF.tw.w + (gw - VF.tw.w) * e; VF.h = VF.tw.h + (gh - VF.tw.h) * e;
+        if (u >= 1) { VF.tw = null; VF.pulse = t; }
+      } else { VF.x = gx; VF.y = gy; VF.w = gw; VF.h = gh; }
+    } else {
+      var f = lag(dt, 0.16);
+      VF.x += (gx - VF.x) * f; VF.y += (gy - VF.y) * f; VF.w += (gw - VF.w) * f; VF.h += (gh - VF.h) * f;
+    }
+    var want = !show ? 0 : (tg ? 1 : 0.7);
+    if (show && M.at && t - M.at > 2500 && !(n === WHAT && VF.tw)) want = 0.35;
+    VF.a += (want - VF.a) * lag(dt, want < VF.a && !show ? 0.06 : 0.12);
+    if (VF.a < 0.005) VF.a = 0;
+    var w = VF.w, h = VF.h;
+    if (VF.pulse) { var p = (t - VF.pulse) / 150; if (p >= 1) VF.pulse = 0; else { var s = 4 * k * Math.sin(Math.PI * p); w -= s * 2; h -= s * 2; } }
+    vf.style.width = w.toFixed(1) + 'px'; vf.style.height = h.toFixed(1) + 'px';
+    vf.style.transform = 'translate3d(' + (VF.x - w / 2).toFixed(1) + 'px,' + (VF.y - h / 2).toFixed(1) + 'px,0)';
+    vf.style.opacity = VF.a.toFixed(3);
+    vf.style.color = n === END ? '#000' : '#fff';
+  }
+  // 키보드로 초점이 간 대상에도 틀이 맞춰진다(마우스를 움직이면 다시 마우스를 따른다)
+  document.addEventListener('focusin', function (e) {
+    var el = e.target;
+    if (!D.on || !el.matches || !el.matches(':focus-visible')) { VF.kbd = null; return; }
+    if (el.matches(TARGETS) || el.closest('.row, .step')) { VF.kbd = el; VF.kbdAt = now(); }
+  });
+
+  /* ───────── 5-3. 첫 화면 ───────── */
+  var heroImg = $('.hero-video'), heroEye = $('.hero .eyebrow'), h1 = $('.hero h1');
+  if (!reduce) { wrapWords(heroEye); wrapWords(h1); }
+  function heroReset() { clearT('hero'); cancelIn(heroImg); hero.classList.add('fz-bg'); fzReset(heroEye); fzReset(h1); hero.classList.remove('title-on'); }
+  // 배경이 흐림 10px에서 1.6초에 또렷해지고, 작은 영문 세 낱말이 0.2초 간격으로 초점이 맞고, 제목이 초점을 한 번 헤맸다가 맞고, 버튼이 떠오른다
+  function heroPlay(instant) {
+    heroReset();
+    if (instant) { hero.classList.remove('fz-bg'); fzShow(heroEye); fzShow(h1); hero.classList.add('title-on'); return; }
+    hero.classList.remove('fz-bg');
+    anim(heroImg, [{ filter: 'blur(10px)' }, { filter: 'blur(0px)' }], { duration: 1600, easing: 'cubic-bezier(0.3, 0.55, 0.25, 1)', fill: 'backwards' });
+    focusIn(heroEye, 250, { each: 200 });
+    var end = focusIn(h1, 850, { hunt: true });
+    later('hero', function () { hero.classList.add('title-on'); }, end - 450);
+  }
+
+  /* 5-3 첫 화면 영상(대표 11-12): 가로 900px 아래는 휴대폰용 파일만 받는다. 첫 화면에 있는 동안(넘김: 첫 화면이거나 그리로 넘어가는 중, 스크롤: 첫 화면이 보이는 동안)만
+     재생하고, 떠나 있거나 창이 안 보이면 멈췄다가 돌아오면 이어서 돈다. 움직임 줄이기에서는 받지 않고 첫 장면 그림만 보인다 */
+  var heroVid = heroImg, VID = { want: null };
+  if (!reduce) heroVid.src = '../2026-11-10-pages/img/' + (window.innerWidth <= 900 ? 'media-hero-m.mp4' : 'media-hero.mp4');
+  function heroVideoFrame() {
+    if (reduce) return;
+    var live = !document.hidden && (D.on ? (D.cur === HERO || !!(D.trans && (D.trans.from === HERO || D.trans.to === HERO))) : hero.getBoundingClientRect().bottom > 0);
+    if (live === VID.want) return;
+    VID.want = live;
+    if (live) { var pr = heroVid.play(); if (pr && pr.catch) pr.catch(function () { VID.want = null; }); }
+    else heroVid.pause();
+  }
+  document.addEventListener('visibilitychange', heroVideoFrame);
+
+  /* ───────── 5-4. 소개: 작은 영문 → 큰 문장 줄마다 → 설명 ───────── */
+  var introEye = $('.intro .eyebrow'), introH = $('.intro h2');
+  if (!reduce) { wrapWords(introEye); wrapWords(introH); }
+  function introReset() { clearT('intro'); fzReset(introEye); fzReset(introH); intro.classList.remove('title-on'); FILM.enterAt = 0; filmFocus(null); }
+  function introPlay(instant) {
+    introReset();
+    if (instant) { fzShow(introEye); fzShow(introH); intro.classList.add('title-on'); return; }
+    // 화면이 넘어오는 동안(약 0.45초)에는 가려 보이지 않으므로 0.35초 뒤부터 밀려 들어온다
+    FILM.enterAt = now() + 350;
+    focusIn(introEye, 150);
+    var end = focusIn(introH, 380);
+    later('intro', function () { intro.classList.add('title-on'); }, end - 500);
+  }
+  /* ───────── 3판 공통: 깔린 층과 미리 흐리게 한 겹 ─────────
+     화면 전체 사진의 흐림을 매 화면 계산하지 않게, 사진을 작은 그림판에 한 번 흐리게(흑백·밝기도) 그려 두고 늘려서 겹친다. 바꾸는 것은 투명도뿐 */
+  var IMG = '../2026-11-10-pages/img/';
+  function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
+  function bglOf(scene) { var b = el('div', 'bgl'), inn = el('div', 'bgl-in'); b.setAttribute('aria-hidden', 'true'); b.setAttribute('data-bleed', ''); b.appendChild(inn); scene.insertBefore(b, scene.firstChild); return inn; }
+  function pic(name) { var i = el('img', 'sharp'); i.src = IMG + name + '.webp'; i.alt = ''; i.decoding = 'async'; return i; }
+  // blur: 화면에서 보일 흐림(px). 그림판 폭 w로 줄여 그리고 흐림은 그만큼 나눠 건다(늘리면 다시 그만큼 흐려진다)
+  function soft(name, o) {
+    var c = el('canvas', 'soft ' + (o.cls || '')), im = new Image();
+    im.onload = function () {
+      var w = o.w || 480, h = Math.round(w * im.naturalHeight / im.naturalWidth), sc = Math.max(1, (o.disp || window.innerWidth) / w), b = (o.blur || 0) / sc, m = Math.ceil(b * 2.5);
+      c.width = w; c.height = h;
+      var x = c.getContext('2d'), f = (o.gray ? 'grayscale(1) ' : '') + (b ? 'blur(' + b.toFixed(2) + 'px) ' : '') + (o.bright != null ? 'brightness(' + o.bright + ')' : '');
+      if (typeof x.filter === 'string') { x.filter = f.trim() || 'none'; x.drawImage(im, -m, -m, w + m * 2, h + m * 2); }
+      else { x.drawImage(im, 0, 0, w, h); c.style.filter = f.trim(); }
+    };
+    im.src = IMG + name + '.webp';
+    return c;
+  }
+  function stopAnims(e) { e.getAnimations().forEach(function (a) { a.cancel(); }); }
+
+  /* ───────── 3판 5-4. 소개: 필름 띠 ─────────
+     스튜디오 사진 여섯 장이 가로로 이어진 띠(틀 높이 창의 58%, 틀 사이 18px × 배율, 평소 밝기 38%). 혼자 왼쪽으로 초당 14px × 배율 흐르고,
+     마우스를 좌우로 움직이면 따라 흐른다(창 가로를 다 가면 틀 1.6장만큼, 0.5초 늦게). 마우스 아래 틀만 밝기 80%·또렷, 나머지 흐림 3px.
+     들어올 때 0.35초 뒤부터 띠가 오른쪽에서 틀 3장만큼 밀려 들어와 느려진다(0.9초) */
+  var FILM_SET = ['media-studio-1', 'media-studio-2', 'media-hero', 'media-studio-3', 'media-studio-4', 'media-studio-5'];
+  var filmIn = bglOf(intro), film = el('div', 'film'), FILM = { set: 0, step: 0, auto: 0, scrub: 0, scrubT: 0, drag: 0, flow: 0, enterAt: 0, x: 0, fo: null, ff: [] };
+  filmIn.appendChild(film);
+  function filmLayout() {
+    var vw = window.innerWidth, h = film.getBoundingClientRect().height || window.innerHeight * 0.58, gap = 18 * K(), fw = h * 1.6;
+    FILM.step = fw + gap; FILM.set = FILM.step * FILM_SET.length;
+    var need = Math.ceil((vw + FILM.set * 2) / FILM.set) + 1;
+    if (film.children.length !== need * FILM_SET.length) {
+      film.innerHTML = ''; FILM.ff = [];
+      for (var c = 0; c < need; c++) FILM_SET.forEach(function (n) {
+        var f = el('div', 'ff'); f.appendChild(pic(n)); f.appendChild(soft(n, { w: 320, blur: 3, disp: fw })); f.appendChild(el('i'));
+        film.appendChild(f); FILM.ff.push(f);
+      });
+    }
+    film.style.gap = gap.toFixed(1) + 'px';
+    filmPlace();
+  }
+  function filmPlace() {
+    var off = FILM.auto + FILM.scrub + FILM.drag + FILM.flow, e = 0;
+    if (FILM.enterAt) { var u = clamp((now() - FILM.enterAt) / 900, 0, 1); e = FILM.step * 3 * Math.pow(1 - u, 3); if (u >= 1) FILM.enterAt = 0; }
+    var m = ((off % FILM.set) + FILM.set) % FILM.set;
+    FILM.x = -FILM.set - m + e;
+    film.style.transform = 'translate3d(' + FILM.x.toFixed(1) + 'px,-50%,0)';
+  }
+  function filmFocus(f) {
+    if (f === FILM.fo) return;
+    if (FILM.fo) FILM.fo.classList.remove('fo');
+    FILM.fo = f; if (f) f.classList.add('fo');
+    film.classList.toggle('has-fo', !!f);
+  }
+  function filmFrame(dt) {
+    var M = D.mouse, k = K(), live = D.on ? (D.cur === INTRO || (D.trans && (D.trans.from === INTRO || D.trans.to === INTRO))) : (function () { var r = intro.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight; })();
+    if (!live) return;
+    FILM.auto += 14 * k * dt;
+    var fo = null;
+    if (D.on && fine && M.at) {
+      FILM.scrubT = (M.x / window.innerWidth) * FILM.step * 1.6;
+      if (onlyAt(INTRO)) {
+        var b = film.getBoundingClientRect();
+        if (M.y >= b.top && M.y <= b.bottom) { var j = Math.floor((M.x - FILM.x) / FILM.step); var lx = M.x - FILM.x - j * FILM.step; if (lx <= FILM.step - 18 * k) fo = FILM.ff[j] || null; }
+      }
+    }
+    // 휴대폰 스크롤 반응(12-5): 내리는 만큼 띠가 더 흐르고(10px 내리면 5px), 화면 가운데의 틀만 또렷하다
+    if (!D.on && D.flowOn()) { FILM.flow = window.pageYOffset * 0.5; var jc = Math.floor((window.innerWidth / 2 - FILM.x) / FILM.step); fo = FILM.ff[jc] || null; }
+    FILM.scrub += (FILM.scrubT - FILM.scrub) * lag(dt, 0.17);
+    filmFocus(fo);
+    filmPlace();
+  }
+  // 휴대폰: 손가락으로 띠를 민다(세로 스크롤은 그대로)
+  (function () {
+    var sx = null, sd = 0;
+    intro.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') { sx = e.clientX; sd = FILM.drag; } });
+    intro.addEventListener('pointermove', function (e) { if (sx !== null && e.pointerType !== 'mouse') { FILM.drag = sd - (e.clientX - sx); if (reduce) filmPlace(); } });
+    ['pointerup', 'pointercancel'].forEach(function (t) { intro.addEventListener(t, function () { sx = null; }); });
+  })();
+
+  /* ───────── 5-5. 스튜디오 카드: 확정된 캐러셀 ─────────
+     4초 자동, 이전·다음 버튼, 좌우 화살표, 손가락 밀기(40px), 마우스를 올리면 멈춤, 키보드 초점일 때 멈춤 — 확정본 그대로.
+     더한 것: 마우스로 잡고 끌기(60px 넘게 끌면 넘어감, 끄는 동안 카드가 따라옴), 들어올 때 모였다가 0.8초에 펼쳐짐, 이 화면을 떠나 있으면 자동 넘김 멈춤 */
+  var box = $('.cards'), cards = $$('.cards .card'), N = cards.length;
+  // 카드 차례: 정지 시안의 놓인 순서(-2, -1, 0, 1, 2)에서 0이 1번 사진이다
+  var ORDER = cards.map(function (c, i) { return i; }).sort(function (a, b) { return Number(cards[a].getAttribute('data-off')) - Number(cards[b].getAttribute('data-off')); });
+  var zero = ORDER.indexOf(cards.findIndex(function (c) { return c.getAttribute('data-off') === '0'; }));
+  ORDER = ORDER.slice(zero).concat(ORDER.slice(0, zero));
+  var C = { i: 0, timer: null, hover: false, kbd: false, active: false, dragX: null, dragId: null, dragMouse: false };
+  function front() { return cards[ORDER[C.i]]; }
+  /* 캐러셀 개선(대표 지시 11-12): 배경광, 아래 썸네일, 위치 표시. 썸네일은 카드의 사진을 그대로 쓴다(카드 수가 바뀌어도 따라 만든다).
+     어떤 방법으로 넘기든(버튼, 화살표, 끌기, 손가락, 자동, 썸네일) paint()가 같이 맞춘다 */
+  var glow = el('div', 'cglow'); glow.setAttribute('aria-hidden', 'true'); box.insertBefore(glow, box.firstChild);
+  var cnav = el('div', 'cnav'), cthumbs = el('div', 'cthumbs'), cprog = el('div', 'cprog', '<i><b></b></i>');
+  cthumbs.setAttribute('role', 'group'); cthumbs.setAttribute('aria-label', '설치 스튜디오 사진 고르기');
+  cprog.setAttribute('aria-hidden', 'true');
+  var thumbs = ORDER.map(function (ci, k) {
+    var b = el('button', 'cthumb'), im = el('img'); b.type = 'button';
+    b.setAttribute('aria-label', '설치 스튜디오 ' + (k + 1));
+    im.src = cards[ci].querySelector('img').getAttribute('src'); im.alt = ''; im.draggable = false; im.decoding = 'async';
+    b.appendChild(im); cthumbs.appendChild(b);
+    b.addEventListener('click', function () { if (k !== C.i) { show(k); } cStart(); });
+    return b;
+  });
+  cnav.appendChild(cthumbs); cnav.appendChild(cprog); box.appendChild(cnav);
+  var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+  // 배경광 색: 사진의 평균 색을 채도 40% 이하·밝기 45%로 낮춘다(읽지 못하면 따뜻한 호박색)
+  var GLOW = {};
+  function glowOf(img) {
+    var src = img.getAttribute('src');
+    if (GLOW[src]) return GLOW[src];
+    if (!img.complete || !img.naturalWidth) return null;
+    var c = 'rgb(150, 122, 84)';
+    try {
+      var cv = document.createElement('canvas'); cv.width = cv.height = 12;
+      var x = cv.getContext('2d'); x.drawImage(img, 0, 0, 12, 12);
+      var d = x.getImageData(0, 0, 12, 12).data, r = 0, g = 0, bl = 0;
+      for (var i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; bl += d[i + 2]; }
+      r /= 144 * 255; g /= 144 * 255; bl /= 144 * 255;
+      var mx = Math.max(r, g, bl), mn = Math.min(r, g, bl), h = 0, sat = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(mx + mn - 1));
+      if (mx !== mn) h = mx === r ? ((g - bl) / (mx - mn)) % 6 : mx === g ? (bl - r) / (mx - mn) + 2 : (r - g) / (mx - mn) + 4;
+      c = 'hsl(' + Math.round((h * 60 + 360) % 360) + ', ' + Math.round(Math.min(sat, 0.4) * 100) + '%, 45%)';
+    } catch (e) {}
+    return (GLOW[src] = c);
+  }
+  function glowPaint() {
+    var im = front().querySelector('img'), c = glowOf(im);
+    if (c) glow.style.backgroundColor = c;
+    else im.addEventListener('load', glowPaint, { once: true });
+  }
+  // 자동 넘김 시간 선: 자동 넘김이 도는 동안만, 고른 썸네일 아래에서 4초에 찬다
+  function runLine() {
+    thumbs.forEach(function (t) { t.classList.remove('run'); });
+    if (C.timer && !reduce) { var t = thumbs[C.i]; void t.offsetWidth; t.classList.add('run'); }
+  }
+  function navPaint() {
+    thumbs.forEach(function (t, k) { var on = k === C.i; t.classList.toggle('on', on); if (on) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
+    cprog.setAttribute('data-cur', pad2(C.i + 1)); cprog.setAttribute('data-total', pad2(N));
+    cprog.querySelector('b').style.setProperty('--p', ((C.i + 1) / N).toFixed(4));
+    // 썸네일이 가로로 넘치는 좁은 화면에서는 고른 것이 보이게 띠만 옮긴다(페이지는 스크롤하지 않는다)
+    var t = thumbs[C.i];
+    if (cthumbs.scrollWidth > cthumbs.clientWidth + 1) cthumbs.scrollLeft = t.offsetLeft - (cthumbs.clientWidth - t.offsetWidth) / 2;
+    glowPaint();
+    runLine();
+  }
+  function paint() {
+    ORDER.forEach(function (ci, k) {
+      var off = (k - C.i + N) % N;
+      if (off > N / 2) off -= N;
+      cards[ci].setAttribute('data-off', Math.abs(off) > 2 ? 'far' : String(off));
+      cards[ci].setAttribute('aria-hidden', String(off !== 0));
+    });
+    var f = front();
+    navPaint();
+    if (box.classList.contains('rack')) rackPaint();
+    if (ST && ST.open) stageShow(false);
+  }
+  function cStop() { clearInterval(C.timer); C.timer = null; runLine(); }
+  function cStart() {
+    cStop();
+    if (!C.active || C.hover || C.kbd || C.stage || document.hidden || reduce) return;
+    C.timer = setInterval(function () { show(C.i + 1); }, 4000);
+    runLine();
+  }
+  function show(n) { C.i = (n + N) % N; paint(); }
+  function cMove(step) { show(C.i + step); cStart(); }
+  $('.card-arrow.prev').addEventListener('click', function () { cMove(-1); });
+  $('.card-arrow.next').addEventListener('click', function () { cMove(1); });
+  // 스크롤하는 화면에서는 캐러셀에 초점이 있을 때 좌우 화살표(확정본). 한 화면씩 넘길 때는 이 화면 어디서나 좌우 화살표
+  box.addEventListener('keydown', function (e) { if (D.on) return; if (e.key === 'ArrowLeft') cMove(-1); if (e.key === 'ArrowRight') cMove(1); });
+  document.addEventListener('keydown', function (e) {
+    if (!onlyAt(STUDIO) || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); cMove(-1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); cMove(1); }
+  });
+  box.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { C.hover = true; box.classList.add('mouse'); cStart(); } });
+  box.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { C.hover = false; cStart(); } });
+  box.addEventListener('focusin', function (e) { C.kbd = e.target.matches(':focus-visible'); cStart(); });
+  box.addEventListener('focusout', function () { C.kbd = false; cStart(); });
+  box.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('.card-arrow') || e.target.closest('.cnav') || e.button !== 0) return;
+    C.dragX = e.clientX; C.dragId = e.pointerId; C.dragMouse = e.pointerType === 'mouse'; C.dragCard = e.target.closest('.card');
+    if (C.dragMouse) { e.preventDefault(); try { box.setPointerCapture(e.pointerId); } catch (er) {} box.classList.add('dragging'); }
+  });
+  box.addEventListener('pointermove', function (e) {
+    if (C.dragX === null || e.pointerId !== C.dragId || !C.dragMouse || reduce) return;
+    box.style.setProperty('--drag', ((e.clientX - C.dragX) * 0.7).toFixed(1) + 'px');
+  });
+  function dragEnd(e, cancel) {
+    if (C.dragX === null || e.pointerId !== C.dragId) return;
+    var moved = e.clientX - C.dragX;
+    C.dragX = null;
+    box.classList.remove('dragging');
+    box.style.removeProperty('--drag');
+    if (!cancel && Math.abs(moved) >= (C.dragMouse ? 60 : 40)) cMove(moved < 0 ? 1 : -1);
+    // 끌지 않고 누른 것이면: 뒤 카드를 누르면 그 카드가 앞으로 온다
+    else if (!cancel && Math.abs(moved) < 6 && C.dragCard) { var o = Number(C.dragCard.getAttribute('data-off')); if (o) cMove(o); else if (D.on && fine && !reduce) stageOpen(); }
+  }
+  /* 들어가 보기(대표 11-12). 처음 열 때 화면 3 안에 만든다(정지 시안과 글자를 견주는 검사에 들지 않게) */
+  var studioScene = box.closest('.scene');
+  var ST = { el: null, pics: null, eg: null, open: false, busy: false, shown: -1, tx: 0, ty: 0 };
+  var ARROW = function (d) { return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="' + d + '"/></svg>'; };
+  function stageBuild() {
+    var el = document.createElement('div');
+    el.className = 'stage';
+    el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', '설치 스튜디오 크게 보기');
+    el.innerHTML = '<div class="stage-pics"></div>' +
+      '<button type="button" class="card-arrow prev stage-prev" aria-label="이전 사진">' + ARROW('M15 5l-7 7 7 7') + '</button>' +
+      '<button type="button" class="card-arrow next stage-next" aria-label="다음 사진">' + ARROW('M9 5l7 7-7 7') + '</button>' +
+      '<button type="button" class="stage-close" aria-label="닫기">' + ARROW('M6 6l12 12M18 6L6 18') + '</button>';
+    studioScene.appendChild(el);
+    ST.el = el; ST.pics = el.querySelector('.stage-pics'); 
+    el.querySelector('.stage-prev').addEventListener('click', function (e) { e.stopPropagation(); cMove(-1); });
+    el.querySelector('.stage-next').addEventListener('click', function (e) { e.stopPropagation(); cMove(1); });
+    el.querySelector('.stage-close').addEventListener('click', function (e) { e.stopPropagation(); stageClose(false); });
+    el.addEventListener('click', function () { stageClose(false); });
+  }
+  // 사진 바꾸기: 새 사진이 앞으로 다가오듯(1.24 → 1.15) 0.7초에 겹쳐 나타난다
+  function stageShow(instant) {
+    if (!ST.el || ST.shown === C.i) return;
+    ST.shown = C.i;
+    var src = front().querySelector('img'), im = document.createElement('img');
+    im.src = src.currentSrc || src.src; im.alt = '설치 스튜디오 예시'; im.draggable = false;
+    ST.pics.appendChild(im);
+    var old = [].slice.call(ST.pics.children, 0, -1);
+    if (instant) { old.forEach(function (o) { o.remove(); }); return; }
+    im.animate([{ opacity: 0, transform: 'scale(1.24)' }, { opacity: 1, transform: 'scale(1.15)' }], { duration: 700, easing: EASE }).onfinish = function () { old.forEach(function (o) { o.remove(); }); };
+  }
+  function rectOf(el) { var r = el.getBoundingClientRect(); return { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }; }
+  function stageOpen() {
+    if (ST.open || ST.busy) return;
+    if (!ST.el) stageBuild();
+    ST.shown = -1; ST.pics.innerHTML = ''; stageShow(true);
+    ST.open = true; ST.busy = true; ST.tx = 0; ST.ty = 0; ST.pics.style.transform = '';
+    C.stage = true; cStart();
+    rackSet(null);
+    ST.el.style.display = '';
+    var from = Object.assign(rectOf(front()), { borderRadius: '18px' }), to = { left: '0px', top: '0px', width: innerWidth + 'px', height: innerHeight + 'px', borderRadius: '0px' };
+    ST.el.animate([from, to], { duration: 750, easing: EASE });
+    ST.pics.firstChild.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }], { duration: 750, easing: EASE });
+    later('studio', function () { box.classList.add('away'); }, 250);
+    ST.el.classList.remove('ready');
+    later('studio', function () { ST.busy = false; ST.el.classList.add('ready'); }, 760);
+  }
+  function stageClose(instant) {
+    if (!ST.open) return;
+    ST.open = false; C.stage = false;
+    ST.el.classList.remove('ready');
+    box.classList.remove('away');
+    var el = ST.el, done = function () { el.style.display = 'none'; ST.busy = false; cStart(); };
+    if (instant || reduce) { el.getAnimations().forEach(function (a) { a.cancel(); }); done(); return; }
+    ST.busy = true;
+    var to = Object.assign(rectOf(front()), { borderRadius: '18px' }), from = { left: '0px', top: '0px', width: innerWidth + 'px', height: innerHeight + 'px', borderRadius: '0px' };
+    ST.pics.style.transition = 'transform 0.6s ' + EASE; ST.pics.style.transform = 'translate(0px, 0px)';
+    var im = ST.pics.lastChild;
+    if (im) im.animate([{ transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 650, easing: EASE, fill: 'forwards' });
+    el.animate([from, to], { duration: 650, easing: EASE, fill: 'forwards' }).onfinish = function () { el.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); }); ST.pics.style.transition = ''; done(); };
+  }
+  // 둘러보기: 마우스 자리 쪽을 보듯 사진이 반대로 0.2초 늦게 밀린다(가로·세로 사진 크기의 7.5%까지)
+  function stageFrame(dt) {
+    if (!ST.open || ST.busy || !D.mouse.at) return;
+    var W0 = innerWidth, H0 = innerHeight, mx = clamp(D.mouse.x / W0 - 0.5, -0.5, 0.5), my = clamp(D.mouse.y / H0 - 0.5, -0.5, 0.5);
+    var k = lag(dt, 0.2);
+    ST.tx += (-mx * 2 * 0.075 * W0 - ST.tx) * k; ST.ty += (-my * 2 * 0.075 * H0 - ST.ty) * k;
+    ST.pics.style.transform = 'translate(' + ST.tx.toFixed(1) + 'px, ' + ST.ty.toFixed(1) + 'px)';
+  }
+  document.addEventListener('keydown', function (e) { if (ST.open && e.key === 'Escape') { e.preventDefault(); stageClose(false); } });
+  /* 초점 옮기기: 마우스 아래 카드에 초점(그 카드 0, 한 칸 멀면 1 …). 초점이 새 카드로 옮겨 가면 그 카드가 자동 초점처럼 한 번 헤맸다가 맞는다 */
+  var RACK = { card: null };
+  var HUNT_IMG = [{ filter: 'blur(9px) brightness(0.7)' }, { filter: 'blur(0px) brightness(1)', offset: 0.5 }, { filter: 'blur(1.6px) brightness(1)', offset: 0.72 }, { filter: 'blur(0px) brightness(1)' }];
+  function rackSet(card) {
+    if (card === RACK.card) return;
+    var was = RACK.card;
+    RACK.card = card;
+    box.classList.toggle('rack', !!card);
+    rackPaint();
+    // 새로 초점이 맞는 카드(마우스를 떼면 앞 카드)
+    var tg = card || (was ? front() : null);
+    if (tg && !reduce) { var im = tg.querySelector('img'); im.getAnimations().forEach(function (a) { a.cancel(); }); im.animate(HUNT_IMG, { duration: card ? 520 : 420, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)' }); }
+  }
+  // 카드마다 초점 카드에서 몇 칸 떨어졌는지(카드가 넘어가 자리가 바뀌면 paint가 다시 부른다)
+  function rackPaint() {
+    var f = RACK.card ? Number(RACK.card.getAttribute('data-off')) : 0;
+    cards.forEach(function (c) { var o = c.getAttribute('data-off'); if (o === 'far' || isNaN(f)) c.removeAttribute('data-fd'); else c.setAttribute('data-fd', String(Math.abs(Number(o) - f))); });
+  }
+  function rackFrame() {
+    var c = null, M = D.mouse;
+    if (onlyAt(STUDIO) && fine && !reduce && M.at && C.dragX === null && !box.classList.contains('gather') && !ST.open) {
+      var el = document.elementFromPoint(M.x, M.y);
+      c = el && el.closest && !el.closest('.card-arrow') ? el.closest('.cards .card') : null;
+      if (c && c.getAttribute('data-off') === 'far') c = null;
+    }
+    rackSet(c);
+  }
+  box.addEventListener('pointerup', function (e) { dragEnd(e, false); });
+  box.addEventListener('pointercancel', function (e) { dragEnd(e, true); });
+  document.addEventListener('visibilitychange', cStart);
+  function studioReset() { C.active = false; cStop(); clearT('studio'); box.classList.remove('spread'); rackSet(null); stageClose(true); }
+  // 들어올 때: 카드가 가운데에 모여 있다가 0.8초에 부채꼴로 펼쳐지고, 앞 카드가 또렷해진다
+  function studioPlay(instant) {
+    studioReset();
+    C.active = true;
+    if (!instant && !reduce) {
+      box.classList.add('gather'); void box.offsetWidth;
+      later('studio', function () { box.classList.add('spread'); box.classList.remove('gather'); }, D.on ? 120 : 60);
+      later('studio', function () { box.classList.remove('spread'); }, 1100);
+    }
+    cStart();
+  }
+  paint();
+
+  /* ───────── 5-6. 하는 일: 다섯 줄 ───────── */
+  var rows = $$('.rows .row'), rowList = $('.rows .row-list'), whatTitle = $('.rows .section-title'), procTitle = $('.process .section-title');
+  if (!reduce) { wrapWords(whatTitle); wrapWords(procTitle); }
+  var W = { sel: -1, ready: false, hov: -1, hovAt: 0, hovDone: false };
+  function rowH(r, open) {
+    var cs = getComputedStyle(r);
+    if (open) return r.scrollHeight;
+    return parseFloat(cs.paddingTop) + r.querySelector('.row-label').offsetHeight + parseFloat(cs.paddingBottom);
+  }
+  function fitRows() {
+    if (!D.on) { rows.forEach(function (r) { r.style.height = ''; }); rowList.style.minHeight = ''; return; }
+    var shut = 0, grow = 0;
+    rows.forEach(function (r, i) { var c = rowH(r, false); shut += c; grow = Math.max(grow, rowH(r, true) - c); r.style.height = rowH(r, i === W.sel).toFixed(1) + 'px'; });
+    rowList.style.minHeight = (shut + grow).toFixed(1) + 'px';
+  }
+  function setSel(i) { if (D.on) rowsBg(i, false); W.sel = i; rows.forEach(function (r, k) { r.classList.toggle('sel', k === i); r.setAttribute('aria-expanded', String(k === i)); }); }
+  // 줄이 바뀔 때: 초점 틀이 다음 줄로 미끄러져 내려가고(0.5초), 앞 줄은 접히고 새 줄이 0.5초에 펼쳐진다.
+  // 새 줄의 제목은 초점이 맞으며 나타나고, 설명이 떠오르고, 낱말 다섯 개가 0.05초 간격으로 나타난다
+  /* 3판 5-6: 줄마다 화면 하나가 구역 전체 뒤에 깔린다(밝기 50%, 왼쪽 가림 78% → 오른쪽 25%). 고른 동안 6초에 1.06배로 다가간다.
+     줄이 바뀌면 컷: 앞 화면 0.12초에 꺼지고 새 화면이 흐림 14px·밝기 1.5배에서 0.45초에 초점이 잡힌다. 마지막에 고른 줄의 화면만 남는다 */
+  var ROW_PICS = ['media-studio-2', 'media-studio-1', 'media-hero', 'media-studio-3', 'media-studio-5'];
+  var rowsIn = bglOf(what), RB = { cur: -1, z: 1 }, rdim = el('div', 'rdim');
+  var rshots = ROW_PICS.map(function (n) { var sh = el('div', 'rshot'), z = el('div', 'rz'); z.appendChild(pic(n)); z.appendChild(soft(n, { w: 360, blur: 14 })); sh.appendChild(z); rowsIn.appendChild(sh); return sh; });
+  var rscrim = el('div', 'rscrim');
+  rowsIn.appendChild(rdim); rowsIn.appendChild(rscrim);
+  function rowsBg(i, cut) {
+    if (i === RB.cur) return;
+    var prev = RB.cur; RB.cur = i;
+    rshots.forEach(function (sh, k) { if (k === i || (k === prev && cut && !reduce)) return; stopAnims(sh); stopAnims(sh.firstChild); stopAnims(sh.querySelector('.soft')); sh.classList.remove('on'); });
+    stopAnims(rdim);
+    if (prev >= 0 && cut && !reduce) { var p = rshots[prev]; stopAnims(p); p.classList.remove('on'); p.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: 'linear' }); }
+    if (i < 0) return;
+    var sh = rshots[i], z = sh.firstChild, sf = sh.querySelector('.soft');
+    stopAnims(sh); stopAnims(z); stopAnims(sf);
+    sh.style.zIndex = ++RB.z; rscrim.style.zIndex = RB.z + 1; sh.classList.add('on');
+    if (reduce) return;
+    if (cut) {
+      sh.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 40, delay: 80, fill: 'backwards' });
+      sf.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, delay: 80, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
+      rdim.animate([{ opacity: 0.25 }, { opacity: 0.5 }], { duration: 450, delay: 80, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
+    }
+    z.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }], { duration: 6000, easing: 'cubic-bezier(0.25, 0.1, 0.4, 1)', fill: 'forwards' });
+  }
+  // 스크롤하는 화면: 화면 가운데에 가장 가까운 줄의 화면(움직임 줄이기는 컷 없이 바로)
+  function rowsNear() {
+    var vh = window.innerHeight, wr = what.getBoundingClientRect();
+    if (!(wr.bottom > 0 && wr.top < vh)) { if (!reduce) rowsBg(-1, false); return; }
+    var best = -1, bd = 1e9;
+    rows.forEach(function (r, i) { var b = r.getBoundingClientRect(), d = Math.abs((b.top + b.bottom) / 2 - vh / 2); if (d < bd) { bd = d; best = i; } });
+    rowsBg(best, true);
+  }
+  function select(i, src) {
+    if (i === W.sel || i < 0 || i >= rows.length) return;
+    if (src !== 'hover') W.hovDone = true;
+    rowsBg(i, true);
+    setSel(i);
+    fitRows();
+    var row = rows[i], o = { easing: EASE, fill: 'backwards' };
+    cancelIn(row);
+    anim(row.querySelector('h3'), FOCUS, { duration: 800, delay: 60, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
+    anim(row.querySelector('.row-body p'), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 700, delay: 180 }, o));
+    $$('.keywords li', row).forEach(function (li, k) { anim(li, [{ opacity: 0, transform: 'scale(0.9)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 360, delay: 340 + k * 50 }, o)); });
+  }
+  function whatReset() {
+    clearT('what'); fzReset(whatTitle);
+    W.ready = false; W.hov = -1;
+    snap(what, function () { setSel(-1); fitRows(); rows.forEach(cancelIn); });
+  }
+  // 들어올 때: 제목이 초점이 맞고, 초점 틀이 첫 줄(아래 화면에서 올라오면 마지막 줄)에 맞춰지며 그 줄이 펼쳐진다
+  function whatPlay(from, instant) {
+    whatReset();
+    var first = from > WHAT ? rows.length - 1 : 0;
+    if (instant) { fzShow(whatTitle); snap(what, function () { setSel(first); fitRows(); }); W.ready = true; return; }
+    focusIn(whatTitle, 120);
+    later('what', function () { W.hovDone = true; select(first, 'enter'); W.ready = true; }, 420);
+  }
+  rows.forEach(function (r, i) {
+    r.addEventListener('click', function () { if (D.on && W.ready) select(i, 'click'); });
+    r.addEventListener('focus', function () { if (D.on && W.ready) select(i, 'key'); });
+    r.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && D.on) { e.preventDefault(); select(i, 'key'); } });
+  });
+  // 줄에 0.11초 올려 두면 그 줄. 휠·키보드로 고른 뒤에는 마우스가 다른 줄로 옮겨 가기 전까지 올려 두기로 다시 고르지 않는다(MCN에서 난 버그)
+  function whatFrame(t) {
+    var live = onlyAt(WHAT) && W.ready, M = D.mouse, hov = -1;
+    if (live && M.at) { var el = document.elementFromPoint(M.x, M.y), r = el && el.closest ? el.closest('.row') : null; hov = r ? rows.indexOf(r) : -1; }
+    if (hov !== W.hov) { W.hov = hov; W.hovAt = t; W.hovDone = false; }
+    if (live && hov >= 0 && !W.hovDone && hov !== W.sel && t - W.hovAt >= 110 && M.at > W.hovAt - 200) select(hov, 'hover');
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!onlyAt(WHAT) || !W.ready || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); select(Math.min(rows.length - 1, W.sel + 1), 'key'); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); select(Math.max(0, W.sel - 1), 'key'); }
+  });
+
+  /* ───────── 5-7. 과정: 화면이 완성돼 간다 ───────── */
+  var steps = $$('.step'), stepList = $('.steps'), frames = steps.map(function (s) { return { svg: s.querySelector('.burst'), flash: s.querySelector('.flash'), p: 0 }; });
+  /* 3판 5-7: 구역 전체 뒤에 사진 한 장(media-studio-1)이 단계만큼 현상돼 있다. 단계마다 미리 만든 한 겹:
+     PLAN 흑백·흐림 16px·밝기 28%, DESIGN 흑백·6px·36%(+ 화면 전체 삼등분 선), SETUP 흑백·또렷·44%(+ 가운데 큰 초점 네모), DELIVER 색·또렷·55%.
+     들어올 때 혼자 PLAN → DELIVER로, 올리면 화면 전체 셔터(0.1초, 12%)와 그 단계로(0.4초), 나가면 0.6초에 완성본으로 */
+  var PROC_PIC = 'media-studio-1', PLAYS = [{ gray: 1, blur: 16, bright: 0.28 }, { gray: 1, blur: 6, bright: 0.36 }, { gray: 1, blur: 0, bright: 0.44 }, { gray: 0, blur: 0, bright: 0.7 }];
+  var procIn = bglOf(proc), PB = { cur: -1, z: 1, tap: -1 };
+  var players = PLAYS.map(function (o, i) { var c = soft(PROC_PIC, { w: o.blur ? 480 : 1200, blur: o.blur, gray: o.gray, bright: o.bright, cls: 'pl' }); c.style.zIndex = 1; procIn.appendChild(c); return c; });
+  var pgrid = el('div', 'pgrid'), pfocus = el('div', 'pfocus', '<b></b>'), pscrim = el('div', 'pscrim'), pflash = el('div', 'pflash');
+  [pgrid, pfocus, pscrim, pflash].forEach(function (e) { e.style.zIndex = 50; procIn.appendChild(e); });
+  function procBg(k, dur) {
+    if (k === PB.cur) return;
+    PB.cur = k;
+    proc.classList.remove('st-0', 'st-1', 'st-2', 'st-3');
+    if (k < 0) { players.forEach(function (L) { stopAnims(L); L.style.opacity = 0; }); return; }
+    proc.classList.add('st-' + k);
+    var L = players[k], from = +getComputedStyle(L).opacity;
+    stopAnims(L);
+    L.style.zIndex = ++PB.z;
+    var done = function () { if (PB.cur !== k) return; players.forEach(function (o, j) { if (j !== k) { stopAnims(o); o.style.opacity = 0; } }); L.style.opacity = 1; };
+    if (!dur || reduce) { done(); return; }
+    L.style.opacity = 1;
+    var a = L.animate([{ opacity: from }, { opacity: 1 }], { duration: dur, easing: 'ease' });
+    a.onfinish = done;
+  }
+  function procFlash() { if (!reduce) pflash.animate([{ opacity: 0 }, { opacity: 0.12, offset: 0.3 }, { opacity: 0 }], { duration: 100, easing: 'linear' }); }
+
+  function procReset() {
+    clearT('proc'); fzReset(procTitle);
+    snap(stepList, function () { steps.forEach(function (s) { s.classList.remove('on', 'hot'); }); });
+    stepList.classList.remove('focus');
+    clearT('procbg'); PB.tap = -1; procBg(-1, 0);
+  }
+  // 들어올 때: 제목이 초점이 맞고, 0.48초 뒤부터 0.36초 간격으로 한 단계씩 선이 그려진다(0.7초). 가로 선은 1.44초에 찬다
+  function procPlay(instant) {
+    procReset();
+    if (instant) { fzShow(procTitle); snap(proc, function () { proc.classList.add('in'); snap(stepList, function () { steps.forEach(function (s) { s.classList.add('on'); }); }); }); procBg(3, 0); return; }
+    focusIn(procTitle, 100);
+    steps.forEach(function (s, i) { later('proc', function () { s.classList.add('on'); }, 480 + i * 360); });
+    // 배경이 혼자 현상된다: PLAN은 들어오자마자(0.5초에 나타남), 다음 단계부터 틀이 그려지는 때에 맞춰 0.5초씩
+    procBg(0, 500);
+    [1, 2, 3].forEach(function (i) { later('procbg', function () { procBg(i, 500); }, 480 + i * 360); });
+  }
+  // 셔터: 틀 안이 0.12초 희게 번쩍였다 돌아온다(채워진 마지막 틀은 어둡게)
+  function shutter(i) { anim(frames[i].flash, [{ opacity: 0 }, { opacity: 0.85, offset: 0.35 }, { opacity: 0 }], { duration: 120, easing: 'linear' }); }
+  // 마우스가 260px 안이면 그 틀이 커진다(최대 1.08배)
+  function procFrame(t, dt) {
+    var live = D.on && D.cur === PROC && !D.trans, M = D.mouse, k = K();
+    frames.forEach(function (f) {
+      var want = 0;
+      if (live && fine && M.at) { var b = f.svg.getBoundingClientRect(), d = Math.hypot(M.x - (b.left + b.width / 2), M.y - (b.top + b.height * 0.5)); want = clamp(1 - d / (260 * k), 0, 1); }
+      f.p += (want - f.p) * lag(dt, 0.2);
+      if (f.p < 0.001 && !want) f.p = 0;
+      f.svg.style.transform = f.p ? 'scale(' + (1 + 0.08 * f.p).toFixed(4) + ')' : '';
+    });
+  }
+  steps.forEach(function (s, i) {
+    s.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse' || !D.on) return;
+      s.classList.add('hot'); stepList.classList.add('focus');
+      if (s.classList.contains('on')) { shutter(i); clearT('procbg'); procFlash(); procBg(i, 400); }
+    });
+    s.addEventListener('pointerleave', function () {
+      s.classList.remove('hot');
+      if (!steps.some(function (x) { return x.classList.contains('hot'); })) { stepList.classList.remove('focus'); if (D.on && D.cur === PROC) procBg(3, 600); }
+    });
+    // 휴대폰: 누르면 셔터와 함께 그 단계가 된다(스크롤해서 단계가 더 들어오면 다시 들어온 만큼). 움직임 줄이기는 완성본에 멈춰 있다
+    s.addEventListener('click', function () { if (D.on || reduce) return; shutter(i); procFlash(); if (D.flowOn()) { FLOW.tap = i; FLOW.tapY = window.pageYOffset; flowProc(window.innerHeight); return; } PB.tap = i; procBg(i, 400); });
+  });
+
+  /* ───────── 5-8. 넘김 5→6: 여섯 날 조리개가 닫혔다(0.45초) 열린다(0.65초) ─────────
+     육각형 구멍이 돌며 작아지고, 다 닫힌 순간 화면이 바뀌고, 다시 열리며 다음 화면이 드러난다. 날은 #161616, 날 테두리는 가는 밝은 선(1px, 20%).
+     날 테두리 선은 구멍이 작을 때 한 점에서 뻗는 줄무늬처럼 보이지 않게, 구멍이 작아질수록 옅어진다(README) */
+  var iris = $('.iris'), irisBlades = $('.iris .blades'), irisEdge = $('.iris .edge'), IR = null;
+  var CLOSE = 450, OPEN = 650;
+  function irisDraw(R, rot) {
+    var W0 = window.innerWidth, H0 = window.innerHeight, cx = W0 / 2, cy = H0 / 2, L = Math.hypot(W0, H0) * 1.2;
+    var v = [], d = 'M0 0H' + W0 + 'V' + H0 + 'H0Z';
+    for (var i = 0; i < 6; i++) { var a = rot + i * Math.PI / 3; v.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
+    if (R > 0.5) d += 'M' + v.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('L') + 'Z';
+    irisBlades.setAttribute('d', d);
+    var e = '', Rmax = Math.hypot(cx, cy) / Math.cos(Math.PI / 6);
+    var al = 0.2 * clamp((R / Rmax - 0.12) / 0.3, 0, 1);
+    if (al > 0.005) for (var j = 0; j < 6; j++) {
+      var p0 = v[(j + 5) % 6], p1 = v[j], dx = p1[0] - p0[0], dy = p1[1] - p0[1], dl = Math.hypot(dx, dy) || 1;
+      e += 'M' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + 'L' + (p1[0] + dx / dl * L).toFixed(1) + ' ' + (p1[1] + dy / dl * L).toFixed(1);
+    }
+    irisEdge.setAttribute('d', e);
+    irisEdge.style.strokeOpacity = al.toFixed(3);
+  }
+  function irisFrame(t) {
+    if (!IR) return;
+    var e = t - IR.t0, W0 = window.innerWidth, H0 = window.innerHeight, Rmax = Math.hypot(W0 / 2, H0 / 2) / Math.cos(Math.PI / 6) + 4, R, rot;
+    if (e < CLOSE) { var u = e / CLOSE; R = Rmax * (1 - easeInOut(u)); rot = u * Math.PI / 3; }
+    else if (e < CLOSE + OPEN) { var v = (e - CLOSE) / OPEN; R = Rmax * easeOut(v); rot = Math.PI / 3 + v * Math.PI / 3; }
+    else { IR = null; iris.classList.remove('on'); return; }
+    irisDraw(Math.max(0, R), rot);
+  }
+  function irisRun(from) {
+    IR = { t0: now() };
+    iris.classList.add('on');
+    irisDraw(Math.hypot(window.innerWidth / 2, window.innerHeight / 2) / Math.cos(Math.PI / 6) + 4, 0);
+    // 다 닫힌 순간(0.45초) 앞 화면을 감춰 다음 화면이 드러나게 한다
+    return [anim(from, [{ opacity: 1 }, { opacity: 1, offset: CLOSE / 1100 }, { opacity: 0, offset: CLOSE / 1100 + 0.001 }, { opacity: 0 }], { duration: 1100, fill: 'both' })];
+  }
+
+  /* ───────── 스크롤하는 화면(휴대폰·작은 창, 5-9): 줄·단계를 스크롤에 맞춰 ───────── */
+  function scrollFrame() {
+    var vh = window.innerHeight, hh = header.getBoundingClientRect().bottom;
+    rows.forEach(function (r) {
+      var b = r.getBoundingClientRect(), on = r.classList.contains('on');
+      if (!on && b.top < vh * 0.88 && b.bottom > hh) r.classList.add('on');
+      else if (on && (b.top >= vh || b.bottom <= hh)) r.classList.remove('on');
+    });
+    steps.forEach(function (s) {
+      var b = s.getBoundingClientRect(), on = s.classList.contains('on');
+      if (!on && b.top < vh * 0.8 && b.bottom > hh) s.classList.add('on');
+      else if (on && (b.top >= vh || b.bottom <= hh)) s.classList.remove('on');
+    });
+    // 과정은 단계가 들어온 만큼 현상된다(누른 단계가 있으면 그것, 들어온 단계 수가 바뀌면 다시 들어온 만큼)
+    // (휴대폰 스크롤 반응이 켜진 동안은 아래 D.flow가 스크롤만큼 이어서 현상한다)
+    if (!D.flowOn()) {
+      var n = steps.filter(function (s) { return s.classList.contains('on'); }).length;
+      if (n !== PB.n) { PB.n = n; PB.tap = -1; }
+      procBg(PB.tap >= 0 ? PB.tap : n - 1, 500);
+    }
+    rowsNear();
+  }
+
+  var lastT = 0;
+  function frame(t) {
+    requestAnimationFrame(frame);
+    var dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
+    lastT = t;
+    irisFrame(t);
+    if (D.on) {
+      vfFrame(t, dt);
+      if (D.cur === STUDIO || RACK.card) { rackFrame(); stageFrame(dt); }
+      if (D.cur === WHAT) whatFrame(t);
+      if (D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC))) procFrame(t, dt);
+    } else scrollFrame();
+    filmFrame(dt);
+    heroVideoFrame();
+  }
+
+  function sceneReset(n) {
+    if (n === HERO) heroReset();
+    if (n === INTRO) introReset();
+    if (n === STUDIO) studioReset();
+    if (n === WHAT) whatReset();
+    if (n === PROC) procReset();
+  }
+  if (!reduce) { heroReset(); introReset(); fzReset(whatTitle); fzReset(procTitle); }
+  if (!reduce) rows.forEach(function (r) { r.tabIndex = -1; });
+  D.setup({
+    enter: function (n, scene, from) {
+      if (n === HERO) heroPlay(false);
+      if (n === INTRO) introPlay(false);
+      if (n === STUDIO) studioPlay(false);
+      if (n === WHAT) whatPlay(from, false);
+      if (n === PROC) procPlay(from === END);
+    },
+    reset: sceneReset,
+    // 하는 일: 휠 한 번에 다음 줄(다섯 줄을 다 지나면 다음 화면). 첫 줄이 펼쳐지기 전에 굴린 휠은 버린다. 키보드 위아래는 화면을 넘긴다(줄은 좌우 화살표)
+    step: function (n, d, src) {
+      // 들어가 보기를 연 채로 휠·키보드를 쓰면 먼저 닫는다(화면은 넘기지 않음)
+      if (n === STUDIO && ST.open) { stageClose(false); return true; }
+      if (n !== WHAT || src === 'key') return false;
+      if (!W.ready) return true;
+      var t = W.sel + d;
+      if (t < 0 || t >= rows.length) return false;
+      select(t, 'wheel');
+      return true;
+    },
+    unseen: sceneReset,
+    seen: function (n, scene, instant) {
+      if (n === HERO) heroPlay(instant);
+      if (n === INTRO) introPlay(instant);
+      if (n === STUDIO) studioPlay(instant);
+      if (n === WHAT) { if (instant) fzShow(whatTitle); else focusIn(whatTitle, 100); }
+      if (n === PROC) { if (instant) fzShow(procTitle); else focusIn(procTitle, 100); }
+    },
+    move: function (from, to, fromEl) {
+      if (from === PROC && to === END) return { dur: 1100, anims: irisRun(fromEl), light: CLOSE, enter: CLOSE + 60 };
+      if (from === END && to === PROC) { procPlay(true); return { dur: 1100, anims: irisRun(fromEl), light: CLOSE, enter: CLOSE }; }
+      return null;
+    },
+    start: function () { rows.forEach(function (r) { r.tabIndex = 0; r.setAttribute('role', 'button'); }); fitRows(); filmLayout(); },
+    stop: function () {
+      rows.forEach(function (r) { r.tabIndex = -1; r.removeAttribute('role'); r.removeAttribute('aria-expanded'); r.style.height = ''; });
+      rowList.style.minHeight = '';
+      frames.forEach(function (f) { f.p = 0; f.svg.style.transform = ''; });
+      rowsBg(-1, false); procBg(-1, 0); PB.n = -1;
+      VF.a = 0; vf.style.opacity = '0';
+      IR = null; iris.classList.remove('on');
+    }
+  });
+  // 처음 한 번 놓는다(움직임 줄이기는 여기서 멈춘 채로): 띠 자리, 빛 먼지, 과정은 완성본, 하는 일은 첫 줄
+  filmLayout();
+  if (reduce) { procBg(3, 0); rowsBg(0, false); window.addEventListener('scroll', rowsNear, { passive: true }); }
+  /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-5, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
+     필름 띠: 위 filmFrame에서 스크롤만큼 흐르고 화면 가운데 틀만 또렷
+     하는 일: 화면 가운데에 가장 가까운 줄의 화면이 뒤에 깔린다(있던 rowsNear 그대로, 바뀔 때 컷)
+     과정: 구역 위쪽 85% -> 30% 동안 미리 만든 네 겹(흑백·흐림 -> 색)의 투명도만 바꿔 이어서 현상된다
+     흰 문의 구역: 구역 위쪽 92% -> 40% 동안 육각형 구멍이 60° 돌며 열린다. 바깥은 진회색 날(PC 넘김의 조리개와 같은 날·선) */
+  var FLOW = { proc: 0, end: 0, st: -1, tap: -1, tapY: 0 };
+  var SVGNS = 'http://www.w3.org/2000/svg', irisE = document.createElementNS(SVGNS, 'svg'), ieBl = document.createElementNS(SVGNS, 'path'), ieEd = document.createElementNS(SVGNS, 'path');
+  irisE.setAttribute('class', 'iris-end'); irisE.setAttribute('aria-hidden', 'true');
+  ieBl.setAttribute('class', 'blades'); ieEd.setAttribute('class', 'edge');
+  irisE.appendChild(ieBl); irisE.appendChild(ieEd);
+  endScene.insertBefore(irisE, endScene.firstChild);
+  function flowProc(vh) {
+    var v = 3 * D.span(proc, 0.85, 0.3, vh);
+    FLOW.proc = v / 3;
+    // 단계를 누르면 셔터와 함께 그 단계가 된다(있던 휴대폰 동작). 40px 넘게 스크롤하면 다시 스크롤만큼
+    if (FLOW.tap >= 0 && Math.abs(window.pageYOffset - FLOW.tapY) < 40) v = FLOW.tap; else FLOW.tap = -1;
+    var st = Math.min(3, Math.round(v));
+    players.forEach(function (L, j) { L.style.zIndex = j + 1; L.style.opacity = j ? clamp(v - (j - 1), 0, 1).toFixed(3) : '1'; });
+    if (st !== FLOW.st) { FLOW.st = st; proc.classList.remove('st-0', 'st-1', 'st-2', 'st-3'); proc.classList.add('st-' + st); }
+  }
+  function flowIris(q, vh) {
+    FLOW.end = q;
+    if (q >= 1) { irisE.classList.remove('on'); return; }
+    var w = endScene.clientWidth, h = endScene.offsetHeight, cx = w / 2, cy = Math.min(h, vh) * 0.45;
+    irisE.setAttribute('width', w); irisE.setAttribute('height', h); irisE.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    irisE.classList.add('on');
+    var Rmax = Math.max(Math.hypot(cx, cy), Math.hypot(cx, h - cy)) / Math.cos(Math.PI / 6) + 4, u = 1 - (1 - q) * (1 - q), R = Rmax * u, rot = q * Math.PI / 3;
+    var v = [], d = 'M0 0H' + w + 'V' + h + 'H0Z', L = Math.hypot(w, h) * 1.2;
+    for (var i = 0; i < 6; i++) { var a = rot + i * Math.PI / 3; v.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
+    if (R > 0.5) d += 'M' + v.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join('L') + 'Z';
+    ieBl.setAttribute('d', d);
+    var e = '', al = 0.2 * clamp((R / Rmax - 0.12) / 0.3, 0, 1);
+    if (al > 0.005) for (var j = 0; j < 6; j++) {
+      var p0 = v[(j + 5) % 6], p1 = v[j], dx = p1[0] - p0[0], dy = p1[1] - p0[1], dl = Math.hypot(dx, dy) || 1;
+      e += 'M' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + 'L' + (p1[0] + dx / dl * L).toFixed(1) + ' ' + (p1[1] + dy / dl * L).toFixed(1);
+    }
+    ieEd.setAttribute('d', e);
+    ieEd.style.strokeOpacity = al.toFixed(3);
+  }
+  D.flow(function (vh, on) {
+    if (!on) { FILM.flow = 0; FLOW.st = -1; irisE.classList.remove('on'); players.forEach(function (L) { L.style.zIndex = 1; }); return; }
+    flowProc(vh);
+    flowIris(D.spanEnd(endScene, 0.92, 0.4, vh), vh);
+  });
+  window.__mediaFlow = FLOW;
+
+  // 확인 도구용(움직임 줄이기에서도)
+  window.__media = { state: function () { return { cur: D.cur, sel: W.sel, ready: W.ready, card: C.i, auto: !!C.timer, stage: ST.open, rack: RACK.card ? RACK.card.getAttribute('data-off') : null, fd: cards.map(function (c) { return c.getAttribute('data-off') + ':' + (c.getAttribute('data-fd') || '-'); }).join(' '), vf: { x: Math.round(VF.x), y: Math.round(VF.y), w: Math.round(VF.w), h: Math.round(VF.h), a: +VF.a.toFixed(2), tgt: VF.tgt ? (VF.tgt.className || VF.tgt.tagName) : null }, iris: !!IR, thumb: thumbs.findIndex(function (t) { return t.classList.contains('on'); }), prog: cprog.getAttribute('data-cur') + '/' + cprog.getAttribute('data-total'), run: thumbs.findIndex(function (t) { return t.classList.contains('run'); }), rowBg: RB.cur, procBg: D.flowOn() ? FLOW.st : PB.cur, filmX: Math.round(FILM.x), filmFo: FILM.fo ? FILM.ff.indexOf(FILM.fo) % FILM_SET.length : -1, vid: heroVid.paused ? 'pause' : 'play', vsrc: (heroVid.currentSrc || '').split('/').pop(), vt: +heroVid.currentTime.toFixed(2) }; } };
+  var rt2 = 0;
+  window.addEventListener('resize', function () { clearTimeout(rt2); rt2 = setTimeout(function () { filmLayout(); }, 120); });
+  if (reduce) return;
+  var rt = 0;
+  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fitRows, 120); });
+  requestAnimationFrame(frame);
+})();
+</script>
+<script src="site-menu.js"></script>
+<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
+<!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
+</body>
+</html>

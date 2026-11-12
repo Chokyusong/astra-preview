@@ -1,0 +1,72 @@
+/* 움직이는 시안 공통 틀 (지시서 006, 설계 client/design-refs/pages-motion-design.md 1절).
+   쪽 파일은 ../2026-11-10-pages/pages.css(정지 시안의 배치·색·글꼴)를 먼저 부르고 이 파일을 그 뒤에 부른다.
+   - 휴대폰·태블릿·작은 창·움직임 줄이기: 정지 시안 배치 그대로 스크롤한다. 구역이 화면에 들어오면 내용이 떠오르고, 화면 밖으로 완전히 나갔다 다시 들어오면 또 떠오른다(html.fx).
+   - PC(가로 1100px·세로 620px 이상, 마우스): 휠 한 번에 한 화면씩 넘긴다(html.deck). 값은 브랜드 3판과 같다.
+   이 파일은 쪽 이름이나 문구를 모른다. 쪽마다 다른 것은 쪽 파일에 둔다. */
+:root { --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* 떠 있는 버튼: 정지 시안은 첫 화면 오른쪽 아래에 그려 두었고, 움직이는 시안은 화면에 고정한다(브랜드 3판과 같다) */
+.fab-anchor { position: fixed; top: auto; bottom: 0; right: 0; width: 0; height: 0; z-index: 40; }
+.fab-button { cursor: pointer; }
+
+/* 첫 화면 아래 표시: 누르면 다음 화면으로 간다 */
+button.scroll-hint { padding: 0; border: 0; background: transparent; cursor: pointer; }
+.deck-index { display: none; }
+.hero-gl { display: none; }
+
+/* ── 스크롤하는 화면(휴대폰, 태블릿, 작은 창): 구역이 18% 넘게 보이면 내용이 떠오른다. 화면 밖으로 완전히 나가면 .seen이 빠져 처음 상태로 돌아가고, 다시 들어오면 또 떠오른다(설계 1-4) ── */
+html.fx:not(.deck) .rise, html.fx:not(.deck) .late { opacity: 0; transform: translateY(20px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+html.fx:not(.deck) .scene.seen .rise { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 0.09s); }
+html.fx:not(.deck) .scene.title-on .late { opacity: 1; transform: none; }
+
+/* ── PC: 휠 한 번에 한 화면 ── */
+html.deck, html.deck body { height: 100%; overflow: hidden; }
+html.deck .site-header { position: fixed; left: 0; right: 0; transition: background 0.5s; }
+/* 밝은 화면(흰 문의 화면) 위에서는 머리말 바탕을 짙게 해 흰 글자가 읽히게 한다 */
+html.deck.on-light .site-header { background: rgba(10, 10, 10, 0.94); }
+html.deck .scene { position: fixed; inset: 0; z-index: 1; margin: 0; overflow: hidden; background: var(--scene-bg, var(--ink)); opacity: 0; pointer-events: none; }
+html.deck .scene.current { z-index: 2; opacity: 1; pointer-events: auto; }
+
+/* 화면에 들어올 때: 제목은 아래에서 올라오고(1초), 내용은 26px 아래에서 차례로 떠오른다(0.9초, 0.09초 간격). 다시 들어오면 다시 펼쳐진다 */
+html.deck .mask { display: block; overflow: hidden; padding-bottom: 0.08em; }
+html.deck .mask > span { display: block; transform: translateY(108%); transition: transform 1s var(--ease); }
+html.deck .scene.in .mask > span { transform: none; transition-delay: calc(0.3s + var(--i, 0) * 0.12s); }
+html.deck [data-lines] br { display: none; }
+html.deck .rise, html.deck .late { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+html.deck .scene.in .rise { opacity: 1; transform: none; transition-delay: calc(0.34s + var(--i, 0) * 0.09s); }
+html.deck .scene.title-on .late { opacity: 1; transform: none; }
+/* 구역 제목은 브랜드 3판처럼 작게(30~68px) */
+html.deck .scene .section-title { font-size: clamp(30px, min(4.2vw, 7.5vh), 68px); }
+
+/* 오른쪽 가운데 이동 표시: 짧은 선, 지금 화면만 길다. 올리면 화면 이름이 뜬다 */
+html.deck .deck-index { display: flex; flex-direction: column; gap: 4px; position: fixed; right: 18px; top: 50%; z-index: 35; transform: translateY(-50%); mix-blend-mode: difference; }
+.deck-index button { position: relative; width: 30px; height: 24px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.deck-index button::before { content: ""; position: absolute; right: 0; top: 50%; width: 12px; height: 2px; margin-top: -1px; background: #fff; opacity: 0.45; transition: width 0.5s var(--ease), opacity 0.3s; }
+.deck-index button:hover::before { opacity: 1; }
+.deck-index button[aria-current="true"]::before { width: 30px; opacity: 1; }
+.deck-index button span { position: absolute; right: 42px; top: 50%; transform: translateY(-50%); font-size: 13px; line-height: 1; color: #fff; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.deck-index button:hover span, .deck-index button:focus-visible span { opacity: 1; }
+
+/* 첫 화면: 창을 가득 채운다. 사진은 24초에 걸쳐 아주 천천히 커졌다 작아진다(1배 → 1.06배). 가운데 아래에 휠 모양 표시 */
+html.deck .hero { height: 100%; min-height: 0; margin-top: 0; }
+html.deck .hero h1 { font-size: clamp(27px, min(3.5vw, 6.6vh), 54px); }
+html.deck .hero-bg img { animation: deck-zoom 12s ease-in-out infinite alternate; }
+@keyframes deck-zoom { from { transform: scale(1); } to { transform: scale(1.06); } }
+html.deck .hero-gl.ready { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+html.deck .wheel::after { animation: deck-wheel 1.6s ease-in-out infinite; }
+@keyframes deck-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(15px); opacity: 0; } 100% { transform: translateY(15px); opacity: 0; } }
+
+/* 마지막 화면: 흰 문의 + 바닥글. 다른 화면처럼 아래에서 올라와 덮는다. 낱말이 차례로 올라온다 */
+html.deck .scene-end { display: flex; flex-direction: column; --scene-bg: var(--paper); }
+html.deck .scene-end .cta { flex: 1 1 0; min-height: 0; padding: calc(var(--header-h) + 2vh) var(--gutter) 3vh; display: flex; flex-direction: column; justify-content: center; }
+html.deck .cta .display { font-size: min(10.5vw, 30vh); white-space: nowrap; }
+html.deck .cta .w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0 0.03em 0.08em; margin: 0 -0.03em; }
+html.deck .cta .w > span { display: inline-block; transform: translateY(108%); transition: transform 1.1s var(--ease); }
+html.deck .scene.in .cta .w > span { transform: none; transition-delay: calc(0.4s + var(--i, 0) * 0.11s); }
+html.deck .cta-row { margin-top: clamp(20px, 4.5vh, 56px); }
+/* 바닥글은 한 줄로 낮게. 오른쪽 아래 떠 있는 버튼 자리를 비운다 */
+html.deck .site-footer { flex: none; align-items: center; padding: clamp(14px, 2.6vh, 28px) max(var(--gutter), 124px) clamp(14px, 2.6vh, 28px) var(--gutter); background: var(--ink); }
+html.deck .site-footer > div:first-child { display: flex; align-items: center; gap: 24px; }
+html.deck .footer-links { flex-direction: row; align-items: center; gap: 24px; }
+html.deck .footer-logo { height: 54px; margin-bottom: 0; }
+html.deck .site-footer .slot { padding: 8px 14px; }

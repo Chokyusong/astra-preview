@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ASTRA 협력사 움직이는 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="../2026-11-10-pages/pages.css">
+<link rel="stylesheet" href="deck.css">
+<script>if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('fx');</script>
+<style>
+/* 협력사 2판 — 두 흐름이 만난다 (설계 pages-motion-design.md 6절, 지시서 010).
+   하나의 생각: 두 흐름이 만난다. 마우스는 그 흐름을 미는 손이다. 움직이는 것은 늘 둘이 짝이다(사진 두 쪽, 글 두 방향, 로고 두 줄).
+   화면 4개: 첫 화면 → 로고 벽 → 함께한 작업 → 문의 + 바닥글.
+   문구·순서·색·글꼴·사진은 정지 시안(../2026-11-10-pages/partners.html) 그대로다. 손님 자료가 없어 로고와 소개 문구는 자리 표시 그대로 둔다.
+   크기는 큰 창 배율 --k(공통 틀)를 쓴다. 값은 README.md */
+
+/* ── 6-1. 글이 좌우에서 번갈아 와서 맞물린다: 낱말마다 감싼다(공통 틀 data-words). 짝수 번째는 왼쪽에서, 홀수 번째는 오른쪽에서 ── */
+html.fx .hero .w { display: inline-block; }
+html.fx .hero .w > span { display: inline-block; opacity: 0; transform: translateX(calc(-60px * var(--k, 1))); }
+html.fx .hero .w:nth-child(even) > span { transform: translateX(calc(60px * var(--k, 1))); }
+html.deck .hero.in .w > span, html.fx:not(.deck) .hero.seen .w > span { opacity: 1; transform: none; transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); transition-delay: calc(0.5s + var(--i, 0) * 0.1s); }
+html.fx:not(.deck) .hero.seen .w > span { transition-delay: calc(0.2s + var(--i, 0) * 0.1s); }
+
+/* ── 화면 1 첫 화면(6-2): 사진을 세로로 반 갈라 두 쪽. 들어올 때 양쪽에서 와 가운데서 맞물린다. 마우스에는 답하지 않는다 ── */
+.hhalf { display: none; }
+html.fx .hhalf { position: absolute; inset: 0; overflow: hidden; will-change: transform, filter; }
+html.fx .hero.split .hhalf { display: block; }
+/* 한 장짜리 사진은 두 쪽이 맞물린 뒤(.met)에만 보인다. 그 전에 잠깐 보였다 갈라지지 않게 */
+html.fx .hero:not(.met) .hero-bg > picture img { opacity: 0; }
+.hhalf.l { clip-path: inset(0 50% 0 0); }
+.hhalf.r { clip-path: inset(0 0 0 50%); }
+.hhalf img { object-position: 50% 40%; }
+/* 맞물리는 순간 이음매를 위에서 아래로 한 번 지나가는 빛(검토 010-1) */
+.hseam { display: none; }
+html.fx .hero.split .hseam { display: block; position: absolute; left: 50%; top: 0; width: calc(6px * var(--k, 1)); height: 42%; margin-left: calc(-3px * var(--k, 1)); background: linear-gradient(180deg, rgba(255, 255, 255, 0), #fff 60%, rgba(255, 255, 255, 0)); box-shadow: 0 0 calc(28px * var(--k, 1)) calc(8px * var(--k, 1)) rgba(255, 240, 220, 0.45); border-radius: 3px; opacity: 0; transform: translateY(-100%); pointer-events: none; }
+/* 소개 문구 자리는 정지 시안 크기를 따르고 큰 창 배율만 쓴다(공통 틀의 첫 화면 제목 크기를 받지 않는다) */
+html.deck .hero h1.slot { font-size: max(18px, min(1.8vw, 3.4vh, calc(26px * var(--k, 1)))); }
+
+/* ── 화면 2 로고 벽(6-3): 로고 두 줄(와이어프레임대로). 칸을 키워 화면을 채운다. 칸 높이 창 높이의 22%, 가로 1.7배, 칸 사이 창 가로의 1.6%, 줄 사이 창 높이의 5% ── */
+.lbg { display: none; }
+html.deck .logos { height: 100%; padding: 0; display: flex; flex-direction: column; justify-content: center; --ch: 22vh; --cw: calc(var(--ch) * 1.7); --cg: 1.6vw; padding-top: calc(var(--header-h) * 0.5); }
+html.deck .lbg { display: block; position: absolute; inset: 0; z-index: 0; overflow: hidden; background: #0a0a0a; }
+html.deck .lbg canvas { position: absolute; inset: -2%; width: 104%; height: 104%; object-fit: cover; }
+html.deck .logo-row { position: relative; z-index: 1; gap: var(--cg); perspective: 1200px; }
+html.deck .logo-row + .logo-row { margin-top: 5vh; margin-left: calc(var(--cw) * -0.5); }
+html.deck .logo-row li { width: var(--cw); height: var(--ch); border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.72); font-size: max(14px, calc(var(--ch) * 0.1)); }
+.logo-row li { will-change: transform; transition: opacity 0.3s, background-color 0.12s, color 0.12s, border-color 0.12s; backface-visibility: hidden; }
+html.fx .logo-row { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+html.fx .logo-row.drag { cursor: grabbing; }
+/* 로고에 올리면(휴대폰은 누르면) 그 칸이 흰색으로 뒤집힌다. 다른 칸은 35%로 물러난다 */
+html .logos .logo-row li.wt { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+.logos.hov .logo-row li:not(.hot) { opacity: 0.35; }
+
+/* ── 화면 3 함께한 작업(6-4): 사진이 창을 가득 채우고 마우스로 사진 속을 둘러본다. 사진은 위아래 반쪽 두 겹(넘김 3→4에서 갈라진다) ── */
+.wk { display: none; }
+html.deck .wide.inset { height: 100%; margin: 0; background: transparent; }
+html.deck .wide > img { visibility: hidden; }
+html.deck .wk { display: block; position: absolute; inset: 0; overflow: hidden; }
+.wh { position: absolute; inset: 0; overflow: hidden; will-change: transform; }
+.wh.t { clip-path: inset(0 0 50% 0); }
+.wh.b { clip-path: inset(50% 0 0 0); }
+.wh img { position: absolute; inset: 0; will-change: transform; transform: scale(1.14); }
+html.deck .wide::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to bottom, rgba(10, 10, 10, 0.45) 0, rgba(10, 10, 10, 0) 160px); }
+
+/* 휴대폰 스크롤 반응(설계 12-6, 지시서 015): 흰 문의 구역 위의 어두운 덮개가 가로로 갈라져 위쪽 반은 왼쪽, 아래쪽 반은 오른쪽으로 밀려난다 */
+html.fx:not(.deck) .scene-end { position: relative; overflow: hidden; overflow: clip; }
+.ecov { display: none; position: absolute; left: 0; width: 100%; z-index: 4; pointer-events: none; background: var(--ink); will-change: transform; }
+html.fx:not(.deck) .ecov.on { display: block; }
+/* ── 화면 4 문의(6-5): WE MAKE NEXT. 낱말이 좌우에서 번갈아 와서 만난다 ── */
+html.deck .cta-pad { display: none; }
+html.deck .scene-end .cta .w { overflow: visible; }
+html.deck .scene-end .cta .w > span { opacity: 0; transform: translateX(calc(-60px * var(--k, 1))); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+html.deck .scene-end .cta .w:nth-child(even) > span { transform: translateX(calc(60px * var(--k, 1))); }
+html.deck .scene-end.in .cta .w > span { opacity: 1; transform: none; transition-delay: calc(0.1s + var(--i, 0) * 0.1s); }
+html.deck .cta-row p { font-size: calc(18px * var(--k, 1)); }
+html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
+  <a class="quick-apply" href="contact.html#apply">빠른 지원하기</a>
+  <button class="menu-button" type="button" aria-label="메뉴 열기" aria-expanded="false" aria-controls="menu-panel"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h18M3 12h18M3 17.5h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <nav class="nav" aria-label="주 메뉴"><a href="home.html">홈</a><a href="about.html">회사소개</a><a href="mcn.html">MCN</a><a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a><a href="entertainment.html">엔터테인먼트</a><a href="media.html">미디어</a><a href="partners.html" aria-current="page">협력사</a><a href="contact.html">CONTACT</a><a class="btn btn-solid" href="contact.html#apply">지원하기</a></nav>
+</header>
+<nav class="menu-panel" id="menu-panel" aria-label="주 메뉴 (펼침)" hidden>
+  <button class="menu-close" type="button" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <div class="menu-list">
+    <a href="home.html">홈</a>
+    <a href="about.html">회사소개</a>
+    <a href="mcn.html">MCN</a>
+    <a href="../2026-11-11-brand-v3/brand-v3.html">브랜드</a>
+    <a href="entertainment.html">엔터테인먼트</a>
+    <a href="media.html">미디어</a>
+    <a href="partners.html" aria-current="page">협력사</a>
+    <a href="contact.html">CONTACT</a>
+  </div>
+</nav>
+<main>
+<section class="hero scene" data-name="첫 화면">
+  <div class="hero-bg" aria-hidden="true"><picture style="display: contents"><img src="../2026-11-10-pages/img/partners-hero.webp" alt="" style="object-position: 50% 40%"></picture><div class="hhalf l"><img src="../2026-11-10-pages/img/partners-hero.webp" alt=""></div><div class="hhalf r"><img src="../2026-11-10-pages/img/partners-hero.webp" alt=""></div><div class="hseam"></div></div>
+  <h1 class="slot" data-words>협력사 소개 문구 (자료 받으면 입력)</h1>
+  <button class="scroll-hint" type="button" aria-label="아래 내용으로 이동"><span class="wheel" aria-hidden="true"></span><span class="arrow" aria-hidden="true"></span></button>
+</section>
+<section class="logos scene" id="page-content" data-name="로고 벽"><div class="lbg" aria-hidden="true" data-bleed></div><ul class="logo-row" data-bleed><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li></ul><ul class="logo-row" data-bleed><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li><li>협력사 로고</li></ul></section>
+<figure class="wide inset scene" data-name="함께한 작업"><img src="../2026-11-10-pages/img/partners-work.webp" alt="함께한 작업 예시"><div class="wk" aria-hidden="true" data-bleed><div class="wh t"><img src="../2026-11-10-pages/img/partners-work.webp" alt=""></div><div class="wh b"><img src="../2026-11-10-pages/img/partners-work.webp" alt=""></div></div></figure>
+<div class="cta-pad"></div>
+<div class="scene scene-end" data-name="문의" data-light>
+<section class="cta">
+  <p class="display" data-words>WE MAKE NEXT.</p>
+  <div class="cta-row rise" style="--i:3"><p>함께할 일을 들려주세요. 서로의 강점을 연결합니다.</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#business">비즈니스 문의</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
+</section>
+<footer class="site-footer">
+  <div>
+    <img class="footer-logo" src="../2026-11-10-pages/img/logo-astra.webp" alt="ASTRA ENTERTAINMENT" width="87" height="81">
+    <p class="slot">사업자 정보 자리 (상호, 대표자, 사업자번호, 주소, 전화, 이메일)</p>
+  </div>
+  <div class="footer-links">
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+    <p class="slot">인스타그램 링크 자리</p>
+  </div>
+</footer>
+</div>
+</main>
+<div class="fab-anchor">
+  <div class="fab">
+    <ul class="fab-menu" id="fab-menu">
+      <li><a href="#">카카오톡 상담</a></li>
+      <li><a href="#">인스타그램</a></li>
+      <li><a href="#">블로그</a></li>
+      <li><a class="main" href="contact.html#apply">지원하기</a></li>
+    </ul>
+    <button class="fab-button" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="상담·지원 바로가기 열기">
+      <svg class="talk" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5h16v10.5H10.5L6 19.5V16H4z"/><path d="M8.5 10.8h.01M12 10.8h.01M15.5 10.8h.01" stroke-width="2.2"/></svg>
+      <svg class="x" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+</div>
+<script src="deck.js"></script>
+<script>
+/* 협력사 2판 — 두 흐름이 만난다(설계 6절). 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js)이 한다.
+   이 쪽이 하는 일: 첫 화면 사진 두 쪽이 맞물림, 로고 두 줄(혼자 반대로 흐름, 마우스로 밀기, 빠를수록 기울고 늘어남, 끌어서 던지기, 올리면 뒤집힘),
+   넘김 2→3(두 줄이 위아래로 갈라지고 사진이 열림), 화면 3 사진 속 둘러보기, 넘김 3→4(사진이 위아래 두 쪽으로 갈라져 반대로 나감). 값은 README.md */
+(function () {
+  var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim, EASE = D.EASE;
+  var HERO = 0, LOGOS = 1, WORK = 2, END = 3;
+  var scenes = $$('.scene');
+  var hero = scenes[HERO], logos = scenes[LOGOS], work = scenes[WORK];
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var now = function () { return performance.now(); };
+  var IMG = '../2026-11-10-pages/img/';
+  var stopAnims = function (e) { if (e && e.getAnimations) e.getAnimations().forEach(function (a) { a.cancel(); }); };
+
+  /* ───────── 화면 1(6-2): 사진 두 쪽이 양쪽에서 와 가운데서 맞물린다 ─────────
+     왼쪽 반은 왼쪽에서, 오른쪽 반은 오른쪽에서 창 가로의 20%만큼 밖에서 와 0.8초에 맞물린다(휴대폰 0.65초).
+     처음은 빠르지 않게 출발해 두 쪽 사이의 어두운 틈이 보이고(검토 010-1: 12%·앞쪽에 몰린 감속은 0.15초에 이미 한 장처럼 보였다),
+     오는 동안 밝기 50%. 맞물리는 순간 이음매에 빛이 위에서 아래로 0.3초 지나가고, 그동안 밝기가 원래로 돌아온다.
+     맞물린 뒤에는 한 장짜리 사진으로 돌아가 이음매가 없다 */
+  var halves = $$('.hhalf', hero);
+  var heroT = 0;
+  function heroReset() { clearTimeout(heroT); halves.forEach(stopAnims); stopAnims($('.hseam', hero)); hero.classList.remove('split', 'met'); }
+  function heroPlay() {
+    heroReset();
+    if (reduce) return;
+    var meet = D.on ? 800 : 650, glow = 300, dur = meet + glow, dx = window.innerWidth * 0.2;
+    hero.classList.add('split');
+    // 한 장짜리 사진과 두 쪽의 천천히 커지는 움직임을 같은 때로 맞춘다(맞물린 뒤 바꿔 끼울 때 크기가 튀지 않게)
+    $$('.hero-bg img', hero).forEach(function (im) { if (im.getAnimations) im.getAnimations().forEach(function (a) { a.currentTime = 0; }); });
+    halves.forEach(function (h, i) {
+      var s = i ? 1 : -1;
+      anim(h, [
+        { transform: 'translateX(' + (s * dx).toFixed(1) + 'px)', filter: 'brightness(0.5)', easing: 'cubic-bezier(0.45, 0, 0.2, 1)' },
+        { transform: 'translateX(0)', filter: 'brightness(0.5)', offset: meet / dur },
+        { transform: 'translateX(0)', filter: 'brightness(1)' }
+      ], { duration: dur, fill: 'both' });
+    });
+    anim($('.hseam', hero), [
+      { opacity: 0, transform: 'translateY(-100%)' },
+      { opacity: 1, transform: 'translateY(-100%)', offset: 0.01 },
+      { opacity: 1, transform: 'translateY(200%)', offset: 0.8 },
+      { opacity: 0, transform: 'translateY(263%)' }
+    ], { duration: glow, delay: meet - 20, easing: 'cubic-bezier(0.4, 0, 0.6, 1)', fill: 'both' });
+    heroT = setTimeout(function () { hero.classList.add('met'); hero.classList.remove('split'); halves.forEach(stopAnims); stopAnims($('.hseam', hero)); }, dur + 60);
+  }
+
+  /* ───────── 화면 2(6-3): 로고 두 줄 ─────────
+     칸은 그대로 두고 칸마다 옆으로 옮겨 끝없이 잇는다(칸 수 9, 화면 밖으로 나간 칸은 반대쪽 끝으로 돌아온다).
+     빠르기(px/초): 혼자 흐름 윗줄 왼쪽·아랫줄 오른쪽 50, 마우스로 밀면 윗줄은 마우스 쪽·아랫줄은 반대쪽으로 더해진다(최대 2,400). 모두 큰 창 배율을 곱한다 */
+  var rowEls = $$('.logo-row', logos);
+  var R = rowEls.map(function (ul, r) {
+    return { ul: ul, cells: $$('li', ul), dir: r ? 1 : -1, off: 0, sc: 0, extra: 0, slow: 1, pitch: 0, total: 0, v: 0, f: 0, ang: 0, flip: [] };
+  });
+  R.forEach(function (row) { row.flip = row.cells.map(function () { return 0; }); });
+  var BASE = 50, MAX = 2400, PUSH = 7, TAU = 0.4, FLIP_MAX = 400;
+  var L = { hot: null, drag: null, entering: 0, nudge: [0, 0], live: !reduce, moved: false };
+  function measure() {
+    R.forEach(function (row) {
+      var w = row.cells[0].offsetWidth, g = parseFloat(getComputedStyle(row.ul).columnGap) || 0;
+      row.pitch = w + g; row.total = row.pitch * row.cells.length;
+    });
+  }
+  var K = function () { return D.on ? D.k : 1; };
+  function paintRow(row) {
+    var n = row.cells.length, p = row.pitch, T = row.total;
+    if (!p) return;
+    var f = row.f, ang = row.ang, sx = 1 + 0.12 * f;
+    var o = row.off + row.sc; // sc: 휴대폰 스크롤 반응(12-6)에서 스크롤만큼 민 거리
+    for (var i = 0; i < n; i++) {
+      var pos = ((i * p + o + p) % T + T) % T - p, tx = pos - i * p;
+      var fl = row.flip[i], ry = fl < 0.5 ? 180 * fl : 180 * fl - 180, sc = 1 + 0.12 * fl;
+      // 뒤집히는 칸은 뒤집힌 만큼 기울기·늘어남을 뺀다(돌기·커짐과 기울기가 겹쳐 사다리꼴이 되지 않게)
+      var c = row.cells[i], ca = ang * (1 - fl), cx = 1 + (sx - 1) * (1 - fl);
+      c.style.transform = 'translateX(' + tx.toFixed(1) + 'px) skewX(' + (-ca).toFixed(2) + 'deg) scaleX(' + cx.toFixed(3) + ')' + (fl > 0.001 ? ' rotateY(' + ry.toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')' : '');
+      c.classList.toggle('wt', fl >= 0.5);
+    }
+  }
+  // 마우스 아래 칸: 그려진 모양(돌고 기운 칸)이 아니라 칸의 제자리로 찾는다. 뒤집히며 좁아진 칸에서 마우스가 빠졌다 들어왔다 하지 않게
+  function hitCell(x, y) {
+    for (var r = 0; r < R.length; r++) {
+      var row = R[r], b = row.ul.getBoundingClientRect();
+      if (y < b.top || y > b.bottom || !row.pitch) continue;
+      var w = row.cells[0].offsetWidth, p = row.pitch, T = row.total;
+      for (var i = 0; i < row.cells.length; i++) {
+        var pos = ((i * p + row.off + p) % T + T) % T - p + b.left;
+        if (x >= pos && x < pos + w) return row.cells[i];
+      }
+    }
+    return null;
+  }
+  function logosLive() { return D.on ? (D.cur === LOGOS || (D.trans && (D.trans.from === LOGOS || D.trans.to === LOGOS))) : logos.classList.contains('seen'); }
+
+  // 마우스로 민다: 좌우로 움직인 만큼(PUSH배) 윗줄은 마우스 쪽, 아랫줄은 반대쪽으로 빠르기가 더해지고 0.4초 시간 상수로 돌아온다(1.5초면 거의 원래)
+  var lastMX = null;
+  window.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var x = e.clientX;
+    if (lastMX !== null && D.on && D.cur === LOGOS && !D.trans && !L.drag && !reduce) {
+      var dx = x - lastMX, m = MAX * K();
+      R[0].extra = clamp(R[0].extra + dx * PUSH, -m, m);
+      R[1].extra = clamp(R[1].extra - dx * PUSH, -m, m);
+    }
+    lastMX = x;
+  }, { passive: true });
+
+  // 끌어서 던진다: 잡은 줄은 손을 따라오고 다른 줄은 반대로 간다. 놓으면 그 빠르기에서 돌아온다. 손가락으로 누르기만 하면(휴대폰) 그 칸이 뒤집힌다
+  R.forEach(function (row, r) {
+    row.ul.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      L.drag = { r: r, id: e.pointerId, x0: e.clientX, x: e.clientX, t: now(), v: 0, on: false, cell: e.target.closest ? e.target.closest('li') : null, type: e.pointerType };
+    });
+  });
+  window.addEventListener('pointermove', function (e) {
+    var d = L.drag;
+    if (!d || e.pointerId !== d.id) return;
+    var t = now(), dx = e.clientX - d.x;
+    if (!d.on && Math.abs(e.clientX - d.x0) > 6) {
+      d.on = true; R[d.r].ul.classList.add('drag');
+      try { R[d.r].ul.setPointerCapture(d.id); } catch (er) { /* 놓친 경우 */ }
+    }
+    if (d.on) {
+      R[d.r].off += dx; R[1 - d.r].off -= dx;
+      var dt = Math.max(8, t - d.t);
+      d.v = d.v * 0.6 + (dx / dt * 1000) * 0.4;
+      R[0].extra = R[1].extra = 0;
+    }
+    d.x = e.clientX; d.t = t;
+  });
+  function dragEnd(e) {
+    var d = L.drag;
+    if (!d || e.pointerId !== d.id) return;
+    L.drag = null;
+    R[d.r].ul.classList.remove('drag');
+    if (d.on) {
+      if (now() - d.t > 120) d.v = 0; // 멈췄다가 놓으면 던지지 않는다
+      var m = MAX * K(), v = reduce ? 0 : clamp(d.v, -m, m);
+      // 던진 빠르기에서 혼자 흐르는 빠르기를 뺀 만큼이 더해진 빠르기다
+      R[d.r].extra = v - R[d.r].dir * BASE * K(); R[1 - d.r].extra = -v - R[1 - d.r].dir * BASE * K();
+      if (reduce) R[0].extra = R[1].extra = 0;
+      L.moved = true;
+    } else if (d.cell && d.type !== 'mouse') {
+      // 손가락으로 누름: 그 칸이 뒤집힌다(다시 누르면 돌아온다)
+      L.hot = L.hot === d.cell ? null : d.cell;
+    }
+  }
+  window.addEventListener('pointerup', dragEnd);
+  window.addEventListener('pointercancel', dragEnd);
+
+  // 좌우 화살표: 줄을 한 칸씩 민다(윗줄은 누른 쪽으로, 아랫줄은 반대쪽으로 0.5초)
+  document.addEventListener('keydown', function (e) {
+    if (!D.on || D.cur !== LOGOS || D.trans || e.altKey || e.ctrlKey || e.metaKey) return;
+    var s = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!s) return;
+    e.preventDefault();
+    L.nudge[0] += s * R[0].pitch; L.nudge[1] -= s * R[1].pitch;
+    L.moved = true;
+  });
+
+  // 들어올 때: 두 줄이 화면 양쪽 밖에서 들어와(윗줄은 오른쪽에서, 아랫줄은 왼쪽에서) 서로 스쳐 지나가며 0.9초에 원래 빠르기로 느려진다
+  function logosEnter(from) {
+    logosReset();
+    if (reduce) return;
+    if (from === WORK) return; // 함께한 작업에서 돌아올 때는 넘김이 두 줄을 위아래에서 데려온다
+    var W = window.innerWidth, k = K();
+    L.entering = now();
+    R[0].extra = -2000 * k + BASE * k; R[1].extra = 2000 * k - BASE * k;
+    rowEls.forEach(function (ul, r) {
+      var s = r ? -1 : 1;
+      anim(ul, [{ transform: 'translateX(' + (s * W * 1.1).toFixed(0) + 'px)' }, { transform: 'translateX(0)' }], { duration: 900, easing: 'cubic-bezier(0.15, 0.6, 0.3, 1)', fill: 'backwards' });
+    });
+  }
+  function logosReset() {
+    rowEls.forEach(stopAnims);
+    R.forEach(function (row) { row.extra = 0; row.slow = 1; row.flip = row.flip.map(function () { return 0; }); row.cells.forEach(function (c) { c.classList.remove('hot'); }); });
+    L.hot = null; L.nudge = [0, 0]; L.entering = 0;
+    logos.classList.remove('hov');
+  }
+
+  // 뒤 사진: 첫 화면 사진을 흐리고 어둡게(흐림 24px, 밝기 30%). 큰 사진을 흐리면 느려지므로 작게 그려 미리 흐린 한 장을 늘려 쓴다
+  var lbg = $('.lbg', logos);
+  (function () {
+    var c = document.createElement('canvas'), im = new Image();
+    im.onload = function () {
+      var w = 320, h = Math.round(w * im.naturalHeight / im.naturalWidth), b = 24 / Math.max(1, window.innerWidth / w), m = Math.ceil(b * 3);
+      c.width = w; c.height = h;
+      var x = c.getContext('2d');
+      if (typeof x.filter === 'string') { x.filter = 'blur(' + b.toFixed(2) + 'px) brightness(0.3)'; x.drawImage(im, -m, -m, w + m * 2, h + m * 2); }
+      else { x.drawImage(im, 0, 0, w, h); c.style.filter = 'blur(' + b.toFixed(2) + 'px) brightness(0.3)'; }
+    };
+    im.src = IMG + 'partners-hero.webp';
+    lbg.appendChild(c);
+  })();
+
+  /* ───────── 화면 3(6-4): 사진 속을 둘러본다 ─────────
+     사진 1.14배, 마우스 반대쪽으로 가로·세로 6%까지(0.4초 늦게 따라옴). 마우스가 3초 쉬면 혼자 좌우로 오간다(28초에 한 번, 2%) */
+  var wk = $('.wk', work), wh = $$('.wh', work), wimg = $$('.wh img', work), wcap = $('figcaption', work);
+  var P = { x: 0, y: 0, sway: 0, t0: 0 };
+  function panPaint() {
+    var t = 'translate(' + P.x.toFixed(1) + 'px,' + P.y.toFixed(1) + 'px) scale(1.14)';
+    wimg.forEach(function (im) { im.style.transform = t; });
+  }
+  function workReset() { P.x = P.y = 0; P.sway = 0; wimg.forEach(function (im) { im.style.transform = ''; }); wh.forEach(stopAnims); stopAnims(work); stopAnims(wcap); }
+
+  // 스크롤하는 화면(6-6): 함께한 작업 사진이 화면에 들어오면 가로 띠에서 위아래로 열린다
+  function workOpen() {
+    stopAnims(work);
+    if (reduce || D.flowOn()) return; // 휴대폰 스크롤 반응이 켜진 동안은 아래 D.flow가 스크롤만큼 연다
+    anim(work, [{ clipPath: 'inset(49% 0 49% 0)' }, { clipPath: 'inset(0% 0 0% 0)' }], { duration: 950, easing: EASE, fill: 'backwards' });
+  }
+
+  /* ───────── 한 프레임 ───────── */
+  var last = now();
+  function frame() {
+    var t = now(), dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    var k = K();
+    // 로고 두 줄
+    if (logosLive() && R[0].pitch) {
+      // 마우스가 올라간 칸(한 화면씩 넘길 때). 줄이 빠르게(초당 400px 넘게) 흐르는 동안에는 뒤집기·커짐·다른 칸 물러남을 모두 걸지 않는다.
+      // 이미 뒤집힌 칸도 줄이 빨라지면 놓는다(검토 010-2: 던진 직후 뒤집힌 칸이 커진 채 기울어 옆 칸과 겹쳤다)
+      var hot = L.hot;
+      if (D.on) {
+        hot = null;
+        if (D.cur === LOGOS && !D.trans && !L.drag && D.mouse.at) {
+          var li = hitCell(D.mouse.x, D.mouse.y);
+          if (li) {
+            var rr = R[rowEls.indexOf(li.parentNode)];
+            if (rr && Math.abs(rr.v) <= FLIP_MAX * k) hot = li;
+          }
+        }
+      }
+      var any = false;
+      R.forEach(function (row, r) {
+        var mine = hot && hot.parentNode === row.ul;
+        // 올린 줄은 4분의 1 빠르기로 느려진다
+        row.slow += ((mine ? 0.25 : 1) - row.slow) * (1 - Math.exp(-dt / 0.2));
+        var tau = L.entering && t - L.entering < 900 ? 0.3 : TAU;
+        row.extra *= Math.exp(-dt / tau);
+        if (Math.abs(row.extra) < 0.5) row.extra = 0;
+        var base = (reduce || !L.live) ? 0 : row.dir * BASE * k * row.slow;
+        row.v = L.drag && L.drag.on ? 0 : base + row.extra;
+        if (!(L.drag && L.drag.on)) row.off += row.v * dt;
+        // 화살표로 민 만큼 0.5초에 걸쳐 옮긴다
+        if (L.nudge[r]) { var step = L.nudge[r] * (1 - Math.exp(-dt / 0.12)); if (Math.abs(L.nudge[r] - step) < 0.5) step = L.nudge[r]; row.off += step; L.nudge[r] -= step; }
+        // 빠를수록 가는 쪽으로 기울고(최대 10도) 가로로 늘어난다(최대 1.12배). 혼자 흐르는 빠르기에서는 서 있다
+        var speed = L.drag && L.drag.on ? Math.abs(L.drag.v) : Math.abs(row.v);
+        var sign = L.drag && L.drag.on ? (r === L.drag.r ? 1 : -1) * Math.sign(L.drag.v) : Math.sign(row.v);
+        row.f = clamp((speed - BASE * k * 1.2) / (MAX * k * 0.75), 0, 1);
+        row.ang = 10 * row.f * sign;
+        // 뒤집힘 0.3초
+        row.cells.forEach(function (c, i) {
+          var want = c === hot ? 1 : 0;
+          // 빠르게 흐르는 줄에서 놓은 칸은 0.1초에 바로 돌아온다
+          var back = Math.abs(row.v) > FLIP_MAX * k ? 0.1 : 0.3;
+          row.flip[i] = want ? Math.min(1, row.flip[i] + dt / 0.3) : Math.max(0, row.flip[i] - dt / back);
+          c.classList.toggle('hot', c === hot);
+          if (row.flip[i] > 0) any = true;
+        });
+        if (reduce && !L.moved && !row.flip.some(Boolean)) return; // 움직임 줄이기: 손대기 전에는 정지 시안 그대로
+        paintRow(row);
+      });
+      logos.classList.toggle('hov', !!hot);
+    }
+    // 함께한 작업 둘러보기
+    if (D.on && D.cur === WORK && !D.trans) {
+      var W = window.innerWidth, H = window.innerHeight, mx = D.mouse.at ? D.mouse.x / W * 2 - 1 : 0, my = D.mouse.at ? D.mouse.y / H * 2 - 1 : 0;
+      var idle = !D.mouse.at || t - D.mouse.at > 3000;
+      P.sway += ((idle ? 1 : 0) - P.sway) * (1 - Math.exp(-dt / 0.8));
+      var swayX = Math.sin((t - P.t0) / 28000 * Math.PI * 2) * 0.02 * W * P.sway;
+      var tx = -mx * 0.06 * W * (1 - P.sway) + swayX, ty = -my * 0.06 * H * (1 - P.sway);
+      var a = 1 - Math.exp(-dt / 0.18);
+      P.x += (tx - P.x) * a; P.y += (ty - P.y) * a;
+      panPaint();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ───────── 넘김(6-4, 6-5) ───────── */
+  function rowBand() {
+    var a = rowEls[0].getBoundingClientRect(), b = rowEls[1].getBoundingClientRect(), H = window.innerHeight;
+    var top = a.bottom, bot = b.top;
+    return { top: top, bot: bot, upOut: -(a.bottom + 24), downOut: H - b.top + 24, H: H };
+  }
+  function move(from, to, fromEl, toEl) {
+    if (reduce) return null;
+    var H = window.innerHeight, b, anims = [];
+    // 2 → 3: 윗줄은 위로, 아랫줄은 아래로 밀려 나가고(0.6초, 흐르면서), 두 줄 사이의 띠에서 사진이 위아래로 열린다(0.25초에 시작, 0.95초)
+    if (from === LOGOS && to === WORK) {
+      b = rowBand();
+      toEl.style.zIndex = '3';
+      anims.push(anim(rowEls[0], [{ transform: 'translateY(0)' }, { transform: 'translateY(' + b.upOut.toFixed(0) + 'px)' }], { duration: 600, easing: 'cubic-bezier(0.55, 0, 0.75, 0.3)', fill: 'both' }));
+      anims.push(anim(rowEls[1], [{ transform: 'translateY(0)' }, { transform: 'translateY(' + b.downOut.toFixed(0) + 'px)' }], { duration: 600, easing: 'cubic-bezier(0.55, 0, 0.75, 0.3)', fill: 'both' }));
+      anims.push(anim(lbg, [{ opacity: 1 }, { opacity: 0 }], { duration: 600, easing: 'ease-in', fill: 'both' }));
+      anims.push(anim(toEl, [{ clipPath: 'inset(' + b.top.toFixed(0) + 'px 0 ' + (H - b.bot).toFixed(0) + 'px 0)' }, { clipPath: 'inset(0px 0 0px 0)' }], { duration: 950, delay: 250, easing: 'cubic-bezier(0.65, 0, 0.25, 1)', fill: 'both' }));
+      P.t0 = now();
+      return { dur: 1200, anims: anims, enter: 900 };
+    }
+    // 3 → 2(되돌아가기): 사진이 가로 띠로 닫히고 두 줄이 위아래에서 돌아온다
+    if (from === WORK && to === LOGOS) {
+      b = rowBand();
+      fromEl.style.zIndex = '3';
+      anims.push(anim(fromEl, [{ clipPath: 'inset(0px 0 0px 0)' }, { clipPath: 'inset(' + b.top.toFixed(0) + 'px 0 ' + (H - b.bot).toFixed(0) + 'px 0)' }], { duration: 700, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'both' }));
+      anims.push(anim(fromEl, [{ opacity: 1 }, { opacity: 1, offset: 0.9 }, { opacity: 0 }], { duration: 780, fill: 'both' }));
+      anims.push(anim(rowEls[0], [{ transform: 'translateY(' + b.upOut.toFixed(0) + 'px)' }, { transform: 'translateY(0)' }], { duration: 800, delay: 350, easing: EASE, fill: 'both' }));
+      anims.push(anim(rowEls[1], [{ transform: 'translateY(' + b.downOut.toFixed(0) + 'px)' }, { transform: 'translateY(0)' }], { duration: 800, delay: 350, easing: EASE, fill: 'both' }));
+      anims.push(anim(lbg, [{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 300, easing: 'ease-out', fill: 'both' }));
+      return { dur: 1200, anims: anims, enter: 400 };
+    }
+    // 3 → 4: 사진이 가로로 반 갈라져 위쪽 반은 왼쪽으로, 아래쪽 반은 오른쪽으로 화면 밖까지 밀려 나간다(0.75초, 처음은 천천히 뒤는 빠르게). 뒤의 흰 문의 화면이 드러난다
+    if (from === WORK && to === END) {
+      fromEl.style.zIndex = '3';
+      var out = { duration: 750, easing: 'cubic-bezier(0.6, 0, 0.85, 0.35)', fill: 'both' };
+      anims.push(anim(wh[0], [{ transform: 'translateX(0)' }, { transform: 'translateX(-105%)' }], out));
+      anims.push(anim(wh[1], [{ transform: 'translateX(0)' }, { transform: 'translateX(105%)' }], out));
+      anims.push(anim(wcap, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'both' }));
+      return { dur: 1000, anims: anims, light: 420, enter: 760 };
+    }
+    // 4 → 3(되돌아가기): 두 쪽이 양쪽에서 돌아와 맞물린다
+    if (from === END && to === WORK) {
+      toEl.style.zIndex = '3';
+      var back = { duration: 750, easing: 'cubic-bezier(0.15, 0.65, 0.4, 1)', fill: 'both' };
+      anims.push(anim(wh[0], [{ transform: 'translateX(-105%)' }, { transform: 'translateX(0)' }], back));
+      anims.push(anim(wh[1], [{ transform: 'translateX(105%)' }, { transform: 'translateX(0)' }], back));
+      anims.push(anim(wcap, [{ opacity: 0 }, { opacity: 0, offset: 0.8 }, { opacity: 1 }], { duration: 900, fill: 'both' }));
+      P.t0 = now();
+      return { dur: 1000, anims: anims, light: 380, enter: 700 };
+    }
+    return null;
+  }
+
+  /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-6, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
+     로고 두 줄: 내리는 만큼 윗줄은 왼쪽, 아랫줄은 오른쪽으로 더 밀린다(10px 내리면 6px). 혼자 흐름은 그대로
+     함께한 작업 사진: 사진 위쪽 90% -> 45% 동안 가운데 가로 띠에서 위아래로 열린다
+     흰 문의 구역: 구역 위쪽 92% -> 40% 동안 어두운 덮개가 가로로 갈라져 위쪽 반은 왼쪽, 아래쪽 반은 오른쪽으로 밀려난다.
+     갈라짐은 범위의 앞 75%에 몰아(처음 빠르고 끝이 느리게) 반쯤 멈춰도 위쪽 글이 이미 드러나 있다 */
+  var endScene = $('.scene-end'), FLOW = { work: 0, end: 0 };
+  var ecov = [0, 1].map(function (i) { var c = document.createElement('div'); c.className = 'ecov'; c.setAttribute('aria-hidden', 'true'); endScene.insertBefore(c, endScene.firstChild); return c; });
+  function flowCover(q) {
+    FLOW.end = q;
+    if (q >= 1) { ecov.forEach(function (c) { c.classList.remove('on'); }); return; }
+    var h = endScene.offsetHeight, mid = Math.round(h / 2), u = 1 - Math.pow(1 - clamp(q / 0.75, 0, 1), 3);
+    ecov[0].style.top = '0px'; ecov[0].style.height = mid + 'px';
+    ecov[1].style.top = mid + 'px'; ecov[1].style.height = (h - mid) + 'px';
+    ecov[0].style.transform = 'translateX(' + (-105 * u).toFixed(2) + '%)';
+    ecov[1].style.transform = 'translateX(' + (105 * u).toFixed(2) + '%)';
+    ecov.forEach(function (c) { c.classList.add('on'); });
+  }
+  D.flow(function (vh, on) {
+    if (!on) {
+      R.forEach(function (row) { row.sc = 0; });
+      work.style.clipPath = ''; ecov.forEach(function (c) { c.classList.remove('on'); });
+      return;
+    }
+    var y = window.pageYOffset;
+    R.forEach(function (row) { row.sc = row.dir * y * 0.6; });
+    var p = D.span(work, 0.9, 0.45, vh), g = 49 * (1 - p);
+    FLOW.work = p;
+    if (p >= 1) work.style.clipPath = ''; else { stopAnims(work); work.style.clipPath = 'inset(' + g.toFixed(2) + '% 0 ' + g.toFixed(2) + '% 0)'; }
+    flowCover(D.spanEnd(endScene, 0.92, 0.4, vh));
+  });
+  window.__partnersFlow = FLOW;
+
+  window.__partners = {
+    state: function () {
+      return {
+        cur: D.cur, on: D.on,
+        v: R.map(function (r) { return Math.round(r.v); }), off: R.map(function (r) { return Math.round(r.off); }),
+        ang: R.map(function (r) { return Math.round(r.ang * 10) / 10; }), stretch: R.map(function (r) { return Math.round((1 + 0.12 * r.f) * 1000) / 1000; }),
+        hot: $$('.logo-row li.hot').length, white: $$('.logo-row li.wt').length, slow: R.map(function (r) { return Math.round(r.slow * 100) / 100; }),
+        drag: !!(L.drag && L.drag.on), pan: [Math.round(P.x), Math.round(P.y)], split: hero.classList.contains('split')
+      };
+    }
+  };
+
+  measure();
+  // 창 크기가 바뀌면 칸 간격을 다시 잰다. 움직임 줄이기에서 손대기 전에는 칸을 옮기지 않는다(정지 시안 그대로)
+  window.addEventListener('resize', function () { measure(); if (!reduce || L.moved) R.forEach(paintRow); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  requestAnimationFrame(frame);
+
+  D.setup({
+    enter: function (n, scene, from) {
+      if (n === HERO) heroPlay();
+      else if (n === LOGOS) { measure(); logosEnter(from); }
+      else if (n === WORK) { if (!P.t0) P.t0 = now(); }
+    },
+    reset: function (n) {
+      if (n === HERO) heroReset();
+      else if (n === LOGOS) logosReset();
+      else if (n === WORK) workReset();
+    },
+    // 로고 벽에서 줄을 끄는 동안에는 휠·키보드로 화면이 넘어가지 않는다
+    step: function (n) { return n === LOGOS && !!(L.drag && L.drag.on); },
+    move: move,
+    seen: function (n, scene, instant) {
+      if (instant) { if (n === HERO) hero.classList.add('met'); return; }
+      if (n === HERO) heroPlay();
+      else if (n === LOGOS) measure();
+      else if (n === WORK) workOpen();
+    },
+    unseen: function (n) {
+      if (n === HERO) heroReset();
+      else if (n === LOGOS) logosReset();
+      else if (n === WORK) stopAnims(work);
+    },
+    start: function () { measure(); wk.style.display = ''; },
+    stop: function () { measure(); R.forEach(function (row) { row.cells.forEach(function (c) { c.style.transform = ''; }); }); workReset(); }
+  });
+})();
+</script>
+<script src="site-menu.js"></script>
+<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
+<!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
+</body>
+</html>

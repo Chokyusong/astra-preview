@@ -1,0 +1,116 @@
+/* 엔터테인먼트 숏폼 화면의 카드 모션 (대표 지시 2026-11-11, 참고 witu.co.kr 첫 화면).
+   시험판 ../2026-11-11-ent-shorts/ent-shorts.html에서 옮겼다. 스크립트는 ent-reel.js.
+   카드는 지금은 사진이고, 영상을 받으면 카드 안의 <img>를 <video>로 바꾼다.
+   3판(대표 11-11 "witu와 똑같이"): 옆 카드가 떠다니고, 뒤 벽 세로 줄이 위아래로 흐르고, 글이 낱말·글자마다 나타나고, 끝에 가운데로 작아진다. */
+.reel { --W: 200px; --cy: 45%; --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative; isolation: isolate; height: min(100svh, 760px); min-height: 560px; overflow: hidden; background: var(--ink); }
+/* 한 화면씩 넘길 때는 창을 가득 채운다(공통 틀이 fixed + inset 0을 준다) */
+html.deck .reel { height: auto; min-height: 0; }
+
+/* 카드: 자리(--x --y --r --s --o)는 장면마다 스크립트가 정하고, 움직임은 transition이 맡는다.
+   마우스를 따라 조금 밀리는 것은 translate 속성으로 따로 건다(카드마다 깊이 --d가 다르다). */
+.reel-stage { position: absolute; inset: 0; }
+.rc { position: absolute; left: 50%; top: var(--cy); width: var(--W); aspect-ratio: 9 / 16;
+  margin: calc(var(--W) * -8 / 9) 0 0 calc(var(--W) / -2); border-radius: calc(var(--W) * 0.075);
+  transform: translate(var(--x, 0px), var(--y, 0px)) rotate(var(--r, 0deg)) scale(var(--s, 1)); opacity: var(--o, 0); z-index: var(--z, 1);
+  translate: calc(var(--mx, 0) * var(--d, 0) * 1px) calc(var(--my, 0) * var(--d, 0) * 1px);
+  transition: transform var(--dur, 0.9s) var(--ez, var(--ease)) var(--dl, 0s), opacity var(--odur, 0.5s) linear var(--dl, 0s), translate 0.7s cubic-bezier(.2,.7,.2,1), filter 0.4s;
+  will-change: transform, opacity; }
+.rc-in { position: absolute; inset: 0; display: block; border-radius: inherit; overflow: hidden; background: #161616;
+  box-shadow: 0 calc(var(--W) * 0.1) calc(var(--W) * 0.22) rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.rc img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* 옆 카드는 장면에 머무는 동안 바깥으로 천천히 벌어진다(ent-reel.js의 spread). 사진 안은 움직이지 않는다(대표 11-11: witu는 카드 자체가 옆으로 펼쳐진다) */
+/* 배경(대표 11-11): 우주 사진 한 장(ChatGPT 이미지)을 숏폼 구역 전체에 깐다. 여는 장면은 또렷하게(100%), 분야 무리 42%. 무대·맺음은 뒤 카드 벽이 화면을 채워 배경을 끈다(대표 11-11 "이미 꽉 차 있다").
+   사진은 48초에 걸쳐 천천히 커지며 떠다니고, 위의 별 그림판에서 별이 반짝이며 왼쪽으로 흐른다(깊이마다 빠르기가 다르다).
+   마우스 반대쪽으로 사진과 별이 깊이만큼 밀리고, 마우스 둘레의 별이 밝고 커진다(ent-reel.js). 위·아래 끝은 어둡게 덮는다 */
+.reel-sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; opacity: 0.4; transition: opacity 0.9s linear; }
+.reel-sky-in { position: absolute; inset: -3%; will-change: transform; }
+.reel-sky img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; will-change: transform; animation: reel-sky 48s ease-in-out infinite alternate; }
+.reel-sky canvas { position: absolute; inset: 0; display: block; }
+.reel-sky::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10, 10, 10, 0.6) 0%, rgba(10, 10, 10, 0) 24%, rgba(10, 10, 10, 0) 66%, rgba(10, 10, 10, 0.72) 100%); }
+@keyframes reel-sky { from { transform: scale(1.04) translate(-1.2%, 0.6%); } to { transform: scale(1.13) translate(1.4%, -0.8%); } }
+.reel.open-img .reel-sky { opacity: 1; transition: opacity 0.6s linear; }
+.reel.grid-on .reel-sky { opacity: 0; }
+.reel.cluster .reel-sky { opacity: 0.42; }
+.reel.outro .reel-sky, .reel.shrink .reel-sky { opacity: 0; }
+/* 가운데 카드는 재생 중인 영상처럼 사진이 천천히 커지고, 아래에 진행 막대가 찬다 */
+.rc.lead img { animation: reel-play var(--scene, 2.3s) linear both; }
+.rc.lead::after { content: ""; position: absolute; z-index: 1; left: 7%; right: 7%; bottom: 4.5%; height: 2px; border-radius: 2px; background: linear-gradient(#fff, #fff) no-repeat left / 0% 100%, rgba(255, 255, 255, 0.28); animation: reel-bar var(--scene, 2.3s) linear both; }
+@keyframes reel-play { from { transform: scale(1.02); } to { transform: scale(1.14); } }
+@keyframes reel-bar { to { background-size: 100% 100%, auto; } }
+/* 옆 카드를 누르면 그 카드가 가운데로 온다(대표 지시 2026-11-11). 누를 수 있는 카드에만 손가락 표시 */
+.reel.cluster .rc:not(.lead), .reel.grid-on .rc { cursor: pointer; }
+.rc:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@media (hover: hover) { .reel.cluster .rc:not(.lead):hover, .reel.grid-on .rc:hover { filter: brightness(1.25); } }
+
+/* 뒤에 깔리는 흐린 카드 격자(장면 "무대") */
+/* witu처럼 벽 전체가 가운데서부터 커지며 나타나고(0.6초), 나갈 때는 0.3초에 사라진다. 세로 줄은 홀수는 위로, 짝수는 아래로 천천히 흐른다 */
+.reel-grid { position: absolute; inset: 0 -2%; display: grid; grid-template-columns: repeat(var(--cols, 14), 1fr); gap: calc(var(--W) * 0.1); overflow: hidden; pointer-events: none;
+  opacity: 0; transform: scale(0.72); transition: opacity 0.3s linear, transform 0.3s ease-in; }
+.reel.grid-on .reel-grid { opacity: 1; transform: none; transition: opacity 0.35s linear 0.1s, transform 0.75s cubic-bezier(.16,.84,.3,1) 0.1s; }
+.reel-grid .gc { display: flex; flex-direction: column; gap: calc(var(--W) * 0.1); translate: 0 var(--gy, 0%); animation: reel-roll var(--gt, 40s) linear infinite; }
+.reel-grid .gc:nth-child(even) { animation-direction: reverse; }
+@keyframes reel-roll { from { transform: translateY(0); } to { transform: translateY(calc((-100% - var(--W) * 0.1) / 3)); } }
+.reel-grid i { display: block; flex: none; aspect-ratio: 9 / 16; border-radius: calc(var(--W) * 0.04); background: #161616 center / cover; opacity: 0; transition: opacity 0.3s linear; }
+.reel.grid-on .reel-grid i { opacity: var(--go, 0.2); transition: opacity 0.45s linear var(--gd, 0s); }
+
+/* 맺는 장면: 흐린 카드 세 줄이 서로 반대로 흐른다 */
+.reel-rows { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: calc(var(--W) * 0.14); padding-top: var(--header-h); opacity: 0; transition: opacity 0.5s linear; pointer-events: none; }
+.reel.outro .reel-rows { opacity: 0.34; transition-delay: 0.35s; }
+.reel-row { display: flex; gap: calc(var(--W) * 0.1); width: max-content; animation: reel-flow 34s linear infinite; }
+.reel-row:nth-child(2) { animation-direction: reverse; animation-duration: 40s; }
+.reel-row i { flex: none; width: calc(var(--W) * 0.56); aspect-ratio: 9 / 16; border-radius: calc(var(--W) * 0.045); background: #161616 center / cover; }
+@keyframes reel-flow { to { transform: translateX(-50%); } }
+
+/* 글: 제목(Bodoni)과 한 줄 설명(명조). 장면이 바뀔 때 아래에서 올라온다 */
+.reel-copy { position: absolute; left: 0; right: 0; top: calc(var(--cy) + var(--W) * 0.97); padding: 0 var(--gutter); text-align: center; pointer-events: none; }
+.reel-title { overflow: hidden; padding-bottom: 0.1em; font-family: var(--display); font-weight: 500; font-size: clamp(26px, min(4vw, 6.6vh), 64px); letter-spacing: -0.01em; line-height: 1.08; color: var(--paper); }
+.reel-sub { overflow: hidden; text-wrap: balance; margin-top: clamp(8px, 1.3vh, 16px); font-family: var(--serif-ko); font-weight: 500; font-size: clamp(15px, min(1.5vw, 2.6vh), 23px); line-height: 1.5; color: var(--mist); }
+/* witu처럼: 제목은 낱말마다 흐릿하게 올라와 또렷해지고(0.07초 간격), 설명은 한 글자씩 찍힌다(0.022초 간격). 바뀔 때는 0.18초에 사라진다 */
+.reel-title > span, .reel-sub > span { display: block; }
+.reel-title .rw { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(30%); }
+.reel-sub .rk { opacity: 0; }
+.reel-copy.in .reel-title .rw { opacity: 1; filter: none; transform: none; transition: opacity 0.25s calc(var(--wi) * 0.07s), filter 0.4s calc(var(--wi) * 0.07s), transform 0.5s var(--ease) calc(var(--wi) * 0.07s); }
+.reel-copy.in .reel-sub .rk { opacity: 1; transition: opacity 0.06s calc(0.18s + var(--ci) * 0.022s); }
+.reel-copy.out .reel-title > span, .reel-copy.out .reel-sub > span { opacity: 0; transition: opacity 0.18s; }
+
+/* 네 분야 진행 표시: 지금 분야의 선이 차오른다. 누르면 그 분야로 간다 */
+.reel-segs { position: absolute; left: 50%; bottom: clamp(18px, 4.4vh, 44px); display: flex; gap: 8px; transform: translateX(-50%); opacity: 0; transition: opacity 0.5s; z-index: 30; }
+.reel.cluster .reel-segs { opacity: 1; }
+.reel-segs button { position: relative; width: clamp(34px, 4vw, 56px); height: 28px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.reel-segs button::before, .reel-segs button::after { content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.26); }
+.reel-segs button::after { background: #fff; transform: scaleX(0); transform-origin: left; }
+.reel-segs button.done::after { transform: scaleX(1); }
+.reel-segs button.now::after { animation: reel-seg var(--scene, 2.3s) linear both; }
+.reel-segs button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@keyframes reel-seg { to { transform: scaleX(1); } }
+
+/* 맺는 큰 글자: 흐릿하다가 또렷해진다 */
+.reel-end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(12px, 2.2vh, 24px); padding: var(--header-h) var(--gutter) 0; text-align: center; background: radial-gradient(ellipse 62% 30% at 50% 54%, rgba(10,10,10,0.8), rgba(10,10,10,0) 100%); opacity: 0; filter: blur(18px); transform: scale(1.04); transition: opacity 0.9s, filter 1.1s, transform 1.4s var(--ease); pointer-events: none; }
+.reel.outro .reel-end { opacity: 1; filter: none; transform: none; transition: opacity 0.3s 0.2s, filter 0.35s 0.2s, transform 0.6s var(--ease) 0.2s; }
+.reel.shrink .reel-end, .reel.shrink .reel-rows { opacity: 0; transform: scale(0.24); filter: none; transition: transform 0.45s cubic-bezier(.55,0,.7,.4), opacity 0.3s linear 0.15s; }
+.reel-end .big { font-family: var(--display); font-weight: 500; font-size: clamp(30px, min(5vw, 9vh), 84px); letter-spacing: -0.01em; line-height: 1.06; color: var(--paper); }
+.reel-end .big b { font-weight: inherit; white-space: nowrap; }
+.reel-end .ko { max-width: 30em; text-wrap: balance; font-family: var(--serif-ko); font-weight: 500; font-size: clamp(15px, min(1.5vw, 2.6vh), 23px); line-height: 1.55; color: var(--mist); }
+.reel-end img { width: clamp(30px, 3vw, 44px); height: auto; margin-top: 4px; object-fit: contain; }
+
+.reel-note { position: absolute; left: 14px; bottom: 12px; z-index: 31; padding: 2px 10px; background: rgba(10, 10, 10, 0.6); color: var(--paper); font-size: 13px; line-height: 1.6; }
+.reel-vignette { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(10,10,10,0.7) 0, rgba(10,10,10,0) 16%), radial-gradient(ellipse 75% 70% at 50% 46%, rgba(10,10,10,0) 55%, rgba(10,10,10,0.75) 100%); }
+
+@media (max-width: 720px) {
+  /* 휴대폰: 카드가 화면 폭에 맞춰 작아지므로 구역도 낮춘다(아래가 비지 않게) */
+  .reel { --cy: 40%; height: clamp(520px, 150vw, 640px); min-height: 0; }
+  .reel-end .big b { display: block; }
+  .reel-note { font-size: 12px; }
+}
+/* 움직임 줄이기: 돌지 않는다. 첫 분야 무리에 멈춰 있고, 진행 표시를 눌러 분야를 바꾼다 */
+@media (prefers-reduced-motion: reduce) {
+  .rc, .reel-grid, .reel-grid i, .reel-title .rw, .reel-sub .rk, .reel-title > span, .reel-sub > span { transition: none !important; }
+  .rc.lead img, .rc.lead::after, .reel-segs button.now::after, .reel-row, .reel-grid .gc { animation: none !important; }
+  .reel-sky img { animation: none; }
+  .reel-sky canvas { display: none; }
+  .reel-segs button.now::after { transform: scaleX(1); }
+}
+/* 보이지 않을 때는 흐름을 멈춘다(다른 화면에서 힘을 쓰지 않게). 뒤 벽은 무대 장면에서만, 세 줄은 맺는 장면에서만 흐른다 */
+.reel-grid .gc, .reel-row { animation-play-state: paused; }
+.reel.grid-on .reel-grid .gc, .reel.outro .reel-row, .reel.shrink .reel-row { animation-play-state: running; }
