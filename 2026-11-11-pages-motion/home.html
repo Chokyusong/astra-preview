@@ -19,7 +19,32 @@
 .astra-letter { animation: astra-breath 1.5s cubic-bezier(.37,0,.63,1) infinite alternate both; }
 @keyframes astra-breath { from { font-variation-settings: "wght" 100; } to { font-variation-settings: "wght" 900; } }
 @media (prefers-reduced-motion: reduce) { .astra-letter { animation: none; font-variation-settings: "wght" 600; } }
+/* 회사소개로 넘어갈 때 덮는 막. 값은 회사소개 첫 화면의 어두운 막(../2026-11-10-pages/pages.css .hero-bg::after)과 같다 */
+/* 회사소개에서 홈을 눌러 돌아왔을 때(PC, about.html이 5초 안에 남긴 표시): 홈→회사소개를 거꾸로. 회사소개가 이미 홈 밝기·빛줄기로 되돌려 놓았으므로
+   홈은 ASTRA만 다시 맺는다: 떠날 때 마지막에 사라진 오른쪽 A부터 0.045초씩, 흐림 14px·위로 6%·1.06배에서 제자리로(0.8초), WE MAKE NEXT는 뒤에.
+   멈춘 그림은 확대가 달라 튀므로 숨기고, 쪽 사이 겹침은 0.6초. 다른 화면에서 왔으면 어둠이 0.7초에 걷힌다(대표 11-13) */
+@media (prefers-reduced-motion: no-preference) {
+  html.from-about .home-bg img { visibility: hidden; }
+  html.from-about::view-transition-old(root), html.from-about::view-transition-new(root) { animation-duration: 0.6s; }
+  html.from-about .astra { animation: about-back-astra 0.8s cubic-bezier(.25,.8,.45,1) 0.05s both; }
+  html.from-about .astra-letter { animation: astra-breath 1.5s cubic-bezier(.37,0,.63,1) infinite alternate both, about-back-letter 0.48s cubic-bezier(.25,.8,.45,1) both; }
+  html.from-about .astra-letter:nth-child(5) { animation-delay: -12s, 0.13s !important; }
+  html.from-about .astra-letter:nth-child(4) { animation-delay: -12s, 0.175s !important; }
+  html.from-about .astra-letter:nth-child(3) { animation-delay: -12s, 0.22s !important; }
+  html.from-about .astra-letter:nth-child(2) { animation-delay: -12s, 0.265s !important; }
+  html.from-about .astra-letter:nth-child(1) { animation-delay: -12s, 0.31s !important; }
+  html.from-about .home-tag { animation: about-back-tag 0.45s cubic-bezier(.25,.8,.45,1) 0.4s both; }
+  html.from-about-dark body::after { content: ""; position: fixed; inset: 0; z-index: 25; pointer-events: none; background: #0a0a0a; animation: about-back-dark 0.7s ease 0.1s both; }
+}
+@keyframes about-back-astra { from { transform: translateY(-6%) scale(1.06); filter: blur(14px); } }
+@keyframes about-back-letter { from { opacity: 0; } }
+@keyframes about-back-tag { from { opacity: 0; filter: blur(8px); } }
+@keyframes about-back-dark { to { opacity: 0; } }
+.home-veil { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: linear-gradient(to bottom, rgba(10, 10, 10, 0.5) 0, rgba(10, 10, 10, 0) 170px), linear-gradient(to top, #0a0a0a 0, rgba(10, 10, 10, 0) 34%), radial-gradient(ellipse 70% 60% at 50% 50%, rgba(10, 10, 10, 0.66), rgba(10, 10, 10, 0.4) 100%); }
 </style>
+<script>(function () { try { var o = JSON.parse(sessionStorage.getItem('astra-from-about') || 'null'); sessionStorage.removeItem('astra-from-about');
+  if (o && Date.now() - o.t < 5000) { var r = document.documentElement; r.classList.add('from-about'); if (o.dark) r.classList.add('from-about-dark'); window.__fromAbout = o.s || null;
+    setTimeout(function () { r.classList.remove('from-about', 'from-about-dark'); }, 1300); } } catch (e) {} })();</script>
 </head>
 <body>
 <header class="site-header">
@@ -74,6 +99,13 @@
   var M = { x: 0, y: 0, at: 0 }, HS = { x: 0.5, y: 0.45, i: 0, px: 0, py: 0, last: 0 };
   var lag = function (dt, s) { return 1 - Math.exp(-dt / 1000 / s); };
   window.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') { M.x = e.clientX; M.y = e.clientY; M.at = performance.now(); } }, { passive: true });
+  // 회사소개에서 홈을 눌러 왔으면 빛 자리·세기·그림 위치·마우스를 이어받는다
+  var FA = window.__fromAbout;
+  if (FA && FA.W && hover && cv) {
+    HS.x = FA.x; HS.y = FA.y; HS.i = FA.i; HS.px = FA.px; HS.py = FA.py;
+    if (FA.live) { M.x = FA.mx * window.innerWidth / FA.W; M.y = FA.my * window.innerHeight / FA.H; M.at = performance.now(); }
+    cv.style.transform = 'translate3d(' + HS.px.toFixed(2) + 'px,' + HS.py.toFixed(2) + 'px,0) scale(1.03)';
+  }
   function mouse() {
     var t = performance.now(), dt = Math.min(t - (HS.last || t), 100); HS.last = t;
     var W = window.innerWidth, H = window.innerHeight, live = M.at && t - M.at < 2500, tx, ty, ti, k;
@@ -85,6 +117,11 @@
     cv.style.transform = 'translate3d(' + HS.px.toFixed(2) + 'px,' + HS.py.toFixed(2) + 'px,0) scale(1.03)';
     return [HS.x, HS.y, HS.i, 0.18];
   }
+  // 회사소개로 넘어갈 때 빛·그림 위치를 넘겨 회사소개가 이어받는다(대표 11-13 "배경이랑 인터랙티브가 끊겨 보인다")
+  window.HomeLeaveState = function () {
+    return { x: HS.x, y: HS.y, i: HS.i, px: HS.px, py: HS.py, mx: M.x, my: M.y, W: window.innerWidth, H: window.innerHeight,
+      live: !!(hover && M.at && performance.now() - M.at < 2500) };
+  };
   // 배경: 확정 시험본처럼 늘 움직이고, 움직임 줄이기 설정이면 한 장만 그린다. 창이 안 보이면 쉰다
   if (cv && window.HomeMotion) window.HomeMotion.start(cv, function () { return !reduce && !document.hidden; }, hover && !reduce ? mouse : null);
   if (reduce && cv) window.addEventListener('resize', function () { if (cv.__draw) cv.__draw(0); });
@@ -107,8 +144,69 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('fab-open')) setFab(false, true); });
 })();
 </script>
+<script>
+/* 휠을 내리거나(PC) 손가락으로 위로 밀면(휴대폰) 홈이 흐려지며 사라지고 회사소개로 넘어간다(대표 11-13 "홈에서 휠다운하면 페이드어웨이로
+   회사소개로 자연스럽게"). 회사소개에서 올려도 홈으로 돌아오지 않는다(대표 11-13). 들어온 뒤 0.8초, 메뉴·떠 있는 버튼이 열려 있을 때는
+   반응하지 않는다. 휠은 0.25초 안에 60px 넘게 내려야 넘어간다(터치패드를 살짝 문지른 것은 무시). 화면이 낮아 홈이 스크롤되면 맨 아래에서만 넘어간다.
+   ASTRA 글자가 0.045초씩 늦게(0.72초 안에 모두) 사라지며 위로 떠 흐려지고, 배경은 꺼지지 않고 회사소개 첫 화면 밝기까지 서서히 어두워진 뒤(0.85초) 회사소개로 간다.
+   회사소개는 같은 배경 위에 글이 나타나는 것처럼 이어진다.
+   움직임 줄이기 설정이면 바로 넘어간다. 뒤로 가기로 돌아오면 처음 모습으로 되돌린다 */
+(function () {
+  var NEXT = 'about.html', reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement, bornAt = performance.now(), going = false, anims = [], acc = 0, accAt = 0, ty = null, tx = 0;
+  function atBottom() { var max = root.scrollHeight - window.innerHeight; return max <= 2 || window.scrollY >= max - 2; }
+  function blocked() { return going || performance.now() - bornAt < 800 || root.classList.contains('menu-open') || document.body.classList.contains('fab-open'); }
+  function go() {
+    if (blocked() || !atBottom()) return;
+    going = true;
+    if (reduce) { location.href = NEXT; return; }
+    var IN = 'cubic-bezier(.55,0,.75,.2)', a = function (el, k, o) { if (el) anims.push(el.animate(k, Object.assign({ fill: 'forwards', easing: IN }, o))); };
+    document.querySelectorAll('.astra-letter').forEach(function (el, i) { a(el, [{ opacity: 1 }, { opacity: 0 }], { duration: 480, delay: 60 + i * 45 }); });
+    a(document.querySelector('.astra'), [{ transform: 'none', filter: 'blur(0)' }, { transform: 'translateY(-6%) scale(1.06)', filter: 'blur(14px)' }], { duration: 800 });
+    a(document.querySelector('.home-tag'), [{ opacity: 1, filter: 'blur(0)' }, { opacity: 0, filter: 'blur(8px)' }], { duration: 450 });
+    // 배경은 꺼지지 않는다: 회사소개 첫 화면과 같은 그림이므로, 회사소개의 어두운 막(pages.css .hero-bg::after)을 그대로 천천히 덮어
+    // 회사소개 첫 화면 밝기에 맞춘다(대표 11-13 "아예 꺼졌다 없어지는 것보다 서서히 어두워져서 회사소개로 맞춰지게"). 홈의 가운데 막은 걷는다
+    var bg = document.querySelector('.home-bg'), veil = document.createElement('div');
+    veil.className = 'home-veil'; bg.appendChild(veil);
+    a(veil, [{ opacity: 0 }, { opacity: 1 }], { duration: 850, easing: 'cubic-bezier(.4,0,.6,1)' });
+    a(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 850, easing: 'cubic-bezier(.4,0,.6,1)', pseudoElement: '::after' });
+    // 빛줄기 세기도 회사소개 첫 화면 값(1.7배)까지 같이 올린다
+    var cv = document.querySelector('.home-gl'), lt = performance.now();
+    (function lgStep() { var u = Math.min(1, (performance.now() - lt) / 850); if (!going) return; cv.__lg = 1 + 0.7 * u * u * (3 - 2 * u); if (u < 1) requestAnimationFrame(lgStep); })();
+    setTimeout(function () {
+      // 떠나는 순간의 빛·그림 위치를 남긴다. 회사소개는 5초 안에 받으면 이어받고, 첫 화면 글이 툭 튀어나오지 않고 천천히 떠오른다
+      try { sessionStorage.setItem('astra-from-home', JSON.stringify({ t: Date.now(), s: window.HomeLeaveState ? window.HomeLeaveState() : null })); } catch (e) {}
+      location.href = NEXT;
+    }, 850);
+  }
+  window.addEventListener('wheel', function (e) {
+    if (e.ctrlKey) return;
+    var t = performance.now();
+    if (t - accAt > 250 || e.deltaY <= 0) acc = 0;
+    accAt = t;
+    if (e.deltaY > 0) { acc += e.deltaMode ? e.deltaY * 40 : e.deltaY; if (acc >= 60) go(); }
+  }, { passive: true });
+  window.addEventListener('keydown', function (e) {
+    var k = e.key, onPage = e.target === document.body || e.target === root;
+    if (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && onPage)) go();
+  });
+  window.addEventListener('touchstart', function (e) { if (e.touches.length === 1) { ty = e.touches[0].clientY; tx = e.touches[0].clientX; } else ty = null; }, { passive: true });
+  window.addEventListener('touchend', function (e) {
+    if (ty === null) return;
+    var p = e.changedTouches[0], dy = ty - p.clientY, dx = Math.abs(p.clientX - tx);
+    ty = null;
+    if (dy > 50 && dy > dx * 1.5) go();
+  }, { passive: true });
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    anims.forEach(function (x) { x.cancel(); }); anims = []; going = false; bornAt = performance.now();
+    document.querySelectorAll('.home-veil').forEach(function (v) { v.remove(); });
+    var cv = document.querySelector('.home-gl'); if (cv) cv.__lg = null;
+  });
+})();
+</script>
 <script src="site-menu.js"></script>
-<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
+<script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}, {"source": "list", "urls": ["about.html"], "eagerness": "immediate"}]}</script>
 <!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
 </body>
 </html>

@@ -118,7 +118,12 @@ window.HomeMotion.start = function (cv, active, mouse) {
     tex(0, im); tex(1, mk);
     gl.uniform1i(U('img'), 0); gl.uniform1i(U('msk'), 1); gl.uniform1f(U('asp'), im.naturalWidth / im.naturalHeight);
     var ures = U('res'), ut = U('t'), ump = U('mp'), umr = U('mr');
-    gl.uniform1f(U('lg'), cv.classList.contains('hero-gl') ? 1.7 : 1.0);
+    // 빛줄기 세기: 회사소개 첫 화면은 1.7, 홈은 1.0. cv.__lg가 있으면 그 값(홈에서 회사소개로 넘어갈 때 1.0 -> 1.7로 맞춘다)
+    var ulg = U('lg'), lg0 = cv.classList.contains('hero-gl') ? 1.7 : 1.0;
+    // 시간: 같은 창(세션)에서는 쪽이 바뀌어도 이어지는 시계를 쓴다. 홈에서 회사소개로 넘어가도 소나무·빛줄기·별이 처음부터 다시 시작하지 않는다(대표 11-13)
+    var epoch = 0;
+    try { epoch = +sessionStorage.getItem('astra-bg-epoch') || 0; if (!epoch) { epoch = Date.now(); sessionStorage.setItem('astra-bg-epoch', String(epoch)); } } catch (e) { epoch = 0; }
+    var clock = function (ms) { return epoch ? (performance.timeOrigin + ms - epoch) / 1000 : ms / 1000; };
     function draw(sec) {
       var cw = cv.clientWidth, ch = cv.clientHeight;
       if (!cw || !ch) return;
@@ -126,12 +131,13 @@ window.HomeMotion.start = function (cv, active, mouse) {
       if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); }
       var m = mouse ? mouse() : null;
       gl.uniform3f(ump, m ? m[0] : 0, m ? m[1] : 0, m ? m[2] : 0); gl.uniform1f(umr, m ? m[3] : 0);
+      gl.uniform1f(ulg, cv.__lg != null ? cv.__lg : lg0);
       gl.uniform2f(ures, w, h); gl.uniform1f(ut, sec); gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
     cv.__draw = draw;
     cv.classList.add('ready');
-    draw(0);
-    function loop(ms) { if (active()) draw(ms / 1000); requestAnimationFrame(loop); }
+    draw(clock(performance.now()));
+    function loop(ms) { if (active()) draw(clock(ms)); requestAnimationFrame(loop); }
     requestAnimationFrame(loop);
   });
   return true;
