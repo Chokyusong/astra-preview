@@ -66,6 +66,9 @@ html.deck .intro-text p { font-size: max(16px, min(1.25vw, 2.5vh, calc(18px * va
 .bgl { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #0a0a0a; }
 .bgl-in { position: absolute; inset: 0; overflow: hidden; }
 html:not(.deck) .bgl-in { position: sticky; top: 0; height: 100vh; max-height: 100%; }
+/* 스크롤하는 화면에서는 바깥 층을 overflow: clip으로 자른다. hidden이면 그 층이 스크롤 틀이 되어 안쪽이 붙지 못하고 구역 맨 위에 남아,
+   휴대폰 하는 일 3·4·5번과 과정 아래쪽 뒤가 검게 비었다(대표 11-13) */
+html:not(.deck) .bgl { overflow: clip; }
 .bgl img, .bgl canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* 글 뒤 어두운 번짐이 화면 옆으로 넘치지 않게 잘라 둔다(clip은 스크롤 상자를 만들지 않아 붙어 있는 층이 그대로 붙는다) */
 html:not(.deck) .intro, html:not(.deck) .rows, html:not(.deck) .process { position: relative; overflow-x: clip; }
@@ -177,6 +180,8 @@ html.deck .studio .cards { --tn: clamp(34px, 5vh, 50px); --w: min(58vw, calc(62v
 .rshot .rz { position: absolute; inset: 0; }
 .rshot .soft { opacity: 0; }
 .rdim { position: absolute; inset: 0; background: #000; opacity: 0.5; }
+/* 스크롤하는 화면은 글이 화면 가로 전체에 걸쳐 왼쪽 가림 대신 사진 전체를 고르게 더 누른다(밝은 조명이 글 끝을 가리지 않게, 대표 11-13) */
+html:not(.deck) .rscrim { background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.28) 35%, rgba(0, 0, 0, 0.28) 65%, rgba(0, 0, 0, 0.45) 100%); }
 /* 줄 이름 자리(왼쪽 30%)만 가린다. 사진 위에 올라야 하므로 겹 순서는 스크립트가 사진보다 위로 둔다(014 검토: 밝은 사진 위 줄 이름이 안 읽힘) */
 .rscrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.62) 24%, rgba(0, 0, 0, 0.3) 32%, rgba(0, 0, 0, 0) 40%); }
 /* 다섯 줄 묶음은 제목 아래 남은 높이의 세로 가운데. 묶음 높이는 가장 긴 줄이 펼쳐졌을 때로 고정해(스크립트) 줄이 바뀌어도 위치가 흔들리지 않는다 */
@@ -505,6 +510,9 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   var IMG = '../2026-11-10-pages/img/';
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
   function bglOf(scene) { var b = el('div', 'bgl'), inn = el('div', 'bgl-in'); b.setAttribute('aria-hidden', 'true'); b.setAttribute('data-bleed', ''); b.appendChild(inn); scene.insertBefore(b, scene.firstChild); return inn; }
+  // 세로로 긴 화면(휴대폰)에서는 구역 뒤에 깔리는 사진을 세로로 찍은 판(-m)으로 쓴다. 가로 사진을 세로 화면에 덮으면 가운데 30%만 크게 잘린다(대표 11-13)
+  var TALL = window.matchMedia('(max-aspect-ratio: 4/5)').matches;
+  function tall(name) { return TALL ? name + '-m' : name; }
   function pic(name) { var i = el('img', 'sharp'); i.src = IMG + name + '.webp'; i.alt = ''; i.decoding = 'async'; return i; }
   // blur: 화면에서 보일 흐림(px). 그림판 폭 w로 줄여 그리고 흐림은 그만큼 나눠 건다(늘리면 다시 그만큼 흐려진다)
   function soft(name, o) {
@@ -832,15 +840,25 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   // 새 줄의 제목은 초점이 맞으며 나타나고, 설명이 떠오르고, 낱말 다섯 개가 0.05초 간격으로 나타난다
   /* 3판 5-6: 줄마다 화면 하나가 구역 전체 뒤에 깔린다(밝기 50%, 왼쪽 가림 78% → 오른쪽 25%). 고른 동안 6초에 1.06배로 다가간다.
      줄이 바뀌면 컷: 앞 화면 0.12초에 꺼지고 새 화면이 흐림 14px·밝기 1.5배에서 0.45초에 초점이 잡힌다. 마지막에 고른 줄의 화면만 남는다 */
-  var ROW_PICS = ['media-studio-2', 'media-studio-1', 'media-hero', 'media-studio-3', 'media-studio-5'];
+  var ROW_PICS = ['media-studio-2', 'media-studio-1', 'media-hero', 'media-studio-3', 'media-studio-5'].map(tall);
   var rowsIn = bglOf(what), RB = { cur: -1, z: 1 }, rdim = el('div', 'rdim');
   var rshots = ROW_PICS.map(function (n) { var sh = el('div', 'rshot'), z = el('div', 'rz'); z.appendChild(pic(n)); z.appendChild(soft(n, { w: 360, blur: 14 })); sh.appendChild(z); rowsIn.appendChild(sh); return sh; });
   var rscrim = el('div', 'rscrim');
   rowsIn.appendChild(rdim); rowsIn.appendChild(rscrim);
+  // cut: true면 카메라 컷(PC), 'soft'면 0.7초에 겹쳐 바뀜(휴대폰 스크롤, 대표 11-13 "자연스럽고 이쁘게")
   function rowsBg(i, cut) {
     if (i === RB.cur) return;
     var prev = RB.cur; RB.cur = i;
-    rshots.forEach(function (sh, k) { if (k === i || (k === prev && cut && !reduce)) return; stopAnims(sh); stopAnims(sh.firstChild); stopAnims(sh.querySelector('.soft')); sh.classList.remove('on'); });
+    var softX = cut === 'soft' && !reduce && prev >= 0 && i >= 0;
+    if (cut === 'soft') cut = false;
+    rshots.forEach(function (sh, k) { if (k === i || (k === prev && (cut || softX) && !reduce)) return; stopAnims(sh); stopAnims(sh.firstChild); stopAnims(sh.querySelector('.soft')); sh.classList.remove('on'); });
+    if (softX) {
+      var ps = rshots[prev], ns = rshots[i];
+      stopAnims(ns); ns.style.zIndex = ++RB.z; rscrim.style.zIndex = RB.z + 1; ns.classList.add('on');
+      ns.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = function () { if (RB.cur !== prev) ps.classList.remove('on'); };
+      ns.firstChild.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }], { duration: 6000, easing: 'cubic-bezier(0.25, 0.1, 0.4, 1)', fill: 'forwards' });
+      return;
+    }
     stopAnims(rdim);
     if (prev >= 0 && cut && !reduce) { var p = rshots[prev]; stopAnims(p); p.classList.remove('on'); p.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: 'linear' }); }
     if (i < 0) return;
@@ -861,7 +879,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     if (!(wr.bottom > 0 && wr.top < vh)) { if (!reduce) rowsBg(-1, false); return; }
     var best = -1, bd = 1e9;
     rows.forEach(function (r, i) { var b = r.getBoundingClientRect(), d = Math.abs((b.top + b.bottom) / 2 - vh / 2); if (d < bd) { bd = d; best = i; } });
-    rowsBg(best, true);
+    rowsBg(best, 'soft');
   }
   function select(i, src) {
     if (i === W.sel || i < 0 || i >= rows.length) return;
@@ -911,7 +929,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   /* 3판 5-7: 구역 전체 뒤에 사진 한 장(media-studio-1)이 단계만큼 현상돼 있다. 단계마다 미리 만든 한 겹:
      PLAN 흑백·흐림 16px·밝기 28%, DESIGN 흑백·6px·36%(+ 화면 전체 삼등분 선), SETUP 흑백·또렷·44%(+ 가운데 큰 초점 네모), DELIVER 색·또렷·55%.
      들어올 때 혼자 PLAN → DELIVER로, 올리면 화면 전체 셔터(0.1초, 12%)와 그 단계로(0.4초), 나가면 0.6초에 완성본으로 */
-  var PROC_PIC = 'media-studio-1', PLAYS = [{ gray: 1, blur: 16, bright: 0.28 }, { gray: 1, blur: 6, bright: 0.36 }, { gray: 1, blur: 0, bright: 0.44 }, { gray: 0, blur: 0, bright: 0.7 }];
+  var PROC_PIC = tall('media-studio-1'), PLAYS = [{ gray: 1, blur: 16, bright: 0.28 }, { gray: 1, blur: 6, bright: 0.36 }, { gray: 1, blur: 0, bright: 0.44 }, { gray: 0, blur: 0, bright: 0.7 }];
   var procIn = bglOf(proc), PB = { cur: -1, z: 1, tap: -1 };
   var players = PLAYS.map(function (o, i) { var c = soft(PROC_PIC, { w: o.blur ? 480 : 1200, blur: o.blur, gray: o.gray, bright: o.bright, cls: 'pl' }); c.style.zIndex = 1; procIn.appendChild(c); return c; });
   var pgrid = el('div', 'pgrid'), pfocus = el('div', 'pfocus', '<b></b>'), pscrim = el('div', 'pscrim'), pflash = el('div', 'pflash');
