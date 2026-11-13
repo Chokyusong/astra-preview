@@ -77,7 +77,7 @@ html.deck .scene-end .cta .w { overflow: visible; }
 html.deck .scene-end .cta .w > span { opacity: 0; transform: translateX(calc(-60px * var(--k, 1))); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
 html.deck .scene-end .cta .w:nth-child(even) > span { transform: translateX(calc(60px * var(--k, 1))); }
 html.deck .scene-end.in .cta .w > span { opacity: 1; transform: none; transition-delay: calc(0.1s + var(--i, 0) * 0.1s); }
-html.deck .cta-row p { font-size: calc(18px * var(--k, 1)); }
+html.deck .cta-row p { font-size: max(20px, min(2vw, 4vh, calc(28.8px * var(--k, 1)))); }
 html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
 </style>
 </head>
@@ -113,7 +113,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
 <div class="scene scene-end" data-name="문의" data-light>
 <section class="cta">
   <p class="display" data-words>WE MAKE NEXT.</p>
-  <div class="cta-row rise" style="--i:3"><p>함께할 일을 들려주세요. 서로의 강점을 연결합니다.</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#business">비즈니스 문의</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
+  <div class="cta-row rise" style="--i:3"><p>ASTRA AWAITS YOU DM US</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#business">비즈니스 문의</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
 </section>
 <footer class="site-footer">
   <div>
