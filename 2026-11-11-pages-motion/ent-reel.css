@@ -92,7 +92,8 @@ html.deck .reel { height: auto; min-height: 0; }
 .reel-end .big { font-family: var(--display); font-weight: 500; font-size: clamp(30px, min(5vw, 9vh), 84px); letter-spacing: -0.01em; line-height: 1.06; color: var(--paper); }
 .reel-end .big b { font-weight: inherit; white-space: nowrap; }
 .reel-end .ko { max-width: 30em; text-wrap: balance; font-family: var(--serif-ko); font-weight: 500; font-size: clamp(15px, min(1.5vw, 2.6vh), 23px); line-height: 1.55; color: var(--mist); }
-.reel-end img { width: clamp(30px, 3vw, 44px); height: auto; margin-top: 4px; object-fit: contain; }
+/* 맺는 장면 아래 로고도 글자 로고(대표 2026-11-13). 가로로 긴 그림이라 높이로 크기를 정한다 */
+.reel-end img { width: auto; height: clamp(16px, 1.5vw, 22px); margin-top: 6px; object-fit: contain; }
 
 .reel-note { position: absolute; left: 14px; bottom: 12px; z-index: 31; padding: 2px 10px; background: rgba(10, 10, 10, 0.6); color: var(--paper); font-size: 13px; line-height: 1.6; }
 .reel-vignette { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(10,10,10,0.7) 0, rgba(10,10,10,0) 16%), radial-gradient(ellipse 75% 70% at 50% 46%, rgba(10,10,10,0) 55%, rgba(10,10,10,0.75) 100%); }

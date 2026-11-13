@@ -69,4 +69,6 @@ html.deck .site-footer { flex: none; align-items: center; padding: clamp(14px, 2
 html.deck .site-footer > div:first-child { display: flex; align-items: center; gap: 24px; }
 html.deck .footer-links { flex-direction: row; align-items: center; gap: 24px; }
 html.deck .footer-logo { height: 54px; margin-bottom: 0; }
+/* 바닥글 글자 로고(대표 2026-11-13)는 한 화면씩 넘길 때 조금 작게. 기본 크기는 pages.css */
+html.deck .footer-logo.footer-wordmark { height: 22px; margin-bottom: 0; }
 html.deck .site-footer .slot { padding: 8px 14px; }

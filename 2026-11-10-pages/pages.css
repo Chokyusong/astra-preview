@@ -142,6 +142,8 @@ button { font: inherit; }
 .site-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 32px 48px; padding: 48px var(--gutter) 56px; font-size: 14px; color: var(--stone); }
 /* 바닥글 로고: 글자(ASTRA, ENTERTAINMENT)까지 있는 전체 로고. 브랜드 3판과 같은 크기 */
 .footer-logo { display: block; width: auto; height: 76px; margin-bottom: 16px; object-fit: contain; }
+/* 바닥글 로고도 머리말과 같은 글자 로고(✦ASTRA, 대표 2026-11-13: 둥근 A 표시를 모두 뺌). 가로로 긴 그림이라 높이로 크기를 정한다. 움직이는 시안에서만 쓴다 */
+.footer-logo.footer-wordmark { height: 24px; margin-bottom: 18px; }
 .site-footer .slot { border-color: var(--stone); color: var(--stone); }
 .footer-links { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 
