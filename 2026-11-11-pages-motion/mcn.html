@@ -114,14 +114,30 @@ html.fx:not(.deck) .what .row.on > * { opacity: 1; transform: none; }
 html.fx:not(.deck) .what .row.on > :nth-child(2) { transition-delay: 0.1s; }
 html.fx:not(.deck) .what .row.on > :nth-child(3) { transition-delay: 0.2s; }
 
-/* ── 화면 4 사진(3-5): 창을 가득 채운 사진, 그 위에 가는 원 네 개. 깊이가 달라 마우스에 따라 따로 움직인다 ── */
-.halos { display: none; }
-html.fx .halos { display: block; position: absolute; inset: 0; pointer-events: none; }
-.halo { position: absolute; left: 0; top: 0; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 50%; will-change: transform; }
-/* 대표 11-11: 사진 위에 남는 원은 없앤다(처음 넷·22% → 둘·12% → 없음). 넘어가는 동안에만 원 네 개가 보이고 사라진다 */
-.halo { border-color: transparent; }
-html.deck .wide { height: 100%; --scene-bg: var(--tile); }
-html.deck .wide img { transform: translate3d(var(--ix, 0px), var(--iy, 0px), 0) scale(1.04); will-change: transform; }
+/* ── 화면 4 네 가지(대표 11-14, 사진 화면을 바꿈): 하는 일의 원 네 개가 퍼져 한 줄로 서고, 원마다 아래에 한 줄 소개와 키워드.
+   한 화면씩 넘기는 PC에서만 쓴다. 휴대폰·작은 창은 하는 일 네 줄이 이미 다 보여 숨긴다(높이 0, 순서 계산이 흐트러지지 않게 자리만 남김) ── */
+.four { height: 0; padding: 0; overflow: hidden; visibility: hidden; }
+html.deck .four { visibility: visible; overflow: visible; display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; padding: calc(var(--header-h) + clamp(10px, 2.6vh, 36px)) var(--gutter) clamp(16px, 4vh, 52px); --D: min(12.5vw, 23vh); }
+html.deck .four .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
+html.deck .four .fg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 44px); align-content: center; padding-bottom: clamp(0px, 3vh, 40px); }
+html.deck .four .fc { display: flex; flex-direction: column; align-items: center; text-align: center; transition: opacity 0.45s; }
+html.deck .four .fr { position: relative; flex: none; width: var(--D); height: var(--D); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--D) * 0.04); border: 1px solid var(--paper); border-radius: 50%; color: var(--paper); font-family: var(--display); font-size: calc(var(--D) * 0.095); letter-spacing: 0.04em; line-height: 1.15; transition: background-color 0.45s var(--ease), color 0.45s var(--ease); will-change: transform; }
+html.deck .four .fr i { font-style: normal; font-size: 0.78em; color: var(--mist); transition: color 0.45s var(--ease); }
+html.deck .four .ft { margin-top: clamp(14px, 2.6vh, 30px); }
+html.deck .four .ft h3 { font-family: var(--serif-ko); font-weight: 500; font-size: max(16px, min(1.4vw, 2.6vh, calc(20px * var(--k, 1)))); line-height: 1.5; color: var(--paper); }
+html.deck .four .ft .keywords { justify-content: center; gap: 6px; margin-top: clamp(10px, 1.8vh, 18px); }
+html.deck .four .ft .keywords li { padding: 2px 11px; font-size: max(12px, min(0.95vw, 1.8vh, calc(14px * var(--k, 1)))); }
+/* 마우스를 올린 칸: 원이 흰색으로 차고(하는 일 화면의 고른 원과 같은 모습), 나머지 칸은 조금 물러난다 */
+html.deck .four .fg:hover .fc:not(:hover) { opacity: 0.5; }
+html.deck .four .fc:hover .fr { background: var(--paper); color: var(--ink); }
+html.deck .four .fc:hover .fr i { color: var(--ink); }
+/* 들어올 때: 원이 차례로 떠오르고(다른 화면에서 바로 올 때), 그 뒤 글. 하는 일에서 넘어올 때는 원이 날아와 자리 잡으므로(fly) 원은 바로 보인다 */
+html.deck .four .fr { opacity: 0; transform: scale(0.86); transition: opacity 0.8s var(--ease) calc(var(--c) * 0.08s), transform 0.9s var(--ease) calc(var(--c) * 0.08s), background-color 0.45s var(--ease), color 0.45s var(--ease); }
+html.deck .four.in .fr, html.deck .four.fly .fr { opacity: 1; transform: none; }
+html.deck .four.fly .fr { transition: background-color 0.45s var(--ease), color 0.45s var(--ease); }
+html.deck .four .ft > * { opacity: 0; transform: translateY(14px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+html.deck .four.in .ft > * { opacity: 1; transform: none; transition-delay: calc(0.18s + var(--c) * 0.09s); }
+html.deck .four.in .ft > :nth-child(2) { transition-delay: calc(0.28s + var(--c) * 0.09s); }
 
 /* ── 화면 5 과정(3-6): 단계 표시는 가운데 점과 겹 원(1, 2, 3, 4겹). 들어올 때 단계마다 원이 안쪽부터 그려진다 ── */
 .orbit { display: block; width: 120px; height: 120px; overflow: visible; }
@@ -208,7 +224,10 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   <div class="row-list"><article class="row"><p class="row-label"><i>01 —</i> MANAGEMENT</p><h3>크리에이터의 성장을 함께 설계합니다.</h3><div class="row-body"><p>크리에이터의 강점과 목표에 맞춰 활동 방향을 구체화하고, 안정적인 방송과 콘텐츠 활동을 위한 운영을 지원합니다. 장기적인 성장 전략을 함께 세우며 크리에이터가 자신만의 경쟁력을 만들어가도록 돕습니다.</p><ul class="keywords"><li>크리에이터 발굴</li><li>활동 방향 설정</li><li>매니지먼트</li><li>방송 운영</li><li>성장 전략</li></ul></div></article><article class="row"><p class="row-label"><i>02 —</i> MARKETING</p><h3>크리에이터의 매력을 더 많은 사람에게 전달합니다.</h3><div class="row-body"><p>채널과 팬덤의 특성에 맞는 브랜딩과 마케팅을 기획합니다. 광고·협찬과 브랜드 캠페인을 크리에이터의 콘텐츠에 자연스럽게 연결해, 크리에이터와 브랜드 모두에게 의미 있는 접점을 만듭니다.</p><ul class="keywords"><li>채널 브랜딩</li><li>광고·협찬</li><li>브랜드 캠페인</li><li>팬덤 커뮤니케이션</li><li>파트너십</li></ul></div></article><article class="row"><p class="row-label"><i>03 —</i> COMMERCE</p><h3>콘텐츠의 영향력을 새로운 비즈니스 기회로 확장합니다.</h3><div class="row-body"><p>크리에이터의 관심사와 팬덤에 맞는 브랜드와 상품을 연결하고, 라이브 커머스와 상품 기획을 통해 콘텐츠가 새로운 경험과 수익 기회로 이어지도록 지원합니다.</p><ul class="keywords"><li>라이브 커머스</li><li>브랜드 협업</li><li>상품 기획</li><li>판매 연계</li><li>커머스 콘텐츠</li></ul></div></article><article class="row"><p class="row-label"><i>04 —</i> MEDIA CONTENT</p><h3>아이디어를 크리에이터만의 콘텐츠로 완성합니다.</h3><div class="row-body"><p>기획 단계부터 콘텐츠의 주제와 포맷을 함께 고민하고, 제작과 운영까지 이어갑니다. 숏폼부터 라이브 콘텐츠까지 채널과 시청자에 맞는 콘텐츠를 꾸준히 만들어 크리에이터의 이야기를 확장합니다.</p><ul class="keywords"><li>콘텐츠 기획</li><li>포맷 개발</li><li>영상 제작</li><li>숏폼 콘텐츠</li><li>라이브 콘텐츠</li></ul></div></article></div>
 </section>
 </div>
-<figure class="wide scene" data-name="사진"><img data-bleed src="../2026-11-10-pages/img/mcn-wide.webp" alt="콘텐츠 촬영 현장 예시"><div class="halos" aria-hidden="true"><span class="halo"></span><span class="halo"></span><span class="halo"></span><span class="halo"></span></div></figure>
+<div class="four scene" data-name="네 가지" aria-hidden="true">
+  <h2 class="display section-title">WHAT WE DO</h2>
+  <div class="fg"><div class="fc" style="--c:0"><div class="fr"><i>01</i><span>MANAGEMENT</span></div><div class="ft"><h3>크리에이터의 성장을 함께 설계합니다.</h3><ul class="keywords"><li>크리에이터 발굴</li><li>활동 방향 설정</li><li>매니지먼트</li><li>방송 운영</li><li>성장 전략</li></ul></div></div><div class="fc" style="--c:1"><div class="fr"><i>02</i><span>MARKETING</span></div><div class="ft"><h3>크리에이터의 매력을 더 많은 사람에게 전달합니다.</h3><ul class="keywords"><li>채널 브랜딩</li><li>광고·협찬</li><li>브랜드 캠페인</li><li>팬덤 커뮤니케이션</li><li>파트너십</li></ul></div></div><div class="fc" style="--c:2"><div class="fr"><i>03</i><span>COMMERCE</span></div><div class="ft"><h3>콘텐츠의 영향력을 새로운 비즈니스 기회로 확장합니다.</h3><ul class="keywords"><li>라이브 커머스</li><li>브랜드 협업</li><li>상품 기획</li><li>판매 연계</li><li>커머스 콘텐츠</li></ul></div></div><div class="fc" style="--c:3"><div class="fr"><i>04</i><span>MEDIA<br>CONTENT</span></div><div class="ft"><h3>아이디어를 크리에이터만의 콘텐츠로 완성합니다.</h3><ul class="keywords"><li>콘텐츠 기획</li><li>포맷 개발</li><li>영상 제작</li><li>숏폼 콘텐츠</li><li>라이브 콘텐츠</li></ul></div></div></div>
+</div>
 <section class="process scene" data-name="과정">
   <h2 class="display section-title rise" style="--i:0">FROM POTENTIAL TO NEXT</h2>
   <ol class="steps"><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">DISCOVER</p><h3>가능성을 발견합니다.</h3><p>크리에이터의 개성과 강점을 살펴보고, 활동 목표와 앞으로의 방향을 함께 정합니다.</p></div></li><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="o" r="26" pathLength="1" style="--o:1"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">BUILD</p><h3>성장의 기반을 만듭니다.</h3><p>채널의 정체성을 세우고, 크리에이터에게 맞는 브랜딩과 콘텐츠 방향을 설계합니다.</p></div></li><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="o" r="26" pathLength="1" style="--o:1"/><circle class="o" r="38" pathLength="1" style="--o:2"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">CREATE</p><h3>아이디어를 콘텐츠로 완성합니다.</h3><p>콘텐츠 기획부터 포맷 개발과 제작·운영까지, 크리에이터의 색이 담긴 콘텐츠를 만들어갑니다.</p></div></li><li class="step"><svg class="orbit" viewBox="-60 -60 120 120" aria-hidden="true"><circle class="o" r="14" pathLength="1" style="--o:0"/><circle class="o" r="26" pathLength="1" style="--o:1"/><circle class="o" r="38" pathLength="1" style="--o:2"/><circle class="o" r="50" pathLength="1" style="--o:3"/><circle class="dot" r="2.5"/></svg><div class="step-text"><p class="step-name">GROW</p><h3>더 넓은 기회로 확장합니다.</h3><p>마케팅과 브랜드 협업, 커머스를 연결해 크리에이터의 영향력과 활동 기회를 넓혀갑니다.</p></div></li></ol>
@@ -255,9 +274,9 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
    원 네 개가 창이 되는 넘김, 깊이가 다른 원, 겹 원 과정 표시, GROW의 원이 화면이 되는 넘김. 값은 README.md */
 (function () {
   var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim, EASE = D.EASE;
-  var HERO = 0, INTRO = 1, WHAT = 2, WIDE = 3, PROC = 4, END = 5;
+  var HERO = 0, INTRO = 1, WHAT = 2, FOUR = 3, PROC = 4, END = 5;
   var scenes = $$('.scene');
-  var hero = scenes[HERO], intro = scenes[INTRO], what = scenes[WHAT], wide = scenes[WIDE], proc = scenes[PROC], endScene = scenes[END];
+  var hero = scenes[HERO], intro = scenes[INTRO], what = scenes[WHAT], four = scenes[FOUR], proc = scenes[PROC], endScene = scenes[END];
   var header = $('.site-header');
   var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
   var lag = function (dt, tau) { return 1 - Math.exp(-dt / tau); }; // 남은 거리 중 이번 화면에 다가갈 비율
@@ -627,9 +646,9 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     if (live && hov >= 0 && !W3.hovDone && hov !== W3.sel && t - W3.hovAt >= 110 && M.at > W3.hovAt - 200) select(hov);
   }
 
-  /* ───────── 3-5. 화면 4: 사진과 깊이가 다른 원 네 개, 넘김 3→4 ───────── */
-  var wImg = $('.wide img'), halos = $$('.halo'), WS = { ix: 0, iy: 0, h: [0, 0, 0, 0].map(function () { return { x: 0, y: 0 }; }) };
-  // 원 네 개 화면의 원 자리(창 기준, 크기 바꿈 없이). 화면 4의 가는 원도 같은 자리에 둔다
+  /* ───────── 3-5. 화면 4: 원 네 개가 퍼진다(대표 11-14, 사진 화면을 바꿈) ───────── */
+  var fRings = $$('.four .fr'), fText = $$('.four .ft');
+  // 하는 일 원 네 개의 지금 자리(창 기준). visual이면 기울기·커짐까지 든 실제 보이는 자리
   function ringSpots(visual) {
     var box = ringBox.getBoundingClientRect();
     return rings.map(function (r, i) {
@@ -637,92 +656,48 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       var g = rg(i); return { x: box.left + g.x, y: box.top + g.y, R: g.R };
     });
   }
-  function placeHalos(spots) {
-    halos.forEach(function (h, i) {
-      var s = spots[i];
-      h.style.width = h.style.height = (s.R * 2).toFixed(1) + 'px';
-      h.style.left = (s.x - s.R).toFixed(1) + 'px'; h.style.top = (s.y - s.R).toFixed(1) + 'px';
-    });
-  }
-  function layoutHalos() {
+  // 원 테두리 굵기를 원 크기에 맞춰 1px로
+  function ringStroke() {
     rings.forEach(function (r) { var c = r.querySelector('.rl circle'); if (c && r.offsetWidth) c.style.strokeWidth = (100 / (r.offsetWidth + 2)).toFixed(3); });
-    if (D.on) { placeHalos(ringSpots(false)); return; }
-    // 스크롤하는 화면: 사진 띠 위에 가로로 네 개(지름 사진 폭의 22%)
-    var w = wide.clientWidth, h = wide.clientHeight;
-    placeHalos([0, 1, 2, 3].map(function (i) { return { x: w * (0.2 + 0.2 * i), y: h / 2, R: Math.min(w * 0.11, h * 0.42) }; }));
   }
-  // 사진은 마우스 반대쪽으로 최대 12px, 원 네 개는 마우스 쪽으로 8, 14, 20, 26px
-  function wideFrame(t, dt) {
-    var M = D.mouse, live = D.on && D.cur === WIDE, mx = 0, my = 0, k = K();
-    if (live && M.at) { mx = M.x / window.innerWidth * 2 - 1; my = M.y / window.innerHeight * 2 - 1; }
-    var f = lag(dt, 0.5);
-    WS.ix += (-mx * 12 * k - WS.ix) * f; WS.iy += (-my * 12 * k - WS.iy) * f;
-    wImg.style.setProperty('--ix', WS.ix.toFixed(2) + 'px'); wImg.style.setProperty('--iy', WS.iy.toFixed(2) + 'px');
-    [8, 14, 20, 26].forEach(function (a, i) {
-      var H = WS.h[i], ff = lag(dt, 0.35 + i * 0.08);
-      H.x += (mx * a * k - H.x) * ff; H.y += (my * a * k - H.y) * ff;
-      halos[i].style.transform = 'translate3d(' + H.x.toFixed(2) + 'px,' + H.y.toFixed(2) + 'px,0)';
+  // 넘김 3→4(1.2초): 하는 일 화면이 0.26초에 걷히면 같은 자리에 원 네 개가 남고, 0.12초부터 원마다 0.05초 간격으로 0.9초 동안
+  // 제 칸으로 퍼지며 작아진다. 그 뒤 원 아래 글이 왼쪽 칸부터 떠오른다.
+  // 되돌아갈 때(1.2초): 글이 0.2초에 사라지고, 원들이 오른쪽부터 하는 일 자리로 모여 겹친 뒤 이 화면이 걷혀 하는 일(마지막 원 고름)이 보인다.
+  // 제목 WHAT WE DO는 두 화면에 같은 자리라, 하는 일 쪽 제목을 처음부터 떠 있게 둔다(걷히는 동안 제목이 꺼졌다 다시 떠오르지 않게)
+  function spread(back, fromEl) {
+    var spots = ringSpots(true), anims = [];
+    four.classList.add('fly');
+    fRings.forEach(function (r, i) {
+      var b = r.getBoundingClientRect(), s = spots[i], R = b.width / 2;
+      var at = 'translate(' + (s.x - b.left - R).toFixed(1) + 'px, ' + (s.y - b.top - b.height / 2).toFixed(1) + 'px) scale(' + (s.R / R).toFixed(3) + ')';
+      if (!back) anims.push(anim(r, [{ transform: at }, { transform: 'none' }], { duration: 900, delay: 120 + i * 50, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'both' }));
+      else anims.push(anim(r, [{ transform: 'none' }, { transform: at }], { duration: 850, delay: (3 - i) * 50, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'both' }));
     });
+    // 하는 일의 원(글자 자리가 달라 겹쳐 보인다)은 0.1초에 먼저 걷고, 나머지는 0.26초에
+    if (!back) {
+      anims.push(anim(ringBox, [{ opacity: 1 }, { opacity: 0 }], { duration: 100, easing: 'ease-out', fill: 'both' }));
+      anims.push(anim(fromEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: 'ease-out', fill: 'both' }));
+    }
+    else {
+      fText.forEach(function (el) { anims.push(anim(el, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-out', fill: 'both' })); });
+      anims.push(anim(fromEl, [{ opacity: 1 }, { opacity: 1, offset: 0.78 }, { opacity: 0 }], { duration: 1200, fill: 'both' }));
+      var tt = $('.what .section-title');
+      tt.style.transition = 'none'; what.classList.add('in'); void tt.offsetWidth; tt.style.transition = '';
+    }
+    return anims;
   }
-  // 둥근 가림(mask) 네 겹. 반지름은 등록한 CSS 값(--w0~3)을 움직여 바꾼다. 못 쓰는 브라우저는 공통 넘김(아래에서 덮기)
+  // 둥근 가림(mask). 반지름은 등록한 CSS 값(--g0)을 움직여 바꾼다(마지막 화면 넘김). 못 쓰는 브라우저는 공통 넘김(아래에서 덮기)
   var maskOK = false;
   try {
     var gm = 'radial-gradient(circle at 5px 5px, #000 4px, transparent 5px)';
     if (window.CSS && CSS.registerProperty && (CSS.supports('mask-image', gm) || CSS.supports('-webkit-mask-image', gm))) {
-      ['--w0', '--w1', '--w2', '--w3', '--g0'].forEach(function (n) { CSS.registerProperty({ name: n, syntax: '<length>', inherits: false, initialValue: '0px' }); });
+      CSS.registerProperty({ name: '--g0', syntax: '<length>', inherits: false, initialValue: '0px' });
       maskOK = true;
     }
   } catch (e) { maskOK = false; }
   function setMask(el, m) { el.style.webkitMaskImage = m; el.style.maskImage = m; }
   function hole(x, y, v) { return 'radial-gradient(circle at ' + x.toFixed(1) + 'px ' + y.toFixed(1) + 'px, #000 calc(' + v + ' - 1px), transparent ' + v + ')'; }
   var cover = function (x, y) { var W = window.innerWidth, H = window.innerHeight; return Math.max(Math.hypot(x, y), Math.hypot(W - x, y), Math.hypot(x, H - y), Math.hypot(W - x, H - y)) + 4; };
-  // 넘김 3→4(1.2초): 화면 3의 원 네 개가 그 자리에 남고, 다음 화면의 사진이 그 원 안에서만 보이다가(0.15초) 원들이 제 가운데에서
-  // 커지며(0.9초, 0.05초 간격) 합쳐져 사진 전체가 드러난다. 돌아갈 때는 거꾸로: 사진이 원 네 개 안으로 닫히고 그 원들이 화면 3의 원이 된다
-  // 원 네 개가 함께 화면을 막 다 덮는 정도(0~1): 원마다 제 크기에서 혼자 덮는 크기까지 같은 비율로 커질 때, 화면 위 13×9 점이 모두 어느 원 안에 드는 가장 작은 비율.
-  // 혼자 덮는 크기까지 키우면 다 덮은 뒤에도 0.4초 동안 화면이 멈춰 보였다(되돌아갈 때는 처음 0.8초)
-  function unionK(spots, Rs) {
-    var W = window.innerWidth, H = window.innerHeight, lo = 0, hi = 1;
-    function covers(k) {
-      for (var gx = 0; gx <= 12; gx++) for (var gy = 0; gy <= 8; gy++) {
-        var x = W * gx / 12, y = H * gy / 8, ok = false;
-        for (var i = 0; i < spots.length && !ok; i++) ok = Math.hypot(x - spots[i].x, y - spots[i].y) <= spots[i].R + (Rs[i] - spots[i].R) * k;
-        if (!ok) return false;
-      }
-      return true;
-    }
-    for (var it = 0; it < 14; it++) { var mid = (lo + hi) / 2; if (covers(mid)) hi = mid; else lo = mid; }
-    return Math.min(1, hi * 1.04);
-  }
-  function windows(back) {
-    var spots = ringSpots(true), anims = [], masks = [];
-    var Rs = spots.map(function (s) { return cover(s.x, s.y); }), uk = unionK(spots, Rs);
-    spots.forEach(function (s, i) {
-      var n = '--w' + i, R = s.R + (Rs[i] - s.R) * uk, kf;
-      var px = function (v, o, e) { var f = { offset: o }; f[n] = v.toFixed(1) + 'px'; if (e) f.easing = e; return f; };
-      // 나아갈 때: 0.15초 원 안에 사진, 원마다 0.05초 간격으로 0.9초에 커진다.
-      // 되돌아갈 때: 바로 줄기 시작해(오른쪽 원부터 0.05초 간격) 0.9초 안에 원 자리로 닫히고, 마지막 0.15초에 원 안의 사진이 걷힌다
-      if (!back) kf = [px(s.R, 0), px(s.R, (150 + i * 50) / 1200, 'cubic-bezier(0.65, 0, 0.35, 1)'), px(R, (1050 + i * 50) / 1200), px(R, 1)];
-      else kf = [px(R, 0), px(R, (3 - i) * 50 / 1200, 'cubic-bezier(0.3, 0, 0.2, 1)'), px(s.R, (900 + (3 - i) * 50) / 1200), px(s.R, 1)];
-      if (kf[2].offset > 1) kf[2].offset = 1;
-      masks.push(hole(s.x, s.y, 'var(' + n + ')'));
-      anims.push(anim(wide, kf, { duration: 1200, fill: 'both' }));
-    });
-    setMask(wide, masks.join(', '));
-    wide.style.zIndex = '3';
-    // 사진은 원 안에서 0.15초에 나타난다(돌아갈 때는 마지막 0.15초에 원 안의 사진이 걷히며 화면 3의 원이 보인다)
-    anims.push(anim(wide, [{ opacity: 0 }, { opacity: 1, offset: 0.125 }, { opacity: 1 }], { duration: 1200, fill: 'both', direction: back ? 'reverse' : 'normal' }));
-    // 가는 원 네 개: 화면 3의 원 크기에서 제자리 크기로, 밝기 90% → 0(대표 11-11: 넘어간 뒤 사진 위에는 원을 남기지 않는다)
-    placeHalos(ringSpots(false));
-    var rest = ringSpots(false);
-    halos.forEach(function (h, i) {
-      var s = spots[i], r = rest[i], sc = s.R / r.R;
-      anims.push(anim(h, [{ scale: String(sc.toFixed(3)), borderColor: 'rgba(255,255,255,0.9)' }, { scale: '1', borderColor: 'rgba(255,255,255,0)' }], { duration: 1000, delay: 150 + i * 50, easing: EASE, fill: 'both', direction: back ? 'reverse' : 'normal' }));
-    });
-    // 앞 화면의 글은 0.25초에 사라진다(원만 남는다)
-    if (!back) [$('.what .section-title'), rowList].forEach(function (el) { anims.push(anim(el, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-out', fill: 'both' })); });
-    if (!back) later('mask', function () { setMask(wide, ''); }, 1210);
-    return anims;
-  }
 
   /* ───────── 3-6. 과정: 겹 원 ───────── */
   var steps = $$('.step'), stepList = $('.steps');
@@ -830,21 +805,6 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       if (!on && b.top < vh * 0.8 && b.bottom > hh) s.classList.add('on');
       else if (on && (b.top >= vh || b.bottom <= hh)) s.classList.remove('on');
     });
-    // 사진: 사진 위쪽이 화면 90%에서 45% 높이까지 올라오는 동안 원 네 개가 커지며 사진이 드러난다(설계 12-3)
-    var b = wide.getBoundingClientRect();
-    if (b.bottom > 0 && b.top < vh) {
-      var p = D.span(wide, 0.9, 0.45, vh), w = b.width, h = b.height, m = [];
-      if (p >= 1) { if (wide.style.maskImage) setMask(wide, ''); }
-      else {
-        for (var i = 0; i < 4; i++) {
-          // 다 커졌을 때 네 원이 함께 사진을 막 덮는 크기(이웃 원 사이와 네 모서리까지). 그보다 크게 잡으면 절반쯤에서 이미 사진이 다 보였다
-          var x = w * (0.2 + 0.2 * i), y = h / 2, r0 = Math.min(w * 0.11, h * 0.42), R = Math.hypot(w * 0.2, h / 2) + 2;
-          var q = easeInOut(clamp(p * 1.15 - i * 0.05, 0, 1));
-          m.push(hole(x, y, (r0 + (R - r0) * q).toFixed(1) + 'px'));
-        }
-        setMask(wide, m.join(', '));
-      }
-    }
   }
 
   /* ───────── 한 화면에 한 번 그리는 고리 ───────── */
@@ -856,7 +816,6 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     rippleFrame(t);
     if (!D.on || D.cur === INTRO || (D.trans && (D.trans.from === INTRO || D.trans.to === INTRO))) introFrame(t, dt);
     if (D.on && (D.cur === WHAT || (D.trans && (D.trans.from === WHAT || D.trans.to === WHAT)))) whatFrame(t, dt);
-    if (D.on && (D.cur === WIDE || (D.trans && (D.trans.from === WIDE || D.trans.to === WIDE)))) wideFrame(t, dt);
     if (!D.on || D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC))) procFrame(t, dt);
     if (!D.on) scrollFrame();
   }
@@ -875,7 +834,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       whatReset();
       [$('.what .section-title'), rowList].forEach(function (el) { el.getAnimations && el.getAnimations().forEach(function (a) { a.cancel(); }); });
     }
-    if (n === WIDE) { clearT('mask'); setMask(wide, ''); }
+    if (n === FOUR) four.classList.remove('fly');
     if (n === PROC) procReset();
     if (n === END && !D.flowOn()) clearGrow(); // 휴대폰 스크롤 반응의 가림은 스크롤이 맡는다
   }
@@ -884,8 +843,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     enter: function (n, scene, from) {
       if (n === HERO) heroPlay(false);
       if (n === INTRO) introPlay(false);
-      if (n === WHAT) { if (from === WIDE && W3.picked) showRow(W3.sel, -1); else whatPlay(from, false); }
-      if (n === WIDE) layoutHalos();
+      if (n === WHAT) { if (from === FOUR && W3.picked) showRow(W3.sel, -1); else whatPlay(from, false); }
       if (n === PROC) procPlay(from === END);
     },
     reset: sceneReset,
@@ -906,28 +864,25 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       if (D.flowOn() && (n === INTRO || n === WHAT)) { if (n === WHAT) { rings.forEach(function (r) { r.classList.add('drawn'); }); flowRing(window.innerHeight); } return; } // 휴대폰 스크롤 반응(설계 12-3)이 맡는다
       if (n === INTRO) introPlay(instant);
       if (n === WHAT) { if (instant) { whatReset(); rings.forEach(function (r) { r.classList.add('drawn'); }); W3.picked = true; setSel(0); rings[0].classList.add('full'); } else whatPass(); }
-      if (n === WIDE) layoutHalos();
     },
     move: function (from, to, fromEl, toEl) {
-      if (!maskOK) return null;
-      if (from === WHAT && to === WIDE) { layoutHalos(); return { dur: 1200, anims: windows(false), light: 600, enter: 700 }; }
-      if (from === WIDE && to === WHAT) {
-        // 화면 3을 마지막 원이 골라진 상태로 먼저 놓고, 그 원 자리로 사진이 닫힌다
-        whatPlay(WIDE, true);
-        return { dur: 1200, anims: windows(true), light: 600, enter: 650 };
+      if (from === WHAT && to === FOUR) return { dur: 1200, anims: spread(false, fromEl), light: 600, enter: 850 };
+      if (from === FOUR && to === WHAT) {
+        // 하는 일을 마지막 원이 골라진 상태로 먼저 놓고, 원 네 개가 그 자리로 모인다
+        whatPlay(FOUR, true);
+        return { dur: 1200, anims: spread(true, fromEl), light: 600, enter: 950 };
       }
+      if (!maskOK) return null;
       if (from === PROC && to === END) return { dur: 1100, anims: grow(false), light: 700, enter: 560 };
       if (from === END && to === PROC) { procPlay(true); return { dur: 1100, anims: grow(true), light: 420, enter: 380 }; }
       return null;
     },
-    start: function () { startGL(); clearGrow(); orbitMode(); rsize(); layoutHalos(); },
+    start: function () { startGL(); clearGrow(); orbitMode(); rsize(); ringStroke(); },
     stop: function () {
-      clearGrow(); setMask(wide, '');
+      clearGrow();
       rings.forEach(function (r, i) { var T = W3.tilt[i]; T.x = T.y = T.vx = T.vy = 0; r.style.translate = ''; });
-      wImg.style.removeProperty('--ix'); wImg.style.removeProperty('--iy');
-      halos.forEach(function (h) { h.style.transform = ''; });
       lens.style.opacity = '0';
-      orbitMode(); startGL(); rsize(); layoutHalos();
+      orbitMode(); startGL(); rsize(); ringStroke();
     }
   });
   orbitMode();
@@ -990,10 +945,10 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
 
   if (reduce) return;
   rsize();
-  layoutHalos();
+  ringStroke();
   startGL();
   var rt = 0;
-  window.addEventListener('resize', function () { rsize(); clearTimeout(rt); rt = setTimeout(layoutHalos, 120); });
+  window.addEventListener('resize', function () { rsize(); clearTimeout(rt); rt = setTimeout(ringStroke, 120); });
   requestAnimationFrame(frame);
 })();
 </script>
