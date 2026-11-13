@@ -5,147 +5,297 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>ASTRA 엔터테인먼트 움직이는 시안</title>
-<script>/* 첫 화면 글은 움직임 준비(.fx)와 글꼴(.fonts, 최대 1.5초)이 둘 다 될 때까지 감춘다: 준비 전에 글이 먼저 보였다가 사라지고 LED 점으로 다시 맺혔다(대표 11-12). 움직임 줄이기에서는 감추지 않는다 */
+<script>/* 첫 화면 글은 움직임 준비(.fx)와 글꼴(.fonts, 최대 1.5초)이 둘 다 될 때까지 감춘다(글꼴이 바뀌며 튀지 않게, 대표 11-12). 움직임 줄이기에서는 감추지 않는다 */
 (function () { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; var r = document.documentElement; r.classList.add('pre');
   function ok() { r.classList.add('fonts'); } setTimeout(ok, 1500);
   document.addEventListener('DOMContentLoaded', function () { requestAnimationFrame(function () { if (document.fonts && document.fonts.ready) document.fonts.ready.then(ok); else ok(); }); });
 })();</script>
-<style>html.pre:not(.fx) .hero > .eyebrow, html.pre:not(.fx) .hero h1, html.pre:not(.fx) .hero-actions, html.pre:not(.fonts) .hero > .eyebrow, html.pre:not(.fonts) .hero h1, html.pre:not(.fonts) .hero-actions { visibility: hidden; }</style>
+<style>html.pre:not(.fx) .le-hero-copy, html.pre:not(.fonts) .le-hero-copy { visibility: hidden; }</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Cinzel:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="../2026-11-10-pages/pages.css">
 <link rel="stylesheet" href="deck.css">
-<link rel="stylesheet" href="ent-reel.css">
 <style>
-/* 엔터테인먼트 2판 — LED 무대 (설계 pages-motion-design.md 4절, 지시서 008).
-   하나의 생각: 이 쪽 전체가 LED 무대다. 마우스가 지나간 자리의 LED가 켜진다. 회사소개는 별과 선, MCN은 원, 엔터테인먼트는 점(LED 화소).
-   화면 6개: 첫 화면(스튜디오 둘러보기) → 소개 → ENTERTAINMENT NETWORK → 숏폼(카드 모션, 1판 그대로) → 과정 → 문의 + 바닥글.
-   문구·순서·배치·색·글꼴·사진은 정지 시안(../2026-11-10-pages/entertainment.html) 그대로다. 과정의 단계 표시만 LED 무리로 바꿨다(설계 4-11).
-   크기는 큰 창 배율 --k(공통 틀)를 쓴다. 값은 README.md */
+/* 엔터테인먼트 3판 — 밝은 스튜디오 (손님 요청 1, 대표 11-13 "이대로 작업").
+   시안: ../2026-11-13-ent-light/entertainment-light.html. 테마는 다올엔터처럼 흰 바탕·옅은 회색 띠·따뜻한 금빛 한 색·가는 선.
+   화면 6개: 첫 화면(스튜디오 둘러보기) → 소개+ENTERTAINMENT NETWORK → 지원 내용 → 포토카드(겹친 카드, 2초마다 넘김) → 과정 → 문의(검은 면)+바닥글.
+   하나의 생각: 마우스 = 스튜디오 조명. 깔린 빛은 은은하게, 올리거나 누른 내용 하나만 크게 달라진다.
+   이전 어두운 LED 무대판과 숏폼 카드 모션은 entertainment-led.html, ent-reel.js·ent-reel.css에 그대로 있다(이 쪽에서는 쓰지 않는다).
+   공통 부품(머리말·메뉴·떠 있는 버튼·바닥글)은 pages.css·deck.css 것을 쓰고 색만 밝게 덮는다. 이 쪽만의 부품은 이름이 le-로 시작한다(pages.css의 .cards·.steps와 겹치지 않게). */
+:root {
+  --l-paper: #ffffff;
+  --l-mist: #f5f4f1;
+  --l-ink: #141414;
+  --l-sub: #6d6a65;
+  --l-hair: #e5e1da;
+  --l-gold: #a4865a;
+  --l-gold-soft: rgba(164, 134, 90, 0.14);
+  --l-dark: #121110;
+  --l-shadow: 0 30px 60px -28px rgba(40, 30, 15, 0.35), 0 8px 18px -10px rgba(40, 30, 15, 0.18);
+}
+html, body { background: var(--l-paper); }
+body { color: var(--l-ink); font-size: 17px; line-height: 1.75; }
 
-/* ── LED 점 층(4-1): 화면에 고정된 그림판 하나. 꺼진 점 결과 켜진 점을 그린다. 흰 화면에서는 검은 점 ── */
-.led { display: none; }
-html.fx .led { display: block; position: fixed; inset: 0; width: 100%; height: 100%; z-index: 20; pointer-events: none; }
+/* ── 머리말: 흰 반투명에 검은 글. 마지막 검은 화면에서는 어둡게(공통 틀의 on-light 표시를 "검은 화면"으로 쓴다) ── */
+.site-header { background: rgba(255, 255, 255, 0.84); border-bottom: 1px solid var(--l-hair); transition: background 0.5s, border-color 0.5s; }
+.site-header .wordmark-type { filter: invert(1); transition: filter 0.5s; }
+.site-header .nav a { color: #4a4742; transition: color 0.3s; }
+.site-header .nav a:hover { color: var(--l-ink); }
+.site-header .nav a[aria-current="page"] { color: var(--l-ink); font-weight: 700; box-shadow: 0 1.5px 0 var(--l-gold); }
+.site-header .nav a.btn { background: var(--l-ink); border-color: var(--l-ink); color: var(--l-paper); box-shadow: none; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+.site-header .nav a.btn:hover { background: var(--l-gold); border-color: var(--l-gold); }
+.site-header .quick-apply { background: var(--l-ink); border-color: var(--l-ink); color: var(--l-paper); }
+.site-header .menu-button[aria-controls="menu-panel"] { color: var(--l-ink); }
+html.deck .site-header { background: rgba(255, 255, 255, 0.84); }
+html.deck.on-light .site-header { background: rgba(14, 13, 12, 0.72); border-color: rgba(255, 255, 255, 0.08); }
+html.deck.on-light .site-header .wordmark-type { filter: none; }
+html.deck.on-light .site-header .nav a { color: #bdbdbd; }
+html.deck.on-light .site-header .nav a[aria-current="page"] { color: #fff; }
+html.deck.on-light .site-header .nav a.btn { background: #fff; border-color: #fff; color: var(--l-ink); }
 
-/* ── 전광판처럼 켜지는 글(4-2): 글자마다 꺼짐 → 켜짐 → 잠깐 꺼짐 → 켜짐(0.09초씩). 순서는 낱말 안에서 무작위, 한 줄 0.7초 ── */
-html.fx .mq .c { opacity: 0; }
-html.deck .scene.in .mq .c, html.fx:not(.deck) .scene.seen .mq .c { animation: flick 0.27s steps(1, end) calc(var(--md, 0.3s) + var(--fd, 0s)) both; }
-@keyframes flick { 0% { opacity: 0; } 33.33% { opacity: 1; } 66.66% { opacity: 0.16; } 100% { opacity: 1; } }
+/* 떠 있는 버튼: 밝은 바탕에 검은 원(흰 테두리로 검은 화면에서도 보인다) */
+.fab-button { background: var(--l-ink); color: var(--l-paper); box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.22); }
 
-/* ── 화면 1 첫 화면(4-3): 스튜디오 둘러보기 다섯 장면(1판). 배경은 마우스에 반응하지 않는다. 떠나 있는 동안은 멈추고, 돌아오면 첫 장면부터 ── */
-html.deck .hero-tour .hero-bg .t1 { animation: tour1 9s linear infinite; }
-html.deck .hero-tour .hero-bg .t2 { animation: tour2 9s linear infinite; }
-html.deck .hero-tour .hero-bg .t3 { animation: tour3 9s linear infinite; }
-html.deck .hero-tour .hero-bg .t4 { animation: tour4 9s linear infinite; }
-html.deck .hero-tour .hero-bg .t5 { animation: tour5 9s linear infinite; }
+/* ── 공통: 글 ── */
+.le-eyebrow { font-family: var(--display); font-size: 15px; font-weight: 500; letter-spacing: 0.22em; line-height: 1.4; color: var(--l-gold); }
+.le-h2 { font-family: var(--serif-ko); font-weight: 500; font-size: clamp(28px, min(2.7vw, 5vh), 46px); line-height: 1.4; letter-spacing: -0.02em; color: var(--l-ink); }
+.le-lead { color: var(--l-sub); font-size: clamp(15px, min(1.15vw, 2.1vh), 17.5px); line-height: 1.8; }
+html.deck [data-lines].rise { opacity: 1; transform: none; }
+
+/* ── 화면 높이: 스크롤할 때는 구역마다 한 화면 이상, 한 화면씩 넘길 때는 화면 하나에 맞춘다 ── */
+.le-screen { position: relative; min-height: calc(100svh - var(--header-h)); padding: clamp(56px, 9vh, 110px) var(--gutter); }
+html.deck .le-screen { height: 100%; min-height: 0; padding: calc(var(--header-h) + clamp(16px, 4.5vh, 60px)) var(--gutter) clamp(20px, 5vh, 64px); }
+
+/* ── 마우스 = 스튜디오 조명: 마우스를 따라 따뜻한 빛이 은은하게(곱하기로 겹쳐 흰 바탕만 물든다). 첫 화면·검은 화면에서는 끈다 ── */
+.le-key { position: fixed; left: 0; top: 0; z-index: 4; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%; pointer-events: none; background: radial-gradient(closest-side, rgba(255, 234, 200, 0.6), rgba(255, 234, 200, 0)); mix-blend-mode: multiply; opacity: 0; transition: opacity 0.6s; will-change: transform; }
+html.key-lit:not(.key-off) .le-key { opacity: 1; }
+
+/* ── 화면 1 첫 화면: 머리말 아래부터 화면 끝까지 스튜디오 사진(다섯 장면 둘러보기, pages.css). 들어오면 조명이 켜지듯 밝아진다 ── */
+.le-hero { position: relative; height: calc(100svh - var(--header-h)); min-height: 520px; overflow: hidden; --scene-bg: var(--l-paper); background: #0a0a0a; }
+html.deck .le-hero { height: 100%; min-height: 0; }
+html.deck .le-hero .hero-bg { top: var(--header-h); }
+.le-hero .hero-bg::after { background: linear-gradient(180deg, rgba(10, 8, 5, 0.3), rgba(10, 8, 5, 0.12) 30%, rgba(10, 8, 5, 0.5) 100%), radial-gradient(60% 50% at 50% 50%, rgba(10, 8, 5, 0.42), rgba(10, 8, 5, 0)); }
+html.fx .le-hero .hero-bg { filter: brightness(0.16); transition: filter 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s; }
+html.deck .le-hero.in .hero-bg, html.fx:not(.deck) .le-hero.seen .hero-bg { filter: none; }
 html.fx .hero-tour.tour-off .hero-bg img[class] { animation: none; }
 html.fx .hero-tour.tour-off .hero-bg .t1 { opacity: 1; transform: scale(1.02); }
-/* 제목은 다른 쪽과 같은 크기(1440×900에서 66px) */
-html.deck .hero h1 { font-size: max(32px, min(4.6vw, 8.4vh, calc(66px * var(--k, 1)))); }
-html.deck .hero .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(20px * var(--k, 1)))); }
-html.deck .hero .btn { min-height: calc(56px * var(--k, 1)); padding: 0 calc(32px * var(--k, 1)); font-size: calc(17px * var(--k, 1)); }
-.hero .eyebrow { --md: 0.25s; }
-/* 제목이 LED 화소로 켜졌다가 글자로 맺힌다(4-3, 대표 결정 11-11). 실제 글은 그동안 투명하게만 두고, 점은 제목 위에 겹친 그림판에 그린다.
-   한 번만 나오고 멈춘다. 버튼은 제목이 다 맺힌 뒤 떠오른다 */
-.hero-px { display: none; }
-html.fx .hero-px { display: block; position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; filter: drop-shadow(0 2px 10px rgba(10, 10, 10, 0.55)); }
-html.fx .hero h1.px .mask > span { opacity: 0; transform: none; transition: none; }
-html.fx .hero h1.px .mask.lit > span { opacity: 1; transition: opacity 0.25s linear; }
-html.fx .hero h1.px .mask.lit.now > span { transition: none; }
-/* 버튼은 제목의 마지막 줄이 글자로 바뀌기 시작할 때 떠오른다(스크립트가 px-done을 붙인다. 처음 열 때도 미리 보이지 않게) */
-html.fx .hero.px-on .hero-actions.rise { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); transition-delay: 0s; }
-html.fx .hero.px-on.px-done .hero-actions.rise { opacity: 1; transform: none; }
-/* 글자가 맺히기 전에 버튼을 감출 때는 움직이지 않고 바로(버튼이 흐릿하게 한 번 비쳤다 사라졌다, 대표 11-12) */
-html.fx .hero.px-on:not(.px-done) .hero-actions.rise { transition: none; }
+.le-hero-copy { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--l-paper); padding: 0 24px; }
+html.deck .le-hero-copy { top: var(--header-h); }
+.le-hero h1 { font-family: var(--serif-ko); font-weight: 500; font-size: clamp(28px, min(3.6vw, 6.6vh), 58px); line-height: 1.38; letter-spacing: -0.02em; color: var(--l-paper); filter: drop-shadow(0 2px 16px rgba(10, 10, 10, 0.5)); }
+/* 제목 반사광: 글자 위로 따뜻한 흰 금빛이 한 번 지나가고, 9초마다 다시 지나간다(대표 11-13). 사진은 그대로 */
+/* 같은 글을 금빛으로 한 겹 더 얹고, 그 겹은 지나가는 띠 모양으로만 보이게 가린다(글자 모양 배경 자르기는 이 제목에서 반투명하게 그려져 쓰지 않는다) */
+.le-hero h1 .mask, .le-hero h1 .mask > span { display: block; }
+.le-hero h1 br { display: none; }
+.le-hero h1 .mask > span { position: relative; }
+.le-hero h1 .mask > span[data-t]::after { content: attr(data-t); position: absolute; inset: 0; color: #f4d49b; pointer-events: none; -webkit-mask-image: linear-gradient(105deg, transparent 0%, transparent 42%, #000 50%, transparent 58%, transparent 100%); mask-image: linear-gradient(105deg, transparent 0%, transparent 42%, #000 50%, transparent 58%, transparent 100%); -webkit-mask-size: 320% 100%; mask-size: 320% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+html.deck .le-hero.in h1 .mask > span::after, html.fx:not(.deck) .le-hero.seen h1 .mask > span::after { animation: le-sheen 9s cubic-bezier(0.4, 0, 0.6, 1) 1.9s infinite; }
+@keyframes le-sheen { 0% { -webkit-mask-position: 100% 0; mask-position: 100% 0; } 36% { -webkit-mask-position: 0% 0; mask-position: 0% 0; } 100% { -webkit-mask-position: 0% 0; mask-position: 0% 0; } }
+.le-rule { width: clamp(80px, 9vw, 140px); height: 1px; background: rgba(255, 255, 255, 0.6); margin: clamp(22px, 4vh, 40px) 0 clamp(14px, 2.4vh, 22px); transform-origin: 50% 50%; }
+html.fx .le-rule { transform: scaleX(0); transition: transform 1.1s var(--ease) 0.95s; }
+html.deck .le-hero.in .le-rule, html.fx:not(.deck) .le-hero.seen .le-rule { transform: none; }
+.le-tags { font-size: 14px; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.82); white-space: nowrap; }
+.le-tags > span { display: inline-block; }
+.le-tags i { font-style: normal; color: rgba(255, 255, 255, 0.38); margin: 0 10px; }
+.le-tags .tag-mo { display: none; }
+.le-tags b { font-weight: inherit; }
+html.fx .le-tags > span { opacity: 0; transform: translateY(8px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+html.deck .le-hero.in .le-tags > span, html.fx:not(.deck) .le-hero.seen .le-tags > span { opacity: 1; transform: none; transition-delay: calc(1.25s + var(--i, 0) * 0.1s); }
+.le-hero .le-cta { margin-top: clamp(24px, 5vh, 52px); }
+.btn.le-btn-white { min-height: 54px; padding: 0 30px; border-color: var(--l-paper); background: var(--l-paper); color: var(--l-ink); font-size: 16px; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+.btn.le-btn-white:hover { background: var(--l-gold); border-color: var(--l-gold); color: var(--l-paper); }
 
-/* ── 화면 2 소개(4-4): 뒤의 LED 벽에 영문 한 줄이 점 글자로 흐른다(그림판). 앞의 글은 늘 또렷하다 ── */
-html.deck .intro { height: 100%; align-content: center; padding: calc(var(--header-h) + 2vh) var(--gutter) 6vh; }
-html.deck .intro-head .eyebrow { font-size: max(16px, min(1.4vw, 2.3vh, calc(20px * var(--k, 1)))); }
-html.deck .intro h2 { font-size: max(26px, min(3.2vw, 6.2vh, calc(46px * var(--k, 1)))); }
-html.deck .intro-text p { font-size: max(15px, min(1.25vw, 2.5vh, calc(18px * var(--k, 1)))); }
-/* 큰 문장은 한 줄씩 올라온다(줄은 스크립트가 나눈다. 휴대폰은 문장 전체가 떠오른다) */
-html.deck .intro h2.rise { opacity: 1; transform: none; }
-html.deck .intro h2 .ln { display: block; overflow: hidden; padding-bottom: 0.08em; }
-html.deck .intro h2 .ln > span { display: block; transform: translateY(108%); transition: transform 1s var(--ease); }
-html.deck .intro.in h2 .ln > span { transform: none; transition-delay: calc(0.62s + var(--li, 0) * 0.12s); }
+/* ── 화면 2 소개 + ENTERTAINMENT NETWORK: 왼쪽 글, 오른쪽 네 분야. 올린 줄만 펼쳐지고(한 줄만), 이름이 금빛, 나머지 이름은 옅게 ── */
+.le-net { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 110px); align-items: center; --scene-bg: var(--l-paper); background: var(--l-paper); }
+.le-net .le-h2 { margin: clamp(14px, 2.4vh, 22px) 0 clamp(16px, 2.8vh, 26px); }
+.le-net .le-lead { max-width: 30em; }
+.le-rows { position: relative; }
+.le-rows::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--l-ink); transform-origin: left; }
+html.fx .le-rows::before { transform: scaleX(0); transition: transform 1.1s var(--ease) 0.35s; }
+html.deck .scene.in .le-rows::before, html.fx:not(.deck) .scene.seen .le-rows::before { transform: none; }
+.le-row { position: relative; overflow: hidden; border-bottom: 1px solid var(--l-hair); }
+/* 펼친 줄 뒤로 그 분야 영문 이름이 아주 크고 옅게 옆으로 흐른다(대표 11-13, 옛 판 전광판을 밝게 바꾼 것) */
+.le-flow { position: absolute; left: 0; top: 50%; z-index: 0; display: flex; white-space: nowrap; pointer-events: none; font-family: var(--display); font-style: italic; font-weight: 400; font-size: clamp(90px, min(9vw, 17vh), 170px); line-height: 1; letter-spacing: -0.02em; color: var(--l-gold); opacity: 0; transform: translateY(-38%); transition: opacity 0.7s; }
+.le-flow b { flex: none; font-weight: inherit; padding-right: 0.35em; animation: le-marq 26s linear infinite; animation-play-state: paused; }
+.le-row.open .le-flow { opacity: 0.1; }
+.le-row.open .le-flow b { animation-play-state: running; }
+@keyframes le-marq { to { transform: translateX(-100%); } }
+.le-row-head, .le-row-body { position: relative; z-index: 1; }
+.le-row::after { content: ''; position: absolute; left: 0; bottom: 0; z-index: 1; height: 1px; width: 100%; background: var(--l-gold); transform: scaleX(0); transform-origin: left; transition: transform 0.7s var(--ease); }
+.le-row.open::after { transform: none; }
+.le-row-head { display: grid; grid-template-columns: 54px 1fr auto; align-items: baseline; gap: 12px; width: 100%; padding: clamp(12px, 2.4vh, 22px) 4px; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.le-row-head:focus-visible { outline: 1px solid var(--l-gold); outline-offset: 2px; }
+.le-num { font-family: var(--display); font-size: 15px; color: var(--l-gold); }
+.le-name { font-family: var(--display); font-size: clamp(20px, min(2vw, 3.6vh), 32px); letter-spacing: 0.01em; line-height: 1.2; transition: color 0.35s, opacity 0.35s; }
+.le-rows.focus .le-row:not(.open) .le-name { opacity: 0.42; }
+.le-row.open .le-name { color: var(--l-gold); }
+.le-plus { width: 14px; height: 14px; position: relative; align-self: center; }
+.le-plus::before, .le-plus::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; background: var(--l-ink); transition: transform 0.5s var(--ease); }
+.le-plus::after { transform: rotate(90deg); }
+.le-row.open .le-plus::after { transform: rotate(0); }
+.le-row-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.6s var(--ease); }
+.le-row.open .le-row-body { grid-template-rows: 1fr; }
+.le-row-inner { overflow: hidden; padding: 0 4px 0 70px; }
+.le-row-inner > div { padding-bottom: clamp(14px, 2.6vh, 24px); opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.6s var(--ease); }
+.le-row.open .le-row-inner > div { opacity: 1; transform: none; transition-delay: 0.12s; }
+.le-row-inner h3 { font-size: clamp(16px, min(1.25vw, 2.2vh), 18px); font-weight: 700; margin-bottom: 6px; color: var(--l-ink); }
+.le-row-inner p { font-size: clamp(14px, min(1.05vw, 1.95vh), 15.5px); color: var(--l-sub); }
+.le-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: clamp(8px, 1.4vh, 12px); }
+.le-chips li { padding: 3px 12px; border: 1px solid var(--l-hair); border-radius: 999px; font-size: 13px; color: #55524d; }
+html.fx .le-row { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.deck .scene.in .le-row, html.fx:not(.deck) .scene.seen .le-row { opacity: 1; transform: none; transition-delay: calc(0.5s + var(--i, 0) * 0.1s); }
 
-/* ── 화면 3 ENTERTAINMENT NETWORK(4-5): 네 칸이 모두 보인다. 올린 칸 뒤의 LED가 아래에서 위로 켜지고(그림판), 칸 위쪽 선이 그어지고, 나머지 칸은 45% ── */
-html.deck .rows { display: flex; flex-direction: column; justify-content: center; padding: calc(var(--header-h) + 1vh) var(--gutter) 3vh; }
-html.deck .row-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: clamp(18px, 2.2vw, 44px); margin-top: clamp(14px, 3.6vh, calc(44px * var(--k, 1))); }
-html.deck .row { position: relative; display: block; padding: clamp(14px, 2.8vh, calc(30px * var(--k, 1))) 0 0; }
-html.deck .row::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--paper); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
-html.deck .row.hot::before { transform: scaleX(1); }
-html.deck .row > * { transition: opacity 0.4s; }
-html.deck .row-list.focus .row:not(.hot) > :not(.row-arrow) { opacity: 0.45; }
-html.deck .row-label { font-size: max(14px, min(1.3vw, 2.5vh, calc(19px * var(--k, 1)))); }
-html.deck .row h3 { margin-top: clamp(8px, 1.7vh, 18px); font-size: max(18px, min(1.75vw, 3.3vh, calc(27px * var(--k, 1)))); }
-html.deck .row-body { margin-top: clamp(8px, 1.9vh, 20px); }
-html.deck .row-body p { font-size: max(14px, min(1.15vw, 2.35vh, calc(17px * var(--k, 1)))); line-height: 1.7; }
-html.deck .keywords { gap: 6px; margin-top: clamp(10px, 2.1vh, 20px); }
-html.deck .keywords li { padding: 2px 11px; font-size: max(12px, min(1vw, 2vh, calc(14px * var(--k, 1)))); }
-/* 칸 전체가 숏폼 화면으로 가는 링크다(글 없음, 이름은 aria-label). 올린 칸 아래에 작은 아래 화살표 */
-.row { position: relative; }
-.row-go { position: absolute; inset: 0; z-index: 1; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.row-go:focus { outline: none; }
-.row-go:focus-visible { outline: 1px solid rgba(255, 255, 255, 0.55); outline-offset: 8px; }
-.row-arrow { display: none; }
-html.deck .row-arrow { display: block; position: absolute; left: 0; top: calc(100% + clamp(4px, 1vh, 12px)); width: calc(18px * var(--k, 1)); height: calc(18px * var(--k, 1)); opacity: 0; transform: translateY(-6px); transition: opacity 0.3s, transform 0.5s var(--ease); pointer-events: none; }
-html.deck .row-arrow svg { display: block; width: 100%; height: 100%; }
-html.deck .row.hot .row-arrow { opacity: 1; transform: none; }
-/* 휴대폰·작은 창: 줄마다 화면에 들어오면 글이 떠오른다(4-9). 보이는 동안 꺼지지 않는다 */
-html.fx:not(.deck) .scene.rows .row.rise:not(.on) { opacity: 0; transform: translateY(20px); }
-html.fx:not(.deck) .scene.rows .row.rise.on { opacity: 1; transform: none; transition-delay: 0.1s; }
+/* ── 화면 3 지원 내용: 제목은 왼쪽 위, 열 가지는 그 아래 왼쪽, 오른쪽은 올린 항목이 크게(대표 11-13) ── */
+.le-sup { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "head ." "list focus"; column-gap: clamp(40px, 6vw, 110px); row-gap: clamp(20px, 4vh, 44px); align-content: center; --scene-bg: var(--l-mist); background: var(--l-mist); }
+.le-sup-head { grid-area: head; }
+.le-sup-head .le-h2 { margin: clamp(8px, 1.6vh, 18px) 0 clamp(6px, 1.4vh, 16px); }
+.le-sup-head .le-lead { max-width: 34em; }
+.le-sup-list { grid-area: list; position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: column; grid-template-rows: repeat(5, auto); column-gap: clamp(24px, 3vw, 48px); }
+.le-sup-list::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--l-ink); transform-origin: left; }
+html.fx .le-sup-list::before { transform: scaleX(0); transition: transform 1.1s var(--ease) 0.3s; }
+html.deck .scene.in .le-sup-list::before, html.fx:not(.deck) .scene.seen .le-sup-list::before { transform: none; }
+.le-item { position: relative; display: grid; grid-template-columns: 52px 1fr; gap: 4px 10px; padding: clamp(10px, 2vh, 18px) 16px clamp(10px, 2vh, 18px) 4px; border-bottom: 1px solid var(--l-hair); transition: background 0.4s, padding 0.5s var(--ease); }
+.le-item::before { content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0; background: var(--l-gold); transition: width 0.6s var(--ease); }
+.le-item { z-index: 1; }
+.le-item.hot { padding-left: 16px; }
+/* 올린 항목 뒤 흰 칸: 항목 사이를 미끄러지듯 따라다닌다(대표 11-13) */
+.le-sup-hl { position: absolute; left: 0; top: 0; z-index: 0; list-style: none; background: var(--l-paper); box-shadow: 0 22px 44px -28px rgba(40, 30, 15, 0.3); opacity: 0; pointer-events: none; transition: transform 0.5s var(--ease), width 0.5s var(--ease), height 0.5s var(--ease), opacity 0.35s; }
+.le-sup-hl::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--l-gold); }
+.le-sup-hl.on { opacity: 1; }
+.le-item-num { font-family: var(--display); font-size: clamp(18px, min(1.5vw, 2.6vh), 22px); color: var(--l-gold); line-height: 1.2; grid-row: span 2; }
+.le-item h3 { font-size: clamp(15px, min(1.2vw, 2.1vh), 17px); font-weight: 700; letter-spacing: -0.01em; color: var(--l-ink); }
+.le-item p { font-size: clamp(13px, min(1vw, 1.8vh), 14.5px); color: var(--l-sub); line-height: 1.6; }
+.le-item .le-full { display: none; }
+html.fx .le-item { opacity: 0; transform: translateY(12px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease), background 0.4s, padding 0.5s var(--ease); }
+html.deck .scene.in .le-item, html.fx:not(.deck) .scene.seen .le-item { opacity: 1; transform: none; transition-delay: calc(0.45s + var(--i, 0) * 0.06s), calc(0.45s + var(--i, 0) * 0.06s), 0s, 0s; }
+.le-focus { grid-area: focus; align-self: center; }
+.le-count { display: flex; align-items: flex-end; gap: 18px; }
+/* 큰 숫자는 계기판처럼 자릿수가 굴러간다(대표 11-13). 자리마다 숫자 띠를 세로로 쌓고 띠를 올리고 내린다 */
+.le-count .big { display: inline-flex; height: 1em; overflow: hidden; font-family: var(--display); font-weight: 400; font-size: clamp(120px, min(14vw, 26vh), 260px); line-height: 1; color: var(--l-gold); font-variant-numeric: lining-nums tabular-nums; }
+.le-count .dg { display: block; margin-right: -0.03em; }
+.le-count .strip { display: flex; flex-direction: column; will-change: transform; }
+.le-count .strip i { display: block; height: 1em; font-style: normal; text-align: center; }
+.le-count .cap { padding-bottom: 0.14em; font-size: clamp(17px, 1.3vw, 22px); font-weight: 700; color: var(--l-ink); letter-spacing: -0.01em; transition: opacity 0.25s; }
+.le-count.swap .cap { opacity: 0; }
+.le-detail { min-height: 5.4em; max-width: 25em; margin-top: clamp(16px, 3vh, 30px); font-size: clamp(15px, 1.05vw, 18px); line-height: 1.75; color: var(--l-sub); transition: opacity 0.25s; }
+.le-count.swap + .le-detail { opacity: 0; }
+html.fx .le-focus { opacity: 0; transform: translateY(20px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+html.deck .scene.in .le-focus, html.fx:not(.deck) .scene.seen .le-focus { opacity: 1; transform: none; transition-delay: 0.4s; }
+/* 낮은 창: 설명은 오른쪽 큰 자리에서만 보이고, 목록에는 이름만 */
+@media (max-height: 760px) { html.deck .le-item .le-short { display: none; } html.deck .le-item { grid-template-columns: 44px 1fr; } }
 
-/* 화면 4: 숏폼 카드 모션은 ent-reel.css(1판 그대로) */
+/* ── 화면 4 포토카드: 겹친 카드(세다엔터 방식). 2초마다 다음 카드로(대표 11-13). 들어오면 한 장에서 부채처럼 펼쳐진다 ── */
+.le-cards { display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; --scene-bg: var(--l-paper); background: var(--l-paper); }
+.le-stage { position: relative; width: 100%; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(110px, 10vw, 190px); }
+.le-side { font-family: var(--display); font-weight: 500; font-size: clamp(34px, min(3.9vw, 7vh), 64px); line-height: 1.02; letter-spacing: -0.02em; color: var(--l-ink); }
+.le-side.l { text-align: right; }
+.le-side em { font-style: italic; color: var(--l-gold); }
+html.fx .le-side { opacity: 0; transition: opacity 1s var(--ease), transform 1.2s var(--ease); }
+html.fx .le-side.l { transform: translateX(-40px); }
+html.fx .le-side.r { transform: translateX(40px); }
+html.deck .scene.in .le-side, html.fx:not(.deck) .scene.seen .le-side { opacity: 1; transform: none; transition-delay: 0.55s; }
+.le-deck { position: relative; width: clamp(220px, min(21vw, 33vh), 320px); aspect-ratio: 9 / 16; perspective: 1400px; }
+.le-card { position: absolute; inset: 0; border-radius: 30px; padding: 7px; background: var(--l-paper); box-shadow: var(--l-shadow); cursor: pointer; transition: transform 0.7s var(--ease), opacity 0.5s, box-shadow 0.5s, filter 0.5s; will-change: transform; }
+.le-cards.drag .le-card.on { cursor: grabbing; }
+.le-deck { touch-action: pan-y; user-select: none; }
+/* 뒤 배경: 지금 카드 사진 색이 옅게 번진다. 가운데는 흰빛을 얹어 밝은 테마를 지킨다 */
+.le-amb { position: absolute; inset: -12%; z-index: 0; pointer-events: none; }
+.le-amb i { position: absolute; inset: 0; background: center / cover no-repeat; filter: blur(90px) saturate(2.2) brightness(2.4); opacity: 0; transition: opacity 1.2s ease; }
+.le-amb i.on { opacity: 0.14; }
+.le-amb::after { content: ''; position: absolute; inset: 0; background: radial-gradient(40% 48% at 50% 48%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 75%); }
+.le-stage, .le-caption, .le-dots { position: relative; z-index: 1; }
+.le-card img { -webkit-user-drag: none; width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
+.le-card .tag { position: absolute; left: 20px; top: 20px; z-index: 2; padding: 4px 11px; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: var(--l-ink); font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; line-height: 1.6; opacity: 0; transition: opacity 0.4s; }
+.le-card .glare { position: absolute; inset: 7px; border-radius: 24px; pointer-events: none; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 52%); mix-blend-mode: soft-light; opacity: 0; transition: opacity 0.5s; }
+.le-card.on .tag { opacity: 1; }
+.le-card.on { cursor: grab; box-shadow: 0 50px 80px -34px rgba(40, 30, 15, 0.5), 0 10px 22px -10px rgba(40, 30, 15, 0.22); }
+.le-cards.aim .le-card.on .glare { opacity: 1; }
+.le-card:not(.on) { filter: saturate(0.8) brightness(0.96); }
+.le-card:focus-visible { outline: 2px solid var(--l-gold); outline-offset: 4px; }
+.le-arrow { position: absolute; top: 50%; z-index: 20; width: 48px; height: 48px; margin-top: -24px; border: 0; border-radius: 50%; background: var(--l-paper); color: var(--l-ink); box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.35); cursor: pointer; display: grid; place-items: center; transition: transform 0.4s var(--ease), background 0.3s, color 0.3s; }
+.le-arrow:hover { background: var(--l-ink); color: var(--l-paper); transform: scale(1.08); }
+.le-arrow.prev { left: -24px; } .le-arrow.next { right: -24px; }
+.le-caption { margin-top: clamp(16px, 4vh, 40px); text-align: center; min-height: 62px; }
+.le-caption .t { font-family: var(--display); font-size: 15px; letter-spacing: 0.24em; color: var(--l-gold); }
+.le-caption .s { font-size: clamp(15px, 1.2vw, 17px); margin-top: 6px; color: var(--l-ink); }
+html.fx .le-caption, html.fx .le-dots { opacity: 0; transform: translateY(14px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.deck .scene.in .le-caption, html.fx:not(.deck) .scene.seen .le-caption, html.deck .scene.in .le-dots, html.fx:not(.deck) .scene.seen .le-dots { opacity: 1; transform: none; transition-delay: 0.9s; }
+.le-caption .t, .le-caption .s { transition: opacity 0.3s, transform 0.4s var(--ease); }
+.le-caption.swap .t, .le-caption.swap .s { opacity: 0; transform: translateY(6px); }
+.le-dots { display: flex; gap: 8px; justify-content: center; margin-top: clamp(10px, 2vh, 18px); }
+.le-dots button { width: 26px; height: 3px; border: 0; padding: 0; border-radius: 2px; background: var(--l-hair); cursor: pointer; position: relative; overflow: hidden; }
+.le-dots button.on::after { content: ''; position: absolute; inset: 0; background: var(--l-ink); transform-origin: left; animation: le-fill var(--auto, 2s) linear forwards; }
+.le-cards:not(.run) .le-dots button.on::after { animation: none; }
+@keyframes le-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* ── 화면 5 과정(4-7): 단계 표시는 마름모꼴 LED 무리(5, 13, 25, 41개). 점 간격 12px, 반지름 2.4px × 배율 ── */
-.leds { display: block; width: 120px; height: 120px; overflow: visible; }
-.leds circle { fill: #fff; }
-.leds .cl { transform-box: view-box; transform-origin: 50% 50%; }
-.leds .x { opacity: 0; }
-.leds .x.flash { animation: ledx 0.5s ease-out both; }
-@keyframes ledx { 0% { opacity: 0; } 18% { opacity: 0.9; } 100% { opacity: 0; } }
-.steps::before { top: 60px; }
-html.fx .leds .d { opacity: 0; transform: scale(0.2); transform-box: fill-box; transform-origin: center; transition: opacity 0.16s linear calc(var(--o) * 0.03s), transform 0.3s var(--ease) calc(var(--o) * 0.03s); }
-html.fx .step.on .leds .d { opacity: 1; transform: none; }
-html.fx .step .step-text > * { opacity: 0; transform: translateY(18px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
-html.fx .step.on .step-text > * { opacity: 1; transform: none; transition-delay: 0.2s; }
-html.fx .step.on .step-text > :nth-child(2) { transition-delay: 0.28s; }
-html.fx .step.on .step-text > :nth-child(3) { transition-delay: 0.36s; }
-html.fx .steps.snap .step *, html.fx .process.snap .steps::before { transition: none !important; }
-.step { transition: opacity 0.4s; }
-/* 휴대폰 스크롤 반응(설계 12-4, 지시서 015) */
-/* 네 분야: 화면 가운데에 가장 가까운 줄만 또렷하고 나머지 줄은 55% */
-html.fx:not(.deck) .scene.rows .row.rise.on.dim { opacity: 0.55; transition: opacity 0.35s, transform 0.8s var(--ease); }
-/* 과정 LED 무리: 스크롤만큼 가운데 점부터 바깥으로(점마다 늦추지 않는다) */
-html.fx .steps.flowled .step.on .leds .d { transition: opacity 0.12s linear, transform 0.2s var(--ease); transition-delay: 0s; }
-html.fx .steps.flowled .step.on .leds .d:not(.lit) { opacity: 0; transform: scale(0.2); }
-/* 흰 문의 구역: LED 벽이 켜진다. 구역 위에 어두운 판을 깔고 점 모양 구멍이 커져 붙으며 흰 면이 드러난다 */
-html.fx:not(.deck) .scene-end { position: relative; overflow: hidden; overflow: clip; }
-.wallc { display: none; position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; }
-html.fx:not(.deck) .wallc.on { display: block; }
-.steps.focus .step:not(.hot) { opacity: 0.38; }
-/* 표시·가로 선·글 묶음은 제목 아래 남은 높이의 세로 가운데(MCN 과정에서 아래가 비어 보였던 것을 되풀이하지 않는다) */
-html.deck .process { --ob: min(calc(120px * var(--k, 1)), 20vh); display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(16px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 88px); }
-html.deck .process .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
-html.deck .steps { margin-top: 0; align-self: center; }
-html.deck .leds { width: var(--ob); height: var(--ob); }
-html.deck .steps::before { top: calc(var(--ob) / 2); transform: scaleX(0); transform-origin: left; transition: transform 1.44s cubic-bezier(0.65, 0, 0.35, 1) 0.48s; }
-html.deck .process.in .steps::before { transform: none; }
-html.deck .step-name { margin-top: calc(var(--ob) * 0.12); font-size: max(15px, min(1.25vw, 2.4vh, calc(18px * var(--k, 1)))); }
-html.deck .step h3 { font-size: max(17px, min(1.45vw, 2.9vh, calc(21px * var(--k, 1)))); }
-html.deck .step-text p:last-child { font-size: max(14px, min(1.1vw, 2.2vh, calc(16px * var(--k, 1)))); }
+/* ── 화면 5 과정: 금빛 선이 왼쪽에서 그어지고, 선이 닿는 단계마다 점이 채워지며 글이 올라온다. 올린 단계만 또렷 ── */
+.le-proc { display: flex; flex-direction: column; justify-content: center; --scene-bg: var(--l-mist); background: var(--l-mist); }
+.le-proc-title { font-family: var(--display); font-weight: 500; font-size: clamp(34px, min(4.4vw, 8vh), 68px); line-height: 1; letter-spacing: -0.02em; color: var(--l-ink); text-align: center; }
+.le-steps { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 48px); margin-top: clamp(40px, 9vh, 96px); }
+.le-steps::before, .le-steps::after { content: ''; position: absolute; left: 0; right: 0; top: 7px; height: 1px; background: var(--l-hair); }
+.le-steps::after { background: linear-gradient(90deg, var(--l-gold), var(--l-gold) 88%, rgba(164, 134, 90, 0)); transform-origin: left; }
+html.fx .le-steps::after { transform: scaleX(var(--p, 0)); }
+/* 선 끝의 빛 알갱이: 선을 따라 달리며 닿는 단계 점을 켠다. 켜진 점에서 금빛 고리가 한 번 퍼진다(대표 11-13) */
+.le-spark { position: absolute; left: 0; top: 7px; z-index: 2; width: 9px; height: 9px; margin: -4px 0 0 -4.5px; border-radius: 50%; list-style: none; pointer-events: none; background: #fff; box-shadow: 0 0 0 2px rgba(164, 134, 90, 0.55), 0 0 16px 6px rgba(226, 190, 128, 0.75), 0 0 46px 14px rgba(255, 232, 190, 0.6); opacity: 0; will-change: transform, opacity; }
+.le-step::after { content: ''; position: absolute; left: 0; top: 0; width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid var(--l-gold); opacity: 0; pointer-events: none; }
+.le-step.le-pop::after { animation: le-burst 1.1s cubic-bezier(0.2, 0.7, 0.3, 1); }
+@keyframes le-burst { from { opacity: 0.85; transform: scale(1); } to { opacity: 0; transform: scale(3.6); } }
+.le-step { position: relative; padding-top: 40px; transition: opacity 0.4s; }
+.le-step::before { content: ''; position: absolute; left: 0; top: 0; width: 15px; height: 15px; border-radius: 50%; background: var(--l-mist); border: 1.5px solid var(--l-gold); transition: background 0.4s, box-shadow 0.6s var(--ease), transform 0.5s var(--ease); }
+.le-step.done::before { background: var(--l-gold); box-shadow: 0 0 0 6px var(--l-gold-soft); }
+.le-steps.focus .le-step:not(.hot) { opacity: 0.4; }
+.le-step.hot::before { transform: scale(1.35); box-shadow: 0 0 0 9px var(--l-gold-soft); }
+.le-step-name { font-family: var(--display); font-size: 14px; letter-spacing: 0.24em; color: var(--l-gold); }
+.le-step h3 { font-family: var(--serif-ko); font-weight: 500; font-size: clamp(18px, min(1.6vw, 3vh), 24px); margin: 10px 0 8px; line-height: 1.45; color: var(--l-ink); }
+.le-step p { font-size: clamp(14px, 1.05vw, 15.5px); color: var(--l-sub); }
+html.fx .le-step > * { opacity: 0; transform: translateY(16px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+html.fx .le-step.done > * { opacity: 1; transform: none; }
+html.fx .le-step.done > :nth-child(2) { transition-delay: 0.08s; }
+html.fx .le-step.done > :nth-child(3) { transition-delay: 0.16s; }
 
-/* ── 화면 6 문의(4-8): LED 벽 전체가 켜져 흰 화면이 된다(그림판). 큰 글자·버튼도 배율만큼 ── */
+/* ── 화면 6 문의: 밝은 쪽의 끝은 검은 면. 과정에서 넘어올 때 조명이 마우스 자리로 좁혀지며 꺼진다(스크립트) ── */
+html.deck .scene-end.le-end { --scene-bg: var(--l-dark); }
+.le-end { background: var(--l-dark); }
+.le-end .cta { background: transparent; color: var(--l-paper); }
+.le-end .cta .display { color: var(--l-paper); }
+.le-end .cta-row { padding-top: clamp(18px, 3vh, 28px); border-top: 1px solid rgba(255, 255, 255, 0.16); align-items: center; }
+.le-end .cta-row p { color: rgba(255, 255, 255, 0.72); }
+.le-end .cta .btn-solid { background: var(--l-paper); border-color: var(--l-paper); color: var(--l-ink); }
+.le-end .cta .btn-solid:hover { background: var(--l-gold); border-color: var(--l-gold); color: var(--l-paper); }
+.le-end .cta .btn-line { border-color: rgba(255, 255, 255, 0.5); color: var(--l-paper); }
+.le-end .cta .btn-line:hover { border-color: var(--l-paper); background: rgba(255, 255, 255, 0.08); }
+.le-end .site-footer { background: var(--l-dark); border-top: 1px solid rgba(255, 255, 255, 0.08); }
+html.deck .le-end .site-footer { background: var(--l-dark); }
 html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1))); }
-html.deck .cta-row p { font-size: max(20px, min(2vw, 4vh, calc(28.8px * var(--k, 1)))); }
-html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
 
+/* ── 휴대폰·태블릿 ── */
 @media (max-width: 900px) {
-  /* 휴대폰: 정지 시안의 솔잎 표시와 같은 자리·폭(72px) */
-  .leds { width: 72px; height: 72px; }
+  .le-tags { font-size: 12.5px; letter-spacing: 0.04em; }
+  .le-tags i { margin: 0 6px; }
+  .le-tags .tag-pc { display: none; }
+  .le-tags .tag-mo { display: inline; }
+  .le-hero { min-height: 480px; }
+  .le-net { grid-template-columns: 1fr; }
+  .le-row-inner { padding-left: 4px; }
+  .le-sup { grid-template-columns: 1fr; grid-template-areas: "head" "list"; }
+  .le-focus { display: none; }
+  .le-item .le-short { display: none; }
+  .le-item .le-full { display: block; }
+  .le-sup-list { grid-template-columns: 1fr; grid-auto-flow: row; grid-template-rows: none; }
+  .le-stage { grid-template-columns: 1fr; justify-items: center; gap: 28px; }
+  .le-side { font-size: 34px; text-align: center !important; }
+  .le-deck { width: min(64vw, 270px); }
+  .le-arrow.prev { left: -14px; } .le-arrow.next { right: -14px; }
+  /* 과정: 세로 줄. 내리는 만큼 금빛 선이 아래로 차고, 선이 닿은 단계가 켜진다 */
+  .le-steps { grid-template-columns: 1fr; gap: 34px; padding-left: 38px; margin-top: 44px; }
+  .le-steps::before, .le-steps::after { left: 7px; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
+  .le-steps::after { background: linear-gradient(180deg, var(--l-gold), var(--l-gold) 92%, rgba(164, 134, 90, 0)); transform-origin: top; }
+  html.fx .le-steps::after { transform: scaleY(var(--p, 0)); transition: none; }
+  .le-step { padding-top: 0; }
+  .le-step::before, .le-step::after { left: -38px; top: 4px; }
+  .le-spark { display: none; }
+  .le-end .cta-row { align-items: flex-start; }
 }
 </style>
 </head>
@@ -170,39 +320,91 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   </div>
 </nav>
 <main>
-<section class="hero hero-tour scene" data-name="첫 화면">
+<!-- 1 첫 화면: 스튜디오 둘러보기(다섯 장면, 9초 반복) -->
+<section class="le-hero hero-tour scene" data-name="첫 화면">
   <div class="hero-bg" aria-hidden="true"><img class="t1" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t2" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t3" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t4" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t5" src="../2026-11-10-pages/img/ent-studio.webp" alt=""></div>
-  <p class="eyebrow mq">TALENT. PLATFORMS. INFLUENCE.</p>
-  <h1 data-lines="2">사람의 가능성을 발견하고,<br>플랫폼을 넘어 영향력으로 확장합니다.</h1>
-  <div class="hero-actions rise" style="--i:6"><a class="btn btn-solid" href="contact.html#apply">크리에이터 지원하기</a></div>
-  <button class="scroll-hint" type="button" aria-label="아래 내용으로 이동"><span class="wheel" aria-hidden="true"></span><span class="arrow" aria-hidden="true"></span></button>
-</section>
-<section class="intro scene" id="page-content" data-name="소개">
-  <div class="intro-head"><p class="eyebrow mq">A NEW STAGE FOR EVERY TALENT</p><h2 class="rise" style="--i:1">각자의 개성과 재능은 저마다 다른 방식으로 빛납니다.</h2></div>
-  <div class="intro-text rise" style="--i:5"><p>ASTRA는 개인방송부터 유튜브와 틱톡까지, 아티스트와 크리에이터가 자신에게 맞는 무대와 콘텐츠를 찾도록 함께합니다. 활동 방향 설정부터 콘텐츠 기획·제작, 채널 성장과 브랜드 협업까지 각자의 가능성이 더 큰 영향력으로 이어지도록 지원합니다.</p></div>
-</section>
-<section class="rows scene" data-name="ENTERTAINMENT NETWORK">
-  <h2 class="display section-title mq">ENTERTAINMENT NETWORK</h2>
-  <div class="row-list"><article class="row rise" style="--i:3"><p class="row-label"><i>01 —</i> PERSONAL BROADCASTING</p><h3>개인의 매력을 방송만의 색으로 만듭니다.</h3><div class="row-body"><p>방송인의 개성과 강점을 살펴 활동 방향과 방송 콘셉트를 설정합니다. 안정적인 방송 운영과 지속적인 콘텐츠 활동을 통해 시청자와의 관계를 넓혀갑니다.</p><ul class="keywords"><li>방송인 발굴</li><li>방송 콘셉트</li><li>활동 방향</li><li>방송 운영</li><li>팬 커뮤니케이션</li></ul></div><a class="row-go" href="#reel" data-field="0" aria-label="PERSONAL BROADCASTING 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article><article class="row rise" style="--i:4"><p class="row-label"><i>02 —</i> YOUTUBE</p><h3>채널의 개성을 콘텐츠와 성장으로 연결합니다.</h3><div class="row-body"><p>채널의 정체성과 시청자에 맞는 콘텐츠를 기획하고 제작합니다. 반복해서 찾고 싶은 콘텐츠와 일관된 채널 이미지를 만들어 지속적인 성장을 돕습니다.</p><ul class="keywords"><li>채널 브랜딩</li><li>콘텐츠 기획</li><li>영상 제작</li><li>시리즈 개발</li><li>채널 성장</li></ul></div><a class="row-go" href="#reel" data-field="1" aria-label="YOUTUBE 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article><article class="row rise" style="--i:5"><p class="row-label"><i>03 —</i> TIKTOK</p><h3>짧은 순간에 크리에이터의 매력을 선명하게 담습니다.</h3><div class="row-body"><p>크리에이터의 개성과 플랫폼의 흐름을 반영해 숏폼 콘텐츠를 기획합니다. 트렌드에 맞는 콘텐츠 형식과 운영 방향을 찾아 더 많은 사람과 만날 기회를 넓힙니다.</p><ul class="keywords"><li>숏폼 콘텐츠</li><li>포맷 기획</li><li>트렌드 콘텐츠</li><li>채널 운영</li><li>캠페인</li></ul></div><a class="row-go" href="#reel" data-field="2" aria-label="TIKTOK 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article><article class="row rise" style="--i:6"><p class="row-label"><i>04 —</i> INFLUENCER</p><h3>영향력과 브랜드의 만남을 기획합니다.</h3><div class="row-body"><p>인플루언서의 이미지와 활동 분야에 맞는 브랜드 협업과 캠페인을 연결합니다. 크리에이터와 브랜드의 이야기가 자연스럽게 전해지는 콘텐츠를 함께 만듭니다.</p><ul class="keywords"><li>인플루언서 발굴</li><li>매니지먼트</li><li>브랜드 협업</li><li>캠페인 기획</li><li>콘텐츠 제작</li></ul></div><a class="row-go" href="#reel" data-field="3" aria-label="INFLUENCER 숏폼 영상 보기"></a><span class="row-arrow" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v13M3.5 9.5L9 15l5.5-5.5"/></svg></span></article></div>
-</section>
-<section class="reel scene" id="reel" data-name="숏폼" aria-label="숏폼 영상" data-open-img="img/ent-reel-space.webp">
-  <div class="reel-grid" id="reel-grid" aria-hidden="true"></div>
-  <div class="reel-rows" aria-hidden="true"><div class="reel-row"></div><div class="reel-row"></div><div class="reel-row"></div></div>
-  <div class="reel-vignette" aria-hidden="true"></div>
-  <div class="reel-stage" id="reel-stage"></div>
-  <div class="reel-copy" id="reel-copy" aria-live="off"><p class="reel-title"><span></span></p><p class="reel-sub"><span></span></p></div>
-  <div class="reel-end" aria-hidden="true">
-    <p class="big"><b>TALENT.</b> <b>PLATFORMS.</b> <b>INFLUENCE.</b></p>
-    <p class="ko">사람의 가능성을 발견하고, 플랫폼을 넘어 영향력으로 확장합니다.</p>
-    <img src="../2026-11-10-pages/img/logo-astra-star.svg" alt="">
+  <div class="le-hero-copy">
+    <h1 class="rise" data-lines="0">사람의 가능성을 발견하고<br>플랫폼을 넘어 영향력으로 확장합니다.</h1>
+    <div class="le-rule" aria-hidden="true"></div>
+    <p class="le-tags"><span style="--i:0"><b class="tag-pc">Personal broadcasting</b><b class="tag-mo">Broadcasting</b></span><span style="--i:1"><i>/</i>Youtube</span><span style="--i:2"><i>/</i>Tiktok</span><span style="--i:3"><i>/</i>Influencer</span></p>
+    <div class="le-cta rise" style="--i:16"><a class="btn le-btn-white" href="contact.html#apply">크리에이터 지원하기</a></div>
   </div>
-  <div class="reel-segs" id="reel-segs" role="group" aria-label="분야 고르기"></div>
 </section>
-<section class="process scene" data-name="FROM TALENT TO INFLUENCE">
-  <h2 class="display section-title mq">FROM TALENT TO INFLUENCE</h2>
-  <ol class="steps"><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">DISCOVER</p><h3>가능성과 개성을 발견합니다.</h3><p>각자의 재능과 강점, 활동 목표를 살펴봅니다.</p></div></li><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">POSITION</p><h3>나만의 무대와 방향을 찾습니다.</h3><p>방송과 채널의 정체성, 콘텐츠 방향을 구체화합니다.</p></div></li><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">CREATE</p><h3>아이디어를 콘텐츠로 만듭니다.</h3><p>플랫폼과 크리에이터의 특성에 맞는 콘텐츠를 기획하고 제작합니다.</p></div></li><li class="step"><svg class="leds" viewBox="-60 -60 120 120" aria-hidden="true"></svg><div class="step-text"><p class="step-name">EXPAND</p><h3>더 넓은 기회와 영향력으로 연결합니다.</h3><p>채널 성장과 팬덤, 브랜드 협업을 통해 활동 영역을 확장합니다.</p></div></li></ol>
+
+<!-- 2 소개 + ENTERTAINMENT NETWORK -->
+<section class="le-screen le-net scene" id="page-content" data-name="소개">
+  <div>
+    <p class="le-eyebrow rise" style="--i:0">ENTERTAINMENT NETWORK</p>
+    <h2 class="le-h2 rise" data-lines="1">각자의 개성과 재능은<br>저마다 다른 방식으로 빛납니다.</h2>
+    <p class="le-lead rise" style="--i:4">ASTRA는 개인방송부터 유튜브와 틱톡까지, 아티스트와 크리에이터가 자신에게 맞는 무대와 콘텐츠를 찾도록 함께합니다. 활동 방향 설정부터 콘텐츠 기획·제작, 채널 성장과 브랜드 협업까지 각자의 가능성이 더 큰 영향력으로 이어지도록 지원합니다.</p>
+  </div>
+  <div class="le-rows">
+    <article class="le-row" style="--i:0"><button class="le-row-head" type="button" aria-expanded="false"><span class="le-num">01</span><span class="le-name">PERSONAL BROADCASTING</span><span class="le-plus" aria-hidden="true"></span></button>
+      <div class="le-row-body"><div class="le-row-inner"><div><h3>개인의 매력을 방송만의 색으로 만듭니다.</h3><p>방송인의 개성과 강점을 살펴 활동 방향과 방송 콘셉트를 설정합니다. 안정적인 방송 운영과 지속적인 콘텐츠 활동을 통해 시청자와의 관계를 넓혀갑니다.</p><ul class="le-chips"><li>방송인 발굴</li><li>방송 콘셉트</li><li>활동 방향</li><li>방송 운영</li><li>팬 커뮤니케이션</li></ul></div></div></div></article>
+    <article class="le-row" style="--i:1"><button class="le-row-head" type="button" aria-expanded="false"><span class="le-num">02</span><span class="le-name">YOUTUBE</span><span class="le-plus" aria-hidden="true"></span></button>
+      <div class="le-row-body"><div class="le-row-inner"><div><h3>채널의 개성을 콘텐츠와 성장으로 연결합니다.</h3><p>채널의 정체성과 시청자에 맞는 콘텐츠를 기획하고 제작합니다. 반복해서 찾고 싶은 콘텐츠와 일관된 채널 이미지를 만들어 지속적인 성장을 돕습니다.</p><ul class="le-chips"><li>채널 브랜딩</li><li>콘텐츠 기획</li><li>영상 제작</li><li>시리즈 개발</li><li>채널 성장</li></ul></div></div></div></article>
+    <article class="le-row" style="--i:2"><button class="le-row-head" type="button" aria-expanded="false"><span class="le-num">03</span><span class="le-name">TIKTOK</span><span class="le-plus" aria-hidden="true"></span></button>
+      <div class="le-row-body"><div class="le-row-inner"><div><h3>짧은 순간에 크리에이터의 매력을 선명하게 담습니다.</h3><p>크리에이터의 개성과 플랫폼의 흐름을 반영해 숏폼 콘텐츠를 기획합니다. 트렌드에 맞는 콘텐츠 형식과 운영 방향을 찾아 더 많은 사람과 만날 기회를 넓힙니다.</p><ul class="le-chips"><li>숏폼 콘텐츠</li><li>포맷 기획</li><li>트렌드 콘텐츠</li><li>채널 운영</li><li>캠페인</li></ul></div></div></div></article>
+    <article class="le-row" style="--i:3"><button class="le-row-head" type="button" aria-expanded="false"><span class="le-num">04</span><span class="le-name">INFLUENCER</span><span class="le-plus" aria-hidden="true"></span></button>
+      <div class="le-row-body"><div class="le-row-inner"><div><h3>영향력과 브랜드의 만남을 기획합니다.</h3><p>인플루언서의 이미지와 활동 분야에 맞는 브랜드 협업과 캠페인을 연결합니다. 크리에이터와 브랜드의 이야기가 자연스럽게 전해지는 콘텐츠를 함께 만듭니다.</p><ul class="le-chips"><li>인플루언서 발굴</li><li>매니지먼트</li><li>브랜드 협업</li><li>캠페인 기획</li><li>콘텐츠 제작</li></ul></div></div></div></article>
+  </div>
 </section>
-<div class="scene scene-end" data-name="문의" data-light>
+
+<!-- 3 지원 내용(손님 요청으로 새로 넣은 구역). 목록에는 한 줄 요약, 올린 항목의 원문 전체는 오른쪽 큰 자리에 -->
+<section class="le-screen le-sup scene" data-name="지원 내용">
+  <div class="le-sup-head">
+    <p class="le-eyebrow rise" style="--i:0">CREATOR SUPPORT</p>
+    <h2 class="le-h2 rise" style="--i:1">지원 내용</h2>
+    <p class="le-lead rise" style="--i:2">매니지먼트부터 방송 환경, 콘텐츠 제작, 채널 성장, 권익 보호까지 크리에이터의 활동 전반을 지원합니다.</p>
+  </div>
+  <div class="le-focus" aria-hidden="true">
+    <div class="le-count"><span class="big" id="supBig"><span class="dg"><span class="strip"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span></span><span class="dg"><span class="strip"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>0</i></span></span></span><span class="cap" id="supCap">가지 지원</span></div>
+    <p class="le-detail" id="supDetail"></p>
+  </div>
+  <ol class="le-sup-list">
+    <li class="le-sup-hl" aria-hidden="true"></li>
+    <li class="le-item"><span class="le-item-num">01</span><h3>크리에이터 맞춤 매니지먼트</h3><p class="le-short">성향·목표 분석으로 방송 전략, 콘텐츠, 일정까지 전담 관리</p><p class="le-full">개인별 활동 성향과 목표를 분석하여 방송 전략, 콘텐츠 방향, 일정 관리 등 체계적인 운영 및 전담 매니지먼트 지원</p></li>
+    <li class="le-item"><span class="le-item-num">02</span><h3>수익 관리 및 비즈니스 확장</h3><p class="le-short">투명한 정산 위에 광고·협찬·라이브 커머스로 수익 확장</p><p class="le-full">투명한 수익 정산 체계를 바탕으로 광고, 브랜드 협찬, 라이브 커머스 등 다양한 수익 창출 기회 및 비즈니스 연계 지원</p></li>
+    <li class="le-item"><span class="le-item-num">03</span><h3>프리미엄 방송 환경 구축</h3><p class="le-short">방송 장비·카메라·조명·음향을 크리에이터에 맞춰 세팅</p><p class="le-full">고성능 방송 장비, 전문 카메라, 조명, 음향 시스템 등 크리에이터별 최적화된 방송 장비 및 기술 세팅 지원</p></li>
+    <li class="le-item"><span class="le-item-num">04</span><h3>전문 스튜디오 및 공간 지원</h3><p class="le-short">개인방송·댄스·토크·라이브에 맞는 전용 스튜디오</p><p class="le-full">개인방송, 댄스, 토크, 라이브 콘텐츠 등 방송 특성에 적합한 전용 스튜디오와 전문 촬영 공간 지원</p></li>
+    <li class="le-item"><span class="le-item-num">05</span><h3>콘텐츠 기획 및 제작 시스템</h3><p class="le-short">기획부터 촬영·편집·디자인·특수효과까지 한 팀으로</p><p class="le-full">콘텐츠 기획부터 영상 촬영, 편집, 디자인, 방송 특수효과까지 전문 제작 인력과 협업하는 통합 제작 환경 제공</p></li>
+    <li class="le-item"><span class="le-item-num">06</span><h3>채널 성장 및 마케팅 전략</h3><p class="le-short">플랫폼별 채널 운영, 홍보, 퍼스널 브랜딩</p><p class="le-full">유튜브, 틱톡, SNS 등 플랫폼별 채널 운영 전략, 콘텐츠 홍보, 디지털 마케팅 및 개인 브랜딩 지원</p></li>
+    <li class="le-item"><span class="le-item-num">07</span><h3>전문 교육 및 역량 강화</h3><p class="le-short">신입 기본 교육부터 진행·소통·브랜딩 맞춤 교육</p><p class="le-full">신입 크리에이터를 위한 기본 교육부터 방송 진행, 팬 소통, 콘텐츠 운영, 퍼스널 브랜딩 등 맞춤형 교육 프로그램 지원</p></li>
+    <li class="le-item"><span class="le-item-num">08</span><h3>브랜드 협업 및 외부 활동 연계</h3><p class="le-short">광고·화보·모델·기업 협업 등 활동 기회 확대</p><p class="le-full">광고 캠페인, 브랜드 콘텐츠, 화보 촬영, 모델 활동, 기업 협업 등 다양한 프로젝트와 외부 활동 기회 확대</p></li>
+    <li class="le-item"><span class="le-item-num">09</span><h3>계약 및 법률·세무 컨설팅</h3><p class="le-short">계약 검토·저작권·세무·정산 자문을 전문 파트너와</p><p class="le-full">계약 조건 검토, 저작권 보호, 세무 관리, 정산 관련 자문 등 전문 파트너와 연계한 안정적인 활동 지원</p></li>
+    <li class="le-item"><span class="le-item-num">10</span><h3>크리에이터 활동 권익 보호</h3><p class="le-short">합리적인 계약과 투명한 운영으로 자율성과 권익 존중</p><p class="le-full">합리적인 계약 조건과 투명한 운영 원칙을 바탕으로 크리에이터의 자율성, 활동 권한 및 권익 존중</p></li>
+  </ol>
+</section>
+
+<!-- 4 포토카드 -->
+<section class="le-screen le-cards scene" id="cards" data-name="포토카드" style="--auto: 2s">
+  <div class="le-amb" aria-hidden="true"><i></i><i></i></div>
+  <div class="le-stage">
+    <p class="le-side l">A NEW<br>STAGE</p>
+    <div class="le-deck" id="le-deck" data-keys>
+      <button class="le-arrow prev" type="button" aria-label="이전 카드"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 3L5 9l6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="le-arrow next" type="button" aria-label="다음 카드"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 3l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <p class="le-side r">FOR <em>EVERY</em><br><em>TALENT</em></p>
+  </div>
+  <div class="le-caption" aria-live="polite"><p class="t"></p><p class="s"></p></div>
+  <div class="le-dots" id="le-dots" role="group" aria-label="카드 고르기"></div>
+</section>
+
+<!-- 5 과정 -->
+<section class="le-screen le-proc scene" data-name="FROM TALENT TO INFLUENCE">
+  <h2 class="le-proc-title rise" data-lines="0">FROM TALENT TO INFLUENCE</h2>
+  <ol class="le-steps">
+    <li class="le-spark" aria-hidden="true"></li>
+    <li class="le-step"><p class="le-step-name">DISCOVER</p><h3>가능성과 개성을 발견합니다.</h3><p>각자의 재능과 강점, 활동 목표를 살펴봅니다.</p></li>
+    <li class="le-step"><p class="le-step-name">POSITION</p><h3>나만의 무대와 방향을 찾습니다.</h3><p>방송과 채널의 정체성, 콘텐츠 방향을 구체화합니다.</p></li>
+    <li class="le-step"><p class="le-step-name">CREATE</p><h3>아이디어를 콘텐츠로 만듭니다.</h3><p>플랫폼과 크리에이터의 특성에 맞는 콘텐츠를 기획하고 제작합니다.</p></li>
+    <li class="le-step"><p class="le-step-name">EXPAND</p><h3>더 넓은 기회와 영향력으로 연결합니다.</h3><p>채널 성장과 팬덤, 브랜드 협업을 통해 활동 영역을 확장합니다.</p></li>
+  </ol>
+</section>
+
+<!-- 6 문의 + 바닥글(검은 면). data-light는 공통 틀이 머리말을 어둡게 바꾸는 표시로 쓴다 -->
+<div class="scene scene-end le-end" data-name="문의" data-light>
 <section class="cta">
   <p class="display" data-words>WE MAKE NEXT.</p>
   <div class="cta-row rise" style="--i:3"><p>당신의 재능을 들려주세요. 맞는 무대를 함께 찾습니다.</p><div class="cta-actions"><a class="btn btn-solid" href="contact.html#apply">크리에이터 지원하기</a><a class="btn btn-line" href="contact.html">카톡 상담</a></div></div>
@@ -220,7 +422,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
 </footer>
 </div>
 </main>
-<canvas class="led" aria-hidden="true"></canvas>
+<div class="le-key" aria-hidden="true"></div>
 <div class="fab-anchor">
   <div class="fab">
     <ul class="fab-menu" id="fab-menu">
@@ -236,694 +438,389 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   </div>
 </div>
 <script src="deck.js"></script>
-<script src="ent-reel.js"></script>
 <script>
-/* 엔터테인먼트 2판 — LED 무대(설계 4절). 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js), 숏폼 카드 모션은 ent-reel.js(1판 그대로).
-   이 쪽이 하는 일: LED 점 층(마우스 둘레가 켜짐, 쉬면 빛 하나가 돎), 전광판 글자, 소개 뒤 흐르는 점 글자, 네 분야 세로 무대와 칸 누르기,
-   과정 LED 무리, 과정 → 문의 LED 벽 넘김. 값은 README.md */
+/* 엔터테인먼트 3판 — 밝은 스튜디오. 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js).
+   이 쪽이 하는 일: 첫 화면 둘러보기 켜고 끄기, 네 분야 펼치기, 지원 내용 큰 숫자(들어오면 00→10, 올린 항목으로 바뀜),
+   포토카드(부채처럼 펼침, 2초마다 넘김, 앞 카드 기울기·빛), 과정 금빛 선, 과정 → 문의 "조명 꺼짐" 넘김, 마우스 조명. */
 (function () {
   var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim;
-  var HERO = 0, INTRO = 1, NET = 2, REEL = 3, PROC = 4, END = 5;
+  var root = document.documentElement;
   var scenes = $$('.scene');
-  var hero = scenes[HERO], intro = scenes[INTRO], net = scenes[NET], reelSc = scenes[REEL], proc = scenes[PROC], endScene = scenes[END];
-  var header = $('.site-header');
-  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
-  var lag = function (dt, tau) { return 1 - Math.exp(-dt / tau); };
-  var easeOut = function (u) { return 1 - Math.pow(1 - u, 3); };
-  var easeInOut = function (u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
-  var now = function () { return performance.now(); };
+  var HERO = 0, NET = 1, SUP = 2, CARDS = 3, PROC = 4, END = 5;
+  var hero = scenes[HERO];
   var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  var K = function () { return D.k || 1; };
-  var rnd = function (i, k) { var v = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return v - Math.floor(v); };
+  var narrow = window.matchMedia('(max-width: 900px)');
+  var easeOut = function (u) { return 1 - Math.pow(1 - u, 3); };
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
   var timers = {};
-  function later(name, fn, ms) { (timers[name] = timers[name] || []).push(setTimeout(fn, ms)); }
-  function clearT(name) { (timers[name] || []).forEach(clearTimeout); timers[name] = []; }
-  function snap(el, fn) { el.classList.add('snap'); fn(); void el.offsetWidth; el.classList.remove('snap'); }
+  function later(k, fn, ms) { (timers[k] = timers[k] || []).push(setTimeout(fn, ms)); }
+  function clearT(k) { (timers[k] || []).forEach(clearTimeout); timers[k] = []; }
 
-  /* ───────── 4-2. 전광판 글자: 글자마다 감싼다(글자는 그대로). 순서는 낱말 안에서 무작위, 낱말은 왼쪽부터. 한 줄 0.7초 ───────── */
-  $$('.mq').forEach(function (el, n) {
-    var words = el.textContent.trim().split(' '), span = 0.7 - 0.27;
-    el.innerHTML = words.map(function (w, wi) {
-      return w.split('').map(function (ch, ci) {
-        var d = span * (wi + rnd(n * 31 + wi, ci + 1)) / words.length;
-        return '<span class="c" style="--fd:' + d.toFixed(3) + 's">' + ch + '</span>';
-      }).join('');
-    }).join(' ');
-  });
-
-  /* ───────── 화면 1: 스튜디오 둘러보기(1판) ───────── */
+  /* ── 첫 화면: 떠나 있는 동안 둘러보기를 멈추고, 돌아오면 첫 장면부터 ── */
   function tour(on) { hero.classList.toggle('tour-off', !on); }
 
-  /* ───────── 화면 1 제목: LED 화소로 켜졌다가 또렷한 글자로 맺힌다(4-3, 한 번만) ─────────
-     글자마다 실제 자리를 재서 보이지 않는 그림판에 같은 글꼴로 그리고, 점 간격 칸마다 글자가 덮은 넓이를 읽어 점을 만든다.
-     PC: 굵은 점(간격 = 글자 크기의 21%)이 왼쪽부터 0.35초에 켜짐 → 0.8초 동안 두 번 쪼개짐(1/2, 1/4, 단계마다 0.25초 겹침) → 0.25초에 실제 글자로.
-     줄마다, 둘째 줄은 0.18초 늦게. 휴대폰은 한 번만 쪼개지고 0.9초 */
-  var h1 = $('h1', hero), pxMasks = [], pxCv = document.createElement('canvas'), pc = pxCv.getContext('2d');
-  pxCv.className = 'hero-px'; pxCv.setAttribute('aria-hidden', 'true'); hero.appendChild(pxCv);
-  var PXT = {
-    pc: { delay: 800, lag: 180, reveal: 350, splits: [[450, 700], [850, 1100]], fade: [1150, 1400], ks: [1, 0.5, 0.25] },
-    mobile: { delay: 500, lag: 120, reveal: 300, splits: [[330, 580]], fade: [650, 900], ks: [1, 0.5] }
-  };
-  var PX = { run: 0, t0: 0, T: null, levels: null, rows: null, ox: 0, oy: 0, fontOK: false, raf: 0 };
-  if (!reduce) { h1.classList.add('px'); hero.classList.add('px-on'); }
-  var pxFont = (document.fonts && document.fonts.load) ? document.fonts.load('500 66px "Noto Serif KR"', h1.textContent).then(function () { PX.fontOK = true; }, function () { PX.fontOK = true; }) : (PX.fontOK = true, null);
-  function pxLit(on, instant) { pxMasks.forEach(function (m) { m.classList.toggle('lit', on); m.classList.toggle('now', !!instant); }); hero.classList.toggle('px-done', on); }
-  function pxStop() { PX.run++; cancelAnimationFrame(PX.raf); pc.setTransform(1, 0, 0, 1, 0, 0); pc.clearRect(0, 0, pxCv.width, pxCv.height); pxCv.style.visibility = 'hidden'; }
-  function pxReset() { pxStop(); pxLit(false); }
-  function pxShow() { pxStop(); pxLit(true, true); }
-  function smooth(u) { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); }
-  function pxBuild(T) {
-    var cs = getComputedStyle(h1), fs = parseFloat(cs.fontSize), s0 = fs * 0.21;
-    var font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily;
-    var hb = hero.getBoundingClientRect(), hr = h1.getBoundingClientRect(), pad = Math.ceil(s0);
-    var cw = Math.ceil(hr.width + pad * 2), ch = Math.ceil(hr.height + pad * 2), ox = hr.left - pad, oy = hr.top - pad;
-    // 글자마다 자리(화면에 실제로 놓인 곳)를 재서 줄(보이는 줄)로 묶는다
-    var rng = document.createRange(), rows = [];
-    pxMasks.forEach(function (m, li) {
-      var w = document.createTreeWalker(m, NodeFilter.SHOW_TEXT), node;
-      while ((node = w.nextNode())) {
-        for (var i = 0; i < node.data.length; i++) {
-          if (/\s/.test(node.data[i])) continue;
-          rng.setStart(node, i); rng.setEnd(node, i + 1);
-          var r = rng.getBoundingClientRect(); if (!r.width) continue;
-          var row = null;
-          for (var k = 0; k < rows.length; k++) if (rows[k].li === li && Math.abs(rows[k].top - r.top) < fs * 0.5) { row = rows[k]; break; }
-          if (!row) { row = { li: li, top: r.top, bottom: r.bottom, left: r.left, right: r.right, ch: [] }; rows.push(row); }
-          row.left = Math.min(row.left, r.left); row.right = Math.max(row.right, r.right); row.bottom = Math.max(row.bottom, r.bottom);
-          row.ch.push({ c: node.data[i], x: r.left, y: r.top });
-        }
-      }
-    });
-    // 보이지 않는 그림판(2배)에 같은 글꼴로 글자마다 그 자리에 그린다
-    var q = 2, c = document.createElement('canvas'), x = c.getContext('2d');
-    c.width = cw * q; c.height = ch * q;
-    x.scale(q, q); x.font = font; x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
-    var mt = x.measureText('가'), asc = mt.fontBoundingBoxAscent || fs * 1.16;
-    rows.forEach(function (row) { row.ch.forEach(function (o) { x.fillText(o.c, o.x - ox, o.y - oy + asc); }); });
-    var d = x.getImageData(0, 0, c.width, c.height).data, iw = c.width + 1, sat = new Float32Array(iw * (c.height + 1));
-    for (var yy = 0; yy < c.height; yy++) {
-      var run = 0;
-      for (var xx = 0; xx < c.width; xx++) { run += d[(yy * c.width + xx) * 4 + 3] / 255; sat[(yy + 1) * iw + xx + 1] = sat[yy * iw + xx + 1] + run; }
-    }
-    function area(x0, y0, x1, y1) {
-      x0 = clamp(Math.round(x0 * q), 0, c.width); x1 = clamp(Math.round(x1 * q), 0, c.width); y0 = clamp(Math.round(y0 * q), 0, c.height); y1 = clamp(Math.round(y1 * q), 0, c.height);
-      var n = (x1 - x0) * (y1 - y0); if (n <= 0) return 0;
-      return (sat[y1 * iw + x1] - sat[y0 * iw + x1] - sat[y1 * iw + x0] + sat[y0 * iw + x0]) / n;
-    }
-    // 단계마다 점 격자. 칸을 글자가 덮은 넓이로 점을 켠다. 가장 굵은 단계는 켜짐·꺼짐만(멀리서 본 LED 글자처럼 거칠게)
-    var levels = T.ks.map(function (kk, li) {
-      var sp = s0 * kk, dots = [], first = li === 0;
-      for (var gy = sp / 2; gy < ch; gy += sp) for (var gx = sp / 2; gx < cw; gx += sp) {
-        var a = area(gx - sp / 2, gy - sp / 2, gx + sp / 2, gy + sp / 2);
-        if (a < (first ? 0.2 : 0.12)) continue;
-        var ry = gy + oy, ri = 0, best = 1e9;
-        rows.forEach(function (row, k) { var m = ry < row.top ? row.top - ry : ry > row.bottom ? ry - row.bottom : 0; if (m < best) { best = m; ri = k; } });
-        var row = rows[ri], u = (gx + ox - row.left) / Math.max(1, row.right - row.left);
-        dots.push(gx, gy, first ? 1 : Math.min(1, a * 2.6), ri, clamp(u, 0, 1));
-      }
-      return { r: sp * 0.36, dots: dots };
-    });
-    var dpr2 = Math.min(window.devicePixelRatio || 1, 2);
-    pxCv.width = Math.round(cw * dpr2); pxCv.height = Math.round(ch * dpr2);
-    pxCv.style.width = cw + 'px'; pxCv.style.height = ch + 'px';
-    pxCv.style.transform = 'translate(' + (ox - hb.left).toFixed(1) + 'px,' + (oy - hb.top).toFixed(1) + 'px)';
-    PX.levels = levels; PX.rows = rows; PX.dpr = dpr2;
-  }
-  // 단계 k의 세기: 들어와서(0단계는 왼쪽부터 켜짐) 다음 단계가 들어오는 동안 빠지고, 마지막 단계는 실제 글자가 나오는 동안 빠진다
-  //   겹쳐 바뀔 때 새 단계가 먼저 다 켜지고(구간의 앞 60%) 앞 단계가 늦게 빠진다(뒤 60%). 둘이 같이 반쯤 흐려져 제목이 어두워 보이지 않게
-  function pxLevelA(T, k, u) {
-    var w;
-    var a = k === 0 ? 1 : (w = T.splits[k - 1], smooth((u - w[0]) / ((w[1] - w[0]) * 0.6)));
-    var out = k < T.splits.length ? (w = T.splits[k], smooth((u - w[0] - (w[1] - w[0]) * 0.4) / ((w[1] - w[0]) * 0.6))) : clamp((u - T.fade[0]) / (T.fade[1] - T.fade[0]), 0, 1);
-    return a * (1 - out);
-  }
-  var BK = 10, buckets = [];
-  function pxFrame(id) {
-    if (id !== PX.run) return;
-    while (buckets.length <= BK) buckets.push([]);
-    var T = PX.T, t = now() - PX.t0, done = true;
-    var lineU = pxMasks.map(function (m, li) { return t - li * T.lag; });
-    lineU.forEach(function (u, li) {
-      if (u < T.fade[1] + 40) done = false;
-      if (u >= T.fade[0] && !pxMasks[li].classList.contains('lit')) { pxMasks[li].classList.add('lit'); pxMasks[li].classList.remove('now'); }
-    });
-    if (pxMasks.every(function (m) { return m.classList.contains('lit'); })) hero.classList.add('px-done');
-    pc.setTransform(PX.dpr, 0, 0, PX.dpr, 0, 0);
-    pc.clearRect(0, 0, pxCv.width, pxCv.height);
-    pc.fillStyle = '#fff';
-    PX.levels.forEach(function (L, k) {
-      var dots = L.dots, j, n;
-      for (j = 0; j <= BK; j++) buckets[j].length = 0;
-      for (n = 0; n < dots.length; n += 5) {
-        var u = lineU[PX.rows[dots[n + 3]].li];
-        if (u <= 0) continue;
-        var la = pxLevelA(T, k, u);
-        if (k === 0) la *= clamp((u / T.reveal - dots[n + 4] * 0.85) / 0.15, 0, 1);
-        var a = la * dots[n + 2];
-        if (a < 0.03) continue;
-        buckets[Math.round(a * BK)].push(dots[n], dots[n + 1]);
-      }
-      for (j = 1; j <= BK; j++) {
-        var b = buckets[j]; if (!b.length) continue;
-        pc.globalAlpha = j / BK; pc.beginPath();
-        for (n = 0; n < b.length; n += 2) { pc.moveTo(b[n] + L.r, b[n + 1]); pc.arc(b[n], b[n + 1], L.r, 0, 6.2832); }
-        pc.fill();
-      }
-    });
-    pc.globalAlpha = 1;
-    if (done) { pxStop(); pxLit(true); return; }
-    PX.raf = requestAnimationFrame(function () { pxFrame(id); });
-  }
-  function pxPlay(mobile) {
-    if (reduce) return;
-    pxMasks = $$('.mask', h1);
-    pxReset();
-    var id = PX.run, T = PX.T = mobile ? PXT.mobile : PXT.pc, at = now();
-    function go() {
-      if (id !== PX.run) return;
-      try { pxBuild(T); } catch (e) { pxShow(); return; }
-      PX.t0 = at + T.delay; pxCv.style.visibility = '';
-      PX.raf = requestAnimationFrame(function () { pxFrame(id); });
-    }
-    if (PX.fontOK || !pxFont) go();
-    else {
-      // 글꼴이 늦으면 2.5초까지 기다리고, 그래도 없으면 글을 그냥 보인다
-      var giveUp = setTimeout(function () { if (id === PX.run) pxShow(); }, 2500);
-      pxFont.then(function () { clearTimeout(giveUp); if (id === PX.run) { at = Math.max(at, now() - T.delay + 200); go(); } });
-    }
-  }
-
-  /* ───────── 화면 2: 큰 문장을 줄마다 나눈다(한 화면씩 넘길 때만. 휴대폰은 문장 전체가 떠오른다) ───────── */
-  var introH = $('.intro h2'), introText = introH.textContent;
-  function splitIntro() {
-    if (!D.on || reduce) { if (introH.querySelector('.ln')) introH.textContent = introText; return; }
-    introH.innerHTML = introText.split(' ').map(function (w) { return '<span class="wq">' + w + '</span>'; }).join(' ');
-    var lines = [], top = null;
-    $$('.wq', introH).forEach(function (s) { var t = s.offsetTop; if (top === null || Math.abs(t - top) > 4) { lines.push([]); top = t; } lines[lines.length - 1].push(s.textContent); });
-    introH.innerHTML = lines.map(function (l, i) { return '<span class="ln" style="--li:' + i + '"><span>' + l.join(' ') + '</span></span>'; }).join(' ');
-  }
-
-  /* ───────── 화면 3: 네 분야. 칸에 올리거나 Tab으로 고르면 그 칸이 "무대"가 되고, 누르면 숏폼 화면이 그 분야부터 돈다 ───────── */
-  var rowList = $('.row-list'), rowEls = $$('.row'), NETS = { hot: -1 }, pendingField = null;
-  var cols = rowEls.map(function () { return { v: 0, front: 0, fs: 0, fe: 0 }; });
-  function setHot(i) {
-    if (NETS.hot === i) return;
-    NETS.hot = i;
-    rowEls.forEach(function (r, k) { r.classList.toggle('hot', k === i); });
-    rowList.classList.toggle('focus', i >= 0);
-  }
-  rowEls.forEach(function (r, i) {
-    r.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && D.on) setHot(i); });
-    r.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && NETS.hot === i && !r.contains(document.activeElement)) setHot(-1); });
-    r.addEventListener('focusin', function () { if (D.on) setHot(i); });
-    r.addEventListener('focusout', function () { if (NETS.hot === i) setHot(-1); });
+  /* ── 네 분야: 올린 줄(또는 누른 줄)만 펼쳐진다. 들어오면 첫 줄이 펼쳐진다 ── */
+  var rowsBox = $('.le-rows'), rows = $$('.le-row');
+  rows.forEach(function (r) {
+    var name = $('.le-name', r).textContent, f = document.createElement('span'), one = '<b>' + (name + ' · ').repeat(3) + '</b>';
+    f.className = 'le-flow'; f.setAttribute('aria-hidden', 'true'); f.innerHTML = one + one;
+    r.insertBefore(f, r.firstChild);
   });
-  $$('.row-go').forEach(function (a) {
-    a.addEventListener('click', function (e) {
-      var k = Number(a.getAttribute('data-field'));
-      pendingField = k;
-      if (D.on) return; // 한 화면씩 넘길 때는 공통 틀이 #reel 화면으로 넘긴다. 들어갈 때 그 분야부터 돈다
-      e.preventDefault();
-      window.scrollTo({ top: reelSc.getBoundingClientRect().top + window.pageYOffset - header.offsetHeight, behavior: reduce ? 'auto' : 'smooth' });
-      if (window.EntReel && EntReel.running()) { EntReel.start(k); pendingField = null; }
+  function openRow(r) {
+    rows.forEach(function (x) { var o = x === r; x.classList.toggle('open', o); $('.le-row-head', x).setAttribute('aria-expanded', String(o)); });
+  }
+  function anyOpen() { return rows.some(function (r) { return r.classList.contains('open'); }); }
+  rows.forEach(function (r) {
+    r.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { openRow(r); rowsBox.classList.add('focus'); } });
+    $('.le-row-head', r).addEventListener('click', function () { openRow(r); });
+  });
+  rowsBox.addEventListener('pointerleave', function () { rowsBox.classList.remove('focus'); });
+  function netPlay(instant) {
+    clearT('net');
+    if (instant || reduce) { if (!anyOpen()) openRow(rows[0]); return; }
+    later('net', function () { if (!anyOpen()) openRow(rows[0]); }, 1050);
+  }
+  function netReset() { clearT('net'); openRow(null); rowsBox.classList.remove('focus'); }
+
+  /* ── 지원 내용: 들어오면 큰 숫자가 00에서 10까지 센다(0.9초). 항목에 올리면 그 번호·이름·원문 전체로 바뀐다 ── */
+  var items = $$('.le-item'), box = $('.le-count'), big = $('#supBig'), cap = $('#supCap'), det = $('#supDetail');
+  var supCur = '10', supT = null, countT = 0;
+  items.forEach(function (li, i) { li.style.setProperty('--i', i); });
+  // 계기판 숫자: 십의 자리 띠(0~9), 일의 자리 띠(0~9 다음에 0 하나 더 — 00에서 10으로 셀 때 한 바퀴 돌아 0에 멈추게)
+  var strips = $$('.strip', big), tensS = strips[0], onesS = strips[1], onesAt = 0;
+  big.setAttribute('aria-label', '10');
+  function roll(s, k, dur, delay) {
+    s.style.transition = dur ? 'transform ' + dur + 's cubic-bezier(0.2, 0.75, 0.2, 1) ' + (delay || 0) + 's' : 'none';
+    s.style.transform = 'translateY(' + (-k) + 'em)';
+  }
+  function setNum(n, how) {
+    var t = +n[0], o = +n[1];
+    if (how === 'count') { roll(tensS, t, 0.5, 0.95); roll(onesS, 10, 1.4, 0.05); onesAt = 10; }
+    else if (how === 'snap') { roll(tensS, t, 0); onesAt = o; roll(onesS, o, 0); }
+    else { if (!(o === 0 && onesAt === 10)) onesAt = o; roll(tensS, t, 0.6); roll(onesS, onesAt, 0.7); }
+    big.setAttribute('aria-label', n);
+  }
+  function supShow(n, c, d) {
+    if (n === supCur) return;
+    supCur = n; clearTimeout(countT);
+    setNum(n);
+    clearTimeout(supT); box.classList.add('swap');
+    supT = setTimeout(function () { cap.textContent = c; det.textContent = d; box.classList.remove('swap'); }, 220);
+  }
+  // 흰 칸이 올린 항목으로 미끄러진다. 처음 나타날 때는 그 자리에서 바로
+  var hl = $('.le-sup-hl'), supList = $('.le-sup-list');
+  function hlTo(li) {
+    var first = !hl.classList.contains('on');
+    if (first) hl.style.transition = 'none';
+    hl.style.width = li.offsetWidth + 'px'; hl.style.height = li.offsetHeight + 'px';
+    hl.style.transform = 'translate(' + li.offsetLeft + 'px,' + li.offsetTop + 'px)';
+    if (first) { void hl.offsetWidth; hl.style.transition = ''; }
+    hl.classList.add('on');
+  }
+  items.forEach(function (li) {
+    li.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      items.forEach(function (x) { x.classList.toggle('hot', x === li); });
+      hlTo(li);
+      supShow($('.le-item-num', li).textContent, $('h3', li).textContent, $('.le-full', li).textContent);
     });
   });
-  // 들어올 때: 네 칸의 LED가 왼쪽부터 0.12초 간격으로 한 번 켜졌다(0.35초) 꺼진다
-  function netFlash(t0) { cols.forEach(function (c, i) { c.fs = t0 + 300 + i * 120; c.fe = c.fs + 350; }); }
-  function netReset() { setHot(-1); cols.forEach(function (c) { c.v = c.front = 0; c.fs = c.fe = 0; }); }
+  supList.addEventListener('pointerleave', function () { items.forEach(function (x) { x.classList.remove('hot'); }); hl.classList.remove('on'); supShow('10', '가지 지원', ''); });
+  // 들어오면 0.5초 뒤 00에서 10으로: 일의 자리가 한 바퀴 돌고, 마지막에 십의 자리가 1로 넘어간다
+  function countUp() {
+    clearTimeout(countT);
+    if (reduce) { setNum('10', 'snap'); return; }
+    countT = setTimeout(function () { setNum('10', 'count'); }, 500);
+  }
+  function supReset() {
+    clearTimeout(countT); clearTimeout(supT);
+    supCur = '10'; box.classList.remove('swap'); hl.classList.remove('on');
+    items.forEach(function (x) { x.classList.remove('hot'); });
+    setNum(reduce ? '10' : '00', 'snap'); cap.textContent = '가지 지원'; det.textContent = '';
+  }
 
-  /* ───────── 화면 4: 숏폼 ───────── */
-  function reelStart() { var k = pendingField; pendingField = null; EntReel.start(k); }
-
-  /* ───────── 4-7. 과정: 마름모꼴 LED 무리. 바깥 한 겹(.x)은 올렸을 때만 켜졌다 꺼진다 ───────── */
-  var stepList = $('.steps'), stepEls = $$('.step');
-  var CL = stepEls.map(function (s, i) {
-    var svg = $('.leds', s), n = i + 1, pts = [], dots = '', extra = '', o = 0;
-    for (var x = -n - 1; x <= n + 1; x++) for (var y = -n - 1; y <= n + 1; y++) {
-      var m = Math.abs(x) + Math.abs(y);
-      if (m <= n + 1) pts.push({ x: x, y: y, m: m, a: Math.atan2(y, x) });
-    }
-    pts.sort(function (a, b) { return a.m - b.m || a.a - b.a; });
-    pts.forEach(function (p) {
-      var c = '<circle cx="' + p.x * 12 + '" cy="' + p.y * 12 + '" r="2.4"';
-      if (p.m <= n) dots += c + ' class="d" style="--o:' + (o++) + '"/>'; else extra += c + '/>';
-    });
-    svg.innerHTML = '<g class="cl"><g class="dots">' + dots + '</g><g class="x">' + extra + '</g></g>';
-    return { svg: svg, cl: $('.cl', svg), x: $('.x', svg), p: 0, hot: false, next: 0 };
+  /* ── 포토카드: 세다엔터 방식(가운데 한 장, 양옆 두 장씩 3°·6° 기울여 겹침, 누르면 앞으로).
+     2초마다 다음 카드(대표 11-13). 들어오면 한 장에 모였다가 부채처럼 펼쳐진다. 앞 카드는 마우스 쪽으로 기울고 빛이 스친다 ── */
+  var FIELD = [
+    { t: 'PERSONAL BROADCASTING', s: '개인의 매력을 방송만의 색으로 만듭니다.' },
+    { t: 'YOUTUBE', s: '채널의 개성을 콘텐츠와 성장으로 연결합니다.' },
+    { t: 'TIKTOK', s: '짧은 순간에 크리에이터의 매력을 선명하게 담습니다.' },
+    { t: 'INFLUENCER', s: '영향력과 브랜드의 만남을 기획합니다.' }
+  ];
+  var CARDS_SRC = [
+    ['../2026-11-10-pages/img/ent-short-2.webp', 0], ['../2026-11-11-ent-shorts/img/short-09.webp', 1], ['../2026-11-10-pages/img/ent-short-3.webp', 2],
+    ['../2026-11-11-ent-shorts/img/short-06.webp', 3], ['../2026-11-11-ent-shorts/img/short-07.webp', 0], ['../2026-11-11-ent-shorts/img/short-12.webp', 1], ['../2026-11-10-pages/img/ent-short-1.webp', 2]
+  ];
+  var AUTO = 2000;
+  var cardSc = scenes[CARDS], deckEl = $('#le-deck'), dotsEl = $('#le-dots'), capBox = $('.le-caption'), capT = $('.le-caption .t'), capS = $('.le-caption .s');
+  var cardCur = 0, cardsOn = false, ready = false, autoT = null, capTimer = null, tilt = { x: 0, y: 0, tx: 0, ty: 0 }, tiltRaf = 0;
+  var cards = CARDS_SRC.map(function (c, i) {
+    var el = document.createElement('div');
+    el.className = 'le-card'; el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.setAttribute('aria-label', FIELD[c[1]].t + ' 카드 ' + (i + 1));
+    el.innerHTML = '<img src="' + c[0] + '" alt="" draggable="false"><span class="tag">' + FIELD[c[1]].t + '</span><span class="glare"></span>';
+    el.addEventListener('click', function () { if (i !== cardCur) cardGo(i); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cardGo(i); } });
+    deckEl.insertBefore(el, deckEl.firstChild);
+    var d = document.createElement('button'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 카드');
+    d.addEventListener('click', function () { cardGo(i); }); dotsEl.appendChild(d);
+    return el;
   });
-  function flash(i) { var x = CL[i].x; x.classList.remove('flash'); void x.getBoundingClientRect(); x.classList.add('flash'); }
+  var dots = dotsEl.children;
+  function setCaption(instant) {
+    var f = FIELD[CARDS_SRC[cardCur][1]];
+    if (capT.textContent === f.t) return;
+    clearTimeout(capTimer);
+    if (instant || !capT.textContent) { capT.textContent = f.t; capS.textContent = f.s; capBox.classList.remove('swap'); return; }
+    capBox.classList.add('swap');
+    capTimer = setTimeout(function () { capT.textContent = f.t; capS.textContent = f.s; capBox.classList.remove('swap'); }, 260);
+  }
+  function place(fan) {
+    var n = cards.length, small = window.innerWidth < 768, o1 = small ? 22 : 46, o2 = small ? 40 : 84;
+    cards.forEach(function (el, i) {
+      var d = i - cardCur; if (d > n / 2) d -= n; if (d < -n / 2) d += n;
+      var a = Math.abs(d), s = d < 0 ? -1 : 1, t, z, op;
+      if (d === 0) { t = 'translateX(0) scale(1) rotate(0deg)'; z = 10; op = 1; }
+      else if (a === 1) { t = 'translateX(' + (s * o1) + 'px) scale(0.95) rotate(' + (s * 3) + 'deg)'; z = 9; op = 1; }
+      else if (a === 2) { t = 'translateX(' + (s * o2) + 'px) scale(0.9) rotate(' + (s * 6) + 'deg)'; z = 8; op = 0.85; }
+      else { t = 'translateX(0) scale(0.8)'; z = 7; op = 0; }
+      el.style.transitionDelay = fan ? (0.15 + a * 0.13).toFixed(2) + 's' : '';
+      el.style.zIndex = z; el.style.opacity = op; el.style.transform = t;
+      el.classList.toggle('on', d === 0); el.style.pointerEvents = op ? '' : 'none';
+    });
+    for (var k = 0; k < dots.length; k++) dots[k].classList.remove('on');
+    void dotsEl.offsetWidth; // 같은 막대가 처음부터 다시 차오르게
+    dots[cardCur].classList.add('on');
+    setCaption(fan); setAmb();
+  }
+  // 뒤 배경: 지금 카드 사진을 크게 흐려 옅게 깐다. 카드가 바뀌면 1.2초에 걸쳐 그 사진 색으로 바뀐다(가운데는 흰빛을 얹어 밝게)
+  var amb = $$('.le-amb i'), ambOn = -1, ambK = 0;
+  function setAmb() {
+    if (ambOn === cardCur) return;
+    ambOn = cardCur; ambK = 1 - ambK;
+    amb[ambK].style.backgroundImage = 'url("' + CARDS_SRC[cardCur][0] + '")';
+    amb[ambK].classList.add('on'); amb[1 - ambK].classList.remove('on');
+  }
+  // 한 장에 모은다(펼치기 전)
+  function gather() {
+    ready = false;
+    cards.forEach(function (el, i) {
+      el.style.transition = 'none'; el.style.transitionDelay = '';
+      el.style.transform = 'translateY(26px) scale(0.9)'; el.style.opacity = i === cardCur ? '1' : '0'; el.style.zIndex = i === cardCur ? 10 : 7;
+    });
+    void deckEl.offsetWidth;
+    cards.forEach(function (el) { el.style.transition = ''; });
+  }
+  function auto() { clearTimeout(autoT); if (cardsOn && !reduce && !drag) autoT = setTimeout(function () { cardGo(cardCur + 1); }, AUTO); }
+  /* 셔플(대표 11-13): 다음으로 갈 때 앞 카드가 왼쪽 밖으로 빠졌다가 새 앞 카드 뒤로 들어가 왼쪽에 놓인다.
+     이전으로 갈 때는 왼쪽 카드가 밖으로 빠졌다가 맨 위로 올라와 앞에 놓인다. 0.9초, 42% 지점에서 겹침 순서가 바뀐다. 이웃 카드로 갈 때만 */
+  var TOSS = 900, tossA = null, tossEl = null, tossZ = 0, NO_T = 'opacity 0.5s, box-shadow 0.5s, filter 0.5s';
+  function endToss() {
+    if (!tossA) return;
+    clearTimeout(tossZ); tossA.cancel(); tossEl.style.zIndex = tossEl.dataset.z; tossEl.style.transition = '';
+    tossA = null; tossEl = null;
+  }
+  function toss(el, from, dir) {
+    var to = el.style.transform;
+    el.dataset.z = el.style.zIndex;
+    el.style.zIndex = dir > 0 ? 11 : 8;
+    var mid = 'translateX(-96%) translateY(-4%) rotate(-11deg) scale(1)';
+    tossEl = el;
+    tossA = el.animate([
+      { transform: from, easing: 'cubic-bezier(0.3, 0.7, 0.4, 1)' },
+      { transform: mid, offset: 0.42, easing: 'cubic-bezier(0.55, 0, 0.2, 1)' },
+      { transform: to }
+    ], { duration: TOSS });
+    tossZ = setTimeout(function () { el.style.zIndex = el.dataset.z; }, TOSS * 0.42);
+    tossA.onfinish = endToss;
+  }
+  function cardGo(i, dir) {
+    var n = cards.length; i = (i + n) % n;
+    if (i === cardCur) { place(false); auto(); return; }
+    var step = ((i - cardCur) % n + n) % n;
+    if (!dir) dir = step <= n / 2 ? 1 : -1;
+    endToss();
+    var near = step === 1 || step === n - 1, el = near && !reduce ? (dir > 0 ? cards[cardCur] : cards[i]) : null;
+    var from = el ? getComputedStyle(el).transform : null;
+    if (el) el.style.transition = NO_T;
+    cardCur = i; ready = true; place(false);
+    if (el) toss(el, from, dir);
+    auto();
+  }
+  function cardsStart(instant) {
+    cardsOn = true; cardSc.classList.add('run'); clearT('cards');
+    if (instant || reduce) { ready = true; place(false); auto(); loopTilt(); return; }
+    gather();
+    requestAnimationFrame(function () { place(true); });
+    later('cards', function () { ready = true; cards.forEach(function (el) { el.style.transitionDelay = ''; }); auto(); }, 1100);
+    loopTilt();
+  }
+  function cardsStop() { endToss(); cardsOn = false; ready = false; clearT('cards'); clearTimeout(autoT); cancelAnimationFrame(tiltRaf); cardSc.classList.remove('run', 'aim'); tilt.x = tilt.y = tilt.tx = tilt.ty = 0; }
+  deckEl.querySelector('.prev').addEventListener('click', function () { cardGo(cardCur - 1); });
+  deckEl.querySelector('.next').addEventListener('click', function () { cardGo(cardCur + 1); });
+  deckEl.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); cardGo(cardCur - 1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); cardGo(cardCur + 1); }
+  });
+  var sx = 0;
+  deckEl.addEventListener('touchstart', function (e) { sx = e.changedTouches[0].clientX; }, { passive: true });
+  deckEl.addEventListener('touchend', function (e) { var dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) cardGo(cardCur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); }, { passive: true });
+  // PC: 앞 카드를 잡아 끌면 따라오고, 70px 넘게 끌고 놓으면 넘어간다(왼쪽으로 = 다음). 덜 끌면 제자리로
+  var drag = null, dragMoved = false;
+  deckEl.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0 || !ready || !e.target.closest('.le-card.on')) return;
+    endToss(); clearTimeout(autoT); dragMoved = false;
+    drag = { x: e.clientX, dx: 0, el: cards[cardCur] };
+    drag.el.style.transition = NO_T; cardSc.classList.add('drag');
+    deckEl.setPointerCapture(e.pointerId);
+  });
+  deckEl.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    drag.dx = e.clientX - drag.x; if (Math.abs(drag.dx) > 5) dragMoved = true;
+    drag.el.style.transform = 'translateX(' + drag.dx.toFixed(1) + 'px) translateY(' + (-Math.min(Math.abs(drag.dx), 160) * 0.06).toFixed(1) + 'px) rotate(' + (drag.dx * 0.035).toFixed(2) + 'deg)';
+  });
+  function dragEnd() {
+    if (!drag) return;
+    var d = drag; drag = null; cardSc.classList.remove('drag');
+    if (Math.abs(d.dx) > 70) cardGo(cardCur + (d.dx < 0 ? 1 : -1), d.dx < 0 ? 1 : -1);
+    else { d.el.style.transition = ''; place(false); auto(); }
+  }
+  deckEl.addEventListener('pointerup', dragEnd);
+  deckEl.addEventListener('pointercancel', dragEnd);
+  deckEl.addEventListener('click', function (e) { if (dragMoved) { e.stopPropagation(); dragMoved = false; } }, true);
+  cardSc.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var r = deckEl.getBoundingClientRect();
+    tilt.tx = clamp((e.clientX - (r.left + r.width / 2)) / (r.width * 1.6), -1, 1);
+    tilt.ty = clamp((e.clientY - (r.top + r.height / 2)) / r.height, -1, 1);
+    cardSc.classList.add('aim');
+  });
+  cardSc.addEventListener('pointerleave', function () { tilt.tx = tilt.ty = 0; cardSc.classList.remove('aim'); });
+  // 앞 카드 기울기: 마우스 쪽으로 최대 8°(세로 6°). 빛은 마우스 쪽 위에
+  function loopTilt() {
+    cancelAnimationFrame(tiltRaf);
+    if (reduce || !fine) return;
+    (function f() {
+      if (!cardsOn) return;
+      tilt.x += (tilt.tx - tilt.x) * 0.12; tilt.y += (tilt.ty - tilt.y) * 0.12;
+      var on = cards[cardCur];
+      if (ready && on && on !== tossEl && !drag) {
+        on.style.transform = 'rotateY(' + (tilt.x * 8).toFixed(2) + 'deg) rotateX(' + (-tilt.y * 6).toFixed(2) + 'deg)';
+        on.style.setProperty('--gx', (50 + tilt.x * 38).toFixed(1) + '%');
+        on.style.setProperty('--gy', (30 + tilt.y * 30).toFixed(1) + '%');
+      }
+      tiltRaf = requestAnimationFrame(f);
+    })();
+  }
+  place(false);
+
+  /* ── 과정: 금빛 선이 1.9초에 그어지고, 선이 닿는 때에 맞춰 단계 점이 채워지며 글이 올라온다. 올린 단계만 또렷 ── */
+  var stepList = $('.le-steps'), steps = $$('.le-step'), spark = $('.le-spark'), procRaf = 0;
+  var easeIO = function (u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; };
   function procReset() {
-    clearT('proc');
-    snap(stepList, function () { stepEls.forEach(function (s) { s.classList.remove('on', 'hot'); }); });
-    stepList.classList.remove('focus');
-    CL.forEach(function (c) { c.hot = false; c.x.classList.remove('flash'); });
+    clearT('proc'); cancelAnimationFrame(procRaf);
+    stepList.classList.remove('run', 'focus'); stepList.style.removeProperty('--p'); spark.style.opacity = '0';
+    steps.forEach(function (s) { s.classList.remove('done', 'hot', 'le-pop'); });
   }
-  // 들어올 때: 0.48초 뒤부터 0.36초 간격으로 한 단계씩, 가운데 점부터 바깥으로 0.03초 간격. 가로 선은 1.44초에 찬다
+  function light(s) { s.classList.add('done', 'le-pop'); later('proc', function () { s.classList.remove('le-pop'); }, 1150); }
+  // 0.3초 뒤 1.9초 동안 선이 그어지고 빛 알갱이가 선 끝을 달린다. 알갱이가 단계 점에 닿는 순간 그 점이 켜진다
   function procPlay(instant) {
     procReset();
-    if (instant) { snap(proc, function () { proc.classList.add('in'); snap(stepList, function () { stepEls.forEach(function (s) { s.classList.add('on'); }); }); }); return; }
-    stepEls.forEach(function (s, i) { later('proc', function () { s.classList.add('on'); }, 480 + i * 360); });
+    if (instant || reduce) { stepList.classList.add('run'); stepList.style.setProperty('--p', 1); steps.forEach(function (s) { s.classList.add('done'); }); return; }
+    stepList.classList.add('run');
+    later('proc', function () {
+      var w = stepList.clientWidth, at = steps.map(function (s) { return s.offsetLeft / w; }), t0 = performance.now();
+      (function f(t) {
+        var u = clamp((t - t0) / 1900, 0, 1), p = easeIO(u);
+        stepList.style.setProperty('--p', p.toFixed(4));
+        spark.style.transform = 'translateX(' + (p * w).toFixed(1) + 'px)';
+        spark.style.opacity = Math.min(1, u * 10, (1 - u) * 5).toFixed(2);
+        steps.forEach(function (s, i) { if (!s.classList.contains('done') && p >= at[i] - 0.004) light(s); });
+        if (u < 1) procRaf = requestAnimationFrame(f);
+      })(t0);
+    }, 300);
   }
-  function clCenter(i) { var b = CL[i].svg.getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }
-  // 마우스가 표시에서 260px 안이면 그 무리가 밝아지고 커진다(72% → 100%, 최대 1.15배). 올려 두면 바깥 한 겹이 1.2초마다 켜졌다 0.5초에 꺼지고, 나머지 단계는 38%
-  function procFrame(t, dt) {
-    var live = D.on && D.cur === PROC && !D.trans, M = D.mouse, k = K();
-    CL.forEach(function (c, i) {
-      var want = 0;
-      if (live && fine && M.at && t - M.at < 4000) { var q = clCenter(i); want = clamp(1 - Math.hypot(M.x - q.x, M.y - q.y) / (260 * k), 0, 1); }
-      c.p += (want - c.p) * lag(dt, 0.25);
-      c.cl.style.transform = 'scale(' + (1 + 0.15 * c.p).toFixed(4) + ')';
-      c.cl.style.opacity = (0.72 + 0.28 * c.p).toFixed(3);
-      if (c.hot && live && t >= c.next) { c.next = t + 1200; flash(i); }
-    });
-  }
-  stepEls.forEach(function (s, i) {
-    s.addEventListener('pointerenter', function (e) {
-      if (e.pointerType !== 'mouse' || !D.on) return;
-      CL[i].hot = true; CL[i].next = 0; s.classList.add('hot'); stepList.classList.add('focus');
-    });
-    s.addEventListener('pointerleave', function () { CL[i].hot = false; s.classList.remove('hot'); if (!CL.some(function (c) { return c.hot; })) stepList.classList.remove('focus'); });
-    // 휴대폰: 누르면 한 겹 더 켜진다
-    s.addEventListener('click', function () { if (!D.on) flash(i); });
+  steps.forEach(function (s) {
+    s.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'mouse') return; steps.forEach(function (x) { x.classList.toggle('hot', x === s); }); stepList.classList.add('focus'); });
   });
-  function clStyle(on) { CL.forEach(function (c) { c.p = 0; c.cl.style.transform = ''; c.cl.style.opacity = on ? '0.72' : ''; }); }
-
-  /* ───────── 4-1. LED 점 층 ─────────
-     점: 22px 간격(배율을 따름), 반지름 1px, 꺼진 점 4%. 마우스 둘레(창 가로 10.5%) 안의 점이 켜진다(가운데 60%, 반지름 2.2px까지), 지나가면 0.7초에 꺼진다.
-     2.5초 쉬면 같은 빛이 세기 40%로 화면 가운데 둘레를 28초에 한 바퀴. 첫 화면은 꺼진 점 없이 45%, 숏폼은 감춤, 흰 화면은 검정 14%.
-     꺼진 점 격자는 그림 하나로 그려 두고 매 화면에 한 번 붙인다. 켜진 점만 하나씩 그린다(밝기가 같은 것끼리 한 번에). */
-  var led = $('.led'), g = led.getContext('2d'), dpr = 1, W = 0, H = 0, S = 22, NC = 0, NR = 0, OX = 0, OYD = 0, rowBase = 0;
-  var offW = document.createElement('canvas'), offB = document.createElement('canvas');
-  var Mv = new Float32Array(0), Vv = new Float32Array(0), LT = new Uint8Array(0), ZA = new Float32Array(0), ZI = new Int8Array(0);
-  // 화면마다: 꺼진 점 밝기(흰·검정), 마우스 빛 가운데 밝기, 검은 점인지
-  // 첫 화면은 점을 그리지 않는다(대표 결정 11-11: 배경 영상 위에서 거의 보이지 않았다. 대신 제목이 LED 화소로 맺힌다)
-  var OFFW = [0, 0.04, 0.04, 0, 0.04, 0], OFFB = [0, 0, 0, 0, 0, 0.04], AMP = [0, 0.6, 0.6, 0, 0.6, 0.14];
-  function ledSize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    W = window.innerWidth; H = window.innerHeight; S = 22 * K();
-    led.width = Math.round(W * dpr); led.height = Math.round(H * dpr);
-    NC = Math.floor(W / S); OX = (W - NC * S) / 2 + S / 2;
-    if (D.on) { NR = Math.floor(H / S); OYD = (H - NR * S) / 2 + S / 2; }
-    else { NR = Math.ceil(H / S) + 2; rowBase = Math.floor(window.pageYOffset / S); }
-    var n = NC * NR;
-    Mv = new Float32Array(n); Vv = new Float32Array(n); LT = new Uint8Array(n); ZA = new Float32Array(NR); ZI = new Int8Array(NR);
-    [[offW, '#fff'], [offB, '#000']].forEach(function (o) {
-      var c = o[0], x = c.getContext('2d');
-      c.width = Math.round(W * dpr); c.height = Math.round((NR + 1) * S * dpr);
-      x.setTransform(dpr, 0, 0, dpr, 0, 0); x.fillStyle = o[1]; x.beginPath();
-      for (var r = 0; r <= NR; r++) for (var q = 0; q < NC; q++) { var px = OX + q * S, py = S / 2 + r * S; x.moveTo(px + K(), py); x.arc(px, py, K(), 0, Math.PI * 2); }
-      x.fill();
+  stepList.addEventListener('pointerleave', function () { steps.forEach(function (x) { x.classList.remove('hot'); }); stepList.classList.remove('focus'); });
+  // 휴대폰: 세로 줄. 단계 목록이 화면 높이의 80%에서 30%까지 올라오는 동안 금빛 선이 아래로 차고, 선이 닿은 단계가 켜진다
+  var flowMobile = function () { return narrow.matches && !D.on; };
+  D.flow(function (vh, on) {
+    if (!narrow.matches) return;
+    if (!on) { stepList.style.removeProperty('--p'); return; }
+    var p = D.span(stepList, 0.8, 0.3, vh), top = stepList.getBoundingClientRect().top, h = stepList.offsetHeight;
+    stepList.style.setProperty('--p', p.toFixed(3));
+    steps.forEach(function (s) {
+      var at = (s.getBoundingClientRect().top - top + 6) / h, was = s.classList.contains('done');
+      s.classList.toggle('done', p >= at);
+      if (!was && p >= at && !reduce) { s.classList.remove('le-pop'); void s.offsetWidth; s.classList.add('le-pop'); }
     });
-    letters.rows = 0;
+  });
+
+  /* ── 마우스 = 스튜디오 조명 ── */
+  var key = $('.le-key');
+  if (fine && !reduce) window.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    key.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+    root.classList.add('key-lit');
+  }, { passive: true });
+  function keyScene(n) { root.classList.toggle('key-off', D.on && (n === HERO || n === END)); }
+
+  /* ── 과정 → 문의: 조명이 마우스 자리로 좁혀지며 꺼지고(1초), 그 뒤로 검은 문의 화면이 드러난다. 거꾸로 가면 마우스 자리에서 켜진다 ── */
+  function lightAt() {
+    var m = D.mouse, w = window.innerWidth, h = window.innerHeight, x = m.at ? m.x : w / 2, y = m.at ? m.y : h / 2;
+    var R = Math.ceil(Math.max(Math.hypot(x, y), Math.hypot(w - x, y), Math.hypot(x, h - y), Math.hypot(w - x, h - y))) + 4;
+    var at = ' at ' + x.toFixed(0) + 'px ' + y.toFixed(0) + 'px)';
+    return { open: 'circle(' + R + 'px' + at, shut: 'circle(0px' + at };
   }
-  // 스크롤하는 화면에서는 점이 쪽에 붙어 같이 움직인다. 줄이 바뀌면 남아 있던 빛도 같이 옮긴다
-  function shiftRows(d) {
-    if (!d) return;
-    if (Math.abs(d) >= NR) { Mv.fill(0); return; }
-    if (d > 0) { Mv.copyWithin(0, d * NC); Mv.fill(0, (NR - d) * NC); } else { Mv.copyWithin(-d * NC, 0, (NR + d) * NC); Mv.fill(0, 0, -d * NC); }
+  function lightsOff(fromEl, toEl) {
+    var c = lightAt();
+    fromEl.style.zIndex = '3'; toEl.style.zIndex = '2';
+    var a = anim(fromEl, [{ clipPath: c.open, filter: 'brightness(1)' }, { clipPath: c.shut, filter: 'brightness(0.55)' }], { duration: 1000, easing: 'cubic-bezier(0.7, 0, 0.25, 1)', fill: 'both' });
+    return { dur: 1000, anims: [a], light: 520, enter: 560 };
   }
-
-  // 마우스·손가락 자리(손가락은 대고 있는 동안만)
-  var ptr = { x: -9999, y: -9999, at: 0, down: false, touch: false };
-  function setPtr(x, y, touch) { ptr.x = x; ptr.y = y; ptr.at = now(); ptr.touch = touch; }
-  window.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || ptr.down) setPtr(e.clientX, e.clientY, e.pointerType !== 'mouse'); }, { passive: true });
-  window.addEventListener('pointerdown', function (e) { ptr.down = e.pointerType !== 'mouse'; setPtr(e.clientX, e.clientY, ptr.down); }, { passive: true });
-  ['pointerup', 'pointercancel'].forEach(function (n) { window.addEventListener(n, function () { ptr.down = false; }, { passive: true }); });
-  window.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) setPtr(t.clientX, t.clientY, true); }, { passive: true });
-  window.addEventListener('touchend', function () { ptr.down = false; }, { passive: true });
-
-  // 빛 하나: 마우스가 움직이면 마우스 자리, 2.5초 쉬면 화면 가운데 둘레를 도는 자리로 옮겨 간다(한 화면씩 넘길 때만)
-  var L = { x: 0, y: 0, s: 0, idle: false }, killAt = 0, wasTrans = false;
-
-  // 4-4. 점 글자: 글꼴을 작은 그림판에 그린 뒤 점 격자 칸마다 채워졌는지를 읽는다
-  var WALL_TEXT = 'A NEW STAGE FOR EVERY TALENT', letters = { rows: 0, cols: 0, bits: null, period: 0 }, introAt = 0, fontOK = false;
-  function buildLetters(rows) {
-    var q = 4, c = document.createElement('canvas'), x = c.getContext('2d'), font = '700 100px "Bodoni Moda", serif';
-    x.font = font;
-    var asc = x.measureText('ANEWSTGFORVYL').actualBoundingBoxAscent || 70;
-    var fs = 100 * rows * q / asc;
-    x.font = '700 ' + fs.toFixed(1) + 'px "Bodoni Moda", serif';
-    if ('letterSpacing' in x) x.letterSpacing = (fs * 0.14).toFixed(1) + 'px';
-    var tw = Math.ceil(x.measureText(WALL_TEXT).width / q) + 2;
-    c.width = tw * q; c.height = rows * q;
-    x.font = '700 ' + fs.toFixed(1) + 'px "Bodoni Moda", serif';
-    if ('letterSpacing' in x) x.letterSpacing = (fs * 0.14).toFixed(1) + 'px';
-    x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
-    x.fillText(WALL_TEXT, q, rows * q);
-    var data = x.getImageData(0, 0, c.width, c.height).data, bits = new Uint8Array(tw * rows);
-    for (var r = 0; r < rows; r++) for (var cc = 0; cc < tw; cc++) {
-      var sum = 0;
-      for (var yy = 0; yy < q; yy++) for (var xx = 0; xx < q; xx++) sum += data[((r * q + yy) * c.width + cc * q + xx) * 4 + 3];
-      bits[r * tw + cc] = sum / (q * q * 255) > 0.38 ? 1 : 0;
-    }
-    letters = { rows: rows, cols: tw, bits: bits, period: tw + Math.max(12, Math.round(NC * 0.35)) };
+  function lightsOn(fromEl, toEl) {
+    var c = lightAt();
+    toEl.style.zIndex = '3'; fromEl.style.zIndex = '2';
+    var a = anim(toEl, [{ clipPath: c.shut, filter: 'brightness(0.55)' }, { clipPath: c.open, filter: 'brightness(1)' }], { duration: 1000, easing: 'cubic-bezier(0.7, 0, 0.25, 1)', fill: 'both' });
+    return { dur: 1000, anims: [a], light: 420, enter: 380 };
   }
 
-  // 4-8. 넘김 5 → 6: 화면 전체의 LED 점이 EXPAND 표시에서 가까운 순서로 켜지며 커진다(점마다 0.35초에 반지름 1px → 간격의 0.75배, 끝에 닿는 데 0.75초, 모두 1.1초)
-  var WL = null;
-  function wall(back) {
-    var c = clCenter(3), f = $('.site-footer', endScene).getBoundingClientRect();
-    WL = { t0: now(), back: back, cx: c.x, cy: c.y, ft: f.top, dmax: Math.max(Math.hypot(c.x, c.y), Math.hypot(W - c.x, c.y), Math.hypot(c.x, H - c.y), Math.hypot(W - c.x, H - c.y)) };
-    var anims = [];
-    if (back) anims.push(anim(endScene, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-out', fill: 'both' }));
-    return { dur: 1100, anims: anims, light: back ? 420 : 700, enter: back ? 380 : 900 };
+  function play(n, instant) {
+    if (n === NET) netPlay(instant);
+    else if (n === SUP) { if (instant) { clearTimeout(countT); setNum('10', 'snap'); } else countUp(); }
+    else if (n === CARDS) cardsStart(instant);
+    else if (n === PROC && !flowMobile()) procPlay(instant);
   }
-  function drawWall(t) {
-    var e = (t - WL.t0) / 1000, tt = WL.back ? 1.1 - e : e, buckets = [], i, q;
-    g.save(); g.beginPath(); g.rect(0, 0, W, WL.ft); g.clip();
-    if (tt >= 1.1) { g.fillStyle = '#fff'; g.fillRect(0, 0, W, WL.ft); g.restore(); return; }
-    for (var r = -1; r <= NR; r++) for (var cc = -1; cc <= NC; cc++) {
-      var x = OX + cc * S, y = OYD + r * S;
-      if (y - S > WL.ft) continue;
-      var p = clamp((tt - 0.75 * Math.hypot(x - WL.cx, y - WL.cy) / WL.dmax) / 0.35, 0, 1);
-      if (p <= 0) continue;
-      q = Math.round(p * 40);
-      (buckets[q] = buckets[q] || []).push(x, y);
-    }
-    g.fillStyle = '#fff';
-    for (q = 0; q <= 40; q++) {
-      var b = buckets[q]; if (!b) continue;
-      var rad = Math.max(1, (1 + (0.75 * S - 1) * easeInOut(q / 40)));
-      g.beginPath();
-      for (i = 0; i < b.length; i += 2) { g.moveTo(b[i] + rad, b[i + 1]); g.arc(b[i], b[i + 1], rad, 0, Math.PI * 2); }
-      g.fill();
-    }
-    g.restore();
+  function stopScene(n) {
+    if (n === NET) netReset();
+    else if (n === SUP) supReset();
+    else if (n === CARDS) cardsStop();
+    else if (n === PROC && !flowMobile()) procReset();
   }
+  supReset();
 
-  // 스크롤하는 화면: 그 높이에 있는 구역(첫 화면·소개·네 분야·과정만 빛이 켜진다. 숏폼과 흰 문의는 그리지 않는다)
-  var rects = [];
-  function zoneOf(y) { for (var i = 0; i < rects.length; i++) if (y >= rects[i].top && y < rects[i].bottom) return i; return -1; }
-
-  var buckets = [];
-  function ledFrame(t, dt) {
-    var deck = D.on, tr = deck ? D.trans : null, k = K(), i, r, c, n;
-    g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.clearRect(0, 0, W, H);
-    // 줄의 시작 높이
-    var oy;
-    if (deck) oy = OYD;
-    else {
-      var base = Math.floor(window.pageYOffset / S);
-      if (base !== rowBase) { shiftRows(base - rowBase); rowBase = base; }
-      oy = S / 2 - (window.pageYOffset - base * S);
-      rects = scenes.map(function (s) { return s.getBoundingClientRect(); });
-    }
-    // 넘기는 동안: 켜져 있던 점은 0.3초에 꺼진다. 넘김이 끝나면 새 화면에서 다시 시작
-    if (tr && !wasTrans) killAt = t;
-    if (!tr && wasTrans) { Mv.fill(0); L.s = 0; }
-    wasTrans = !!tr;
-    var kf = tr ? clamp(1 - (t - killAt) / 300, 0, 1) : 1;
-    if (tr && WL) { var pT = clamp((t - tr.t0) / tr.dur, 0, 1); offLayer(OFFW[tr.from] * (1 - pT) + OFFW[tr.to] * pT, OFFB[tr.from] * (1 - pT) + OFFB[tr.to] * pT, oy); drawWall(t); return; }
-    if (!tr) WL = null;
-    // 꺼진 점 결
-    if (deck) {
-      if (tr) { var pt = clamp((t - tr.t0) / tr.dur, 0, 1); offLayer(OFFW[tr.from] * (1 - pt) + OFFW[tr.to] * pt, OFFB[tr.from] * (1 - pt) + OFFB[tr.to] * pt, oy); }
-      else offLayer(OFFW[D.cur], OFFB[D.cur], oy);
-    } else {
-      [INTRO, NET, PROC].forEach(function (z) {
-        var b = rects[z]; if (b.bottom <= 0 || b.top >= H) return;
-        g.save(); g.beginPath(); g.rect(0, b.top, W, b.height); g.clip(); offLayer(0.04, 0, oy); g.restore();
-      });
-    }
-    // 줄마다 그 자리 구역의 빛 세기
-    for (r = 0; r < NR; r++) {
-      if (deck) { ZI[r] = tr ? tr.from : D.cur; ZA[r] = AMP[ZI[r]]; }
-      else { var z = zoneOf(oy + r * S); ZI[r] = z; ZA[r] = z === HERO || z === INTRO || z === NET || z === PROC ? AMP[z] : 0; }
-    }
-    // 빛의 자리와 세기
-    // 소개 화면만 빛이 크다(창 가로의 15.3%, 1440에서 220px. 008 검토: 150px에서는 점 글자를 훑는 것이 잘 안 보였다)
-    var R = deck ? W * ((tr ? tr.from : D.cur) === INTRO ? 0.153 : 0.105) : Math.min(150, W * 0.3), want = 0, tx = L.x, ty = L.y;
-    if (!reduce && !tr) {
-      if (deck) {
-        if (fine && ptr.at && t - ptr.at < 2500 && !ptr.touch) { want = 1; tx = ptr.x; ty = ptr.y; L.idle = false; }
-        else { var a = t / 28000 * Math.PI * 2; want = 0.4 / 0.6; tx = W / 2 + W * 0.26 * Math.cos(a); ty = H / 2 + H * 0.24 * Math.sin(a); L.idle = true; }
-      } else if (ptr.at && (ptr.down || (!ptr.touch && t - ptr.at < 2500))) { want = 1; tx = ptr.x; ty = ptr.y; L.idle = false; }
-    }
-    if (want && !L.idle) { L.x = tx; L.y = ty; } else { L.x += (tx - L.x) * lag(dt, 0.9); L.y += (ty - L.y) * lag(dt, 0.9); }
-    if (!L.s && want) { L.x = tx; L.y = ty; }
-    L.s += (want - L.s) * lag(dt, want ? 0.12 : 0.2);
-    if (L.s < 0.004 && !want) L.s = 0;
-    // 남아 있던 빛이 0.7초에 꺼지고, 빛 둘레의 점이 켜진다
-    var dec = dt / 0.7;
-    for (r = 0; r < NR; r++) { var dd = dec * Math.max(ZA[r], 0.3); for (c = 0; c < NC; c++) { n = r * NC + c; if (Mv[n] > 0) Mv[n] = Math.max(0, Mv[n] - dd); } }
-    if (L.s > 0) {
-      var c0 = Math.max(0, Math.floor((L.x - R - OX) / S)), c1 = Math.min(NC - 1, Math.ceil((L.x + R - OX) / S));
-      var r0 = Math.max(0, Math.floor((L.y - R - oy) / S)), r1 = Math.min(NR - 1, Math.ceil((L.y + R - oy) / S));
-      for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
-        var d = Math.hypot(OX + c * S - L.x, oy + r * S - L.y) / R;
-        if (d >= 1) continue;
-        var f = (1 - d * d); f *= f;
-        n = r * NC + c;
-        var v = L.s * ZA[r] * f;
-        if (v > Mv[n]) Mv[n] = v;
-      }
-    }
-    LT.fill(0);
-    // 소개 화면은 글자가 없는 자리의 빛을 35%로 줄인다(설계 시작 값 그대로 60%이면 빛 안에서 점 글자가 묻혀 손전등처럼 보이지 않았다)
-    for (r = 0; r < NR; r++) { var zb = (ZI[r] === INTRO ? 0.35 : 1) * kf; for (c = 0; c < NC; c++) { n = r * NC + c; Vv[n] = Mv[n] * zb; } }
-
-    // 소개: 뒤의 LED 벽에 흐르는 점 글자. 평소 14%, 빛 둘레에서는 80%까지(008 검토: 8%·55%는 줄이지 않은 화면에서 거의 안 보였다)
-    var ib = deck ? null : rects[INTRO];
-    if (fontOK && ((deck && (D.cur === INTRO || (tr && tr.from === INTRO)) && introAt) || (!deck && introAt && ib.bottom > 0 && ib.top < H))) {
-      var LR = deck ? Math.round(H * 0.46 / S) : Math.round(ib.height * 0.3 / S);
-      if (letters.rows !== LR) buildLetters(LR);
-      var ap = clamp((t - introAt) / 600, 0, 1) * kf;
-      var rTop = deck ? Math.round((H / 2 - oy) / S - LR / 2) : Math.round((ib.top + ib.height / 2 - oy) / S - LR / 2);
-      var shift = Math.floor((t - introAt) / 60000 * letters.period) - 2;
-      var flowing = !deck && D.flowOn();
-      if (flowing) shift += Math.floor(window.pageYOffset / S * 0.6); // 휴대폰 스크롤 반응(12-4): 내리는 만큼 옆으로 더 흐른다
-      for (r = 0; r < LR; r++) {
-        var rr = rTop + r; if (rr < 0 || rr >= NR) continue;
-        var amp = ZA[rr] || AMP[INTRO];
-        for (c = 0; c < NC; c++) {
-          var lc = ((c + shift) % letters.period + letters.period) % letters.period;
-          if (lc >= letters.cols || !letters.bits[r * letters.cols + lc]) continue;
-          n = rr * NC + c;
-          var lit2 = Math.min(1, Mv[n] / amp);
-          if (flowing) lit2 = Math.max(lit2, 0.5 * (1 - clamp(Math.abs(oy + rr * S - H / 2) / (H * 0.22), 0, 1))); // 화면 가운데 높이의 띠가 가장 밝다
-          var lv = (0.14 + 0.66 * lit2) * ap;
-          if (lv > Vv[n]) { Vv[n] = lv; LT[n] = 1; }
-        }
-      }
-    }
-
-    // 네 분야: 올린 칸 뒤의 LED가 아래에서 위로 0.5초에 켜진다(22%, 위로 갈수록 옅게). 나가면 0.4초에 꺼진다
-    if ((deck && D.cur === NET && !tr) || (!deck && rects[NET].bottom > 0 && rects[NET].top < H)) {
-      var hb = header.getBoundingClientRect().bottom;
-      cols.forEach(function (cs, i) {
-        var flashOn = t >= cs.fs && t < cs.fe, on = (deck && NETS.hot === i) || flashOn || (!deck && FLOW.hot === i);
-        if (on) { cs.v = 1; cs.front = Math.min(1, cs.front + dt / (flashOn && NETS.hot !== i ? 0.35 : 0.5)); }
-        else { cs.v = Math.max(0, cs.v - dt / 0.4); if (!cs.v) cs.front = 0; }
-        if (!cs.v) return;
-        var b = rowEls[i].getBoundingClientRect(), x0, x1, yb, yt;
-        if (deck) {
-          var gap = i < 3 ? rowEls[i + 1].getBoundingClientRect().left - b.right : b.left - rowEls[i - 1].getBoundingClientRect().right;
-          x0 = b.left - gap / 2; x1 = b.right + gap / 2; yb = H; yt = hb;
-        } else { x0 = 0; x1 = W; yb = b.bottom; yt = Math.max(b.top, hb); }
-        var cA = Math.max(0, Math.ceil((x0 - OX) / S)), cB = Math.min(NC - 1, Math.floor((x1 - OX) / S));
-        for (var rr2 = 0; rr2 < NR; rr2++) {
-          var y = oy + rr2 * S; if (y > yb || y < yt) continue;
-          var yf = (yb - y) / Math.max(1, yb - yt);
-          if (yf > cs.front) continue;
-          var cv = 0.22 * cs.v * (1 - 0.8 * yf) * kf;
-          for (var c2 = cA; c2 <= cB; c2++) { var nn = rr2 * NC + c2; if (cv > Vv[nn]) Vv[nn] = cv; }
-        }
-      });
-    }
-
-    // 켜진 점 그리기: 밝기가 같은 것끼리 한 번에. 흰 화면은 검은 점
-    // 점 글자의 점은 조금 크다(반지름 1.6px → 2.4px, 80%에서 가장 큼). 8%에서 1px이면 글자 모양이 거의 보이지 않았다
-    for (i = 0; i <= 129; i++) if (buckets[i]) buckets[i].length = 0;
-    for (r = 0; r < NR; r++) for (c = 0; c < NC; c++) {
-      n = r * NC + c; var vv = Vv[n];
-      if (vv < 0.008) continue;
-      var qq = Math.min(64, Math.round(vv * 64)) + (LT[n] ? 65 : 0);
-      (buckets[qq] = buckets[qq] || []).push(OX + c * S, oy + r * S);
-    }
-    var ink = deck && (tr ? tr.from : D.cur) === END;
-    for (i = 1; i <= 129; i++) {
-      var bk = buckets[i]; if (!bk || !bk.length || i === 65) continue;
-      var vq = (i % 65) / 64, rad = (i > 65 ? 1.6 + 0.8 * Math.min(1, vq / 0.8) : 1 + 1.2 * Math.min(1, vq / 0.45)) * k;
-      g.fillStyle = (ink ? 'rgba(0,0,0,' : 'rgba(255,255,255,') + vq.toFixed(3) + ')';
-      g.beginPath();
-      for (var j = 0; j < bk.length; j += 2) { g.moveTo(bk[j] + rad, bk[j + 1]); g.arc(bk[j], bk[j + 1], rad, 0, Math.PI * 2); }
-      g.fill();
-    }
-    // 글 위에는 점을 거의 그리지 않는다(대표 11-11: 네 분야 칸의 글이 위에 켜진 점에 가려 잘 안 보였다). 글 줄마다 둘레까지 점을 88% 지운다
-    var tx = textRects(t), sy = deck ? 0 : window.pageYOffset;
-    if (tx.length) {
-      g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,0.88)'; g.beginPath();
-      var px = 5 * k, py = 3 * k;
-      for (i = 0; i < tx.length; i++) { var q4 = tx[i], ty = q4[1] - sy; if (ty + q4[3] < 0 || ty > H) continue; g.rect(q4[0] - px, ty - py, q4[2] + px * 2, q4[3] + py * 2); }
-      g.fill(); g.restore();
-    }
-  }
-  // 점을 지울 글 줄의 자리(0.2초마다 다시 잰다. 스크롤 방식은 문서 기준으로 적어 두고 그릴 때 스크롤만큼 뺀다). 한 화면씩일 때는 지금 화면의 글만
-  var TXT = { at: -1e9, cur: -2, rects: [] };
-  function textRects(t) {
-    var deck = D.on, cur = deck ? D.cur : -1;
-    if (t - TXT.at < 200 && TXT.cur === cur) return TXT.rects;
-    TXT.at = t; TXT.cur = cur;
-    var list = deck ? ([INTRO, NET, PROC].indexOf(cur) >= 0 ? [scenes[cur]] : []) : [intro, net, proc], out = [], rg = document.createRange(), sy = deck ? 0 : window.pageYOffset;
-    list.forEach(function (sc) {
-      var w = document.createTreeWalker(sc, NodeFilter.SHOW_TEXT), nd;
-      while ((nd = w.nextNode())) {
-        if (!nd.data.trim()) continue;
-        rg.selectNodeContents(nd);
-        var rs = rg.getClientRects();
-        for (var i = 0; i < rs.length; i++) { var r = rs[i]; if (r.width > 0 && r.height > 0) out.push([r.left, r.top + sy, r.width, r.height]); }
-      }
-    });
-    TXT.rects = out; return out;
-  }
-  function offLayer(aw, ab, oy) {
-    if (aw > 0.001) { g.globalAlpha = aw; g.drawImage(offW, 0, oy - S / 2, W, offW.height / dpr); }
-    if (ab > 0.001) { g.globalAlpha = ab; g.drawImage(offB, 0, oy - S / 2, W, offB.height / dpr); }
-    g.globalAlpha = 1;
-  }
-
-  /* ───────── 스크롤하는 화면(휴대폰·작은 창, 4-9): 줄·단계를 스크롤에 맞춰 ───────── */
-  function scrollFrame(t) {
-    var vh = window.innerHeight, hh = header.getBoundingClientRect().bottom;
-    rowEls.forEach(function (r, i) {
-      var b = r.getBoundingClientRect(), on = r.classList.contains('on');
-      if (!on && b.top < vh * 0.88 && b.bottom > hh) { r.classList.add('on'); if (!D.flowOn()) { cols[i].fs = t + 120; cols[i].fe = t + 470; } }
-      else if (on && (b.top >= vh || b.bottom <= hh)) r.classList.remove('on');
-    });
-    stepEls.forEach(function (s) {
-      var b = s.getBoundingClientRect(), on = s.classList.contains('on');
-      if (!on && b.top < vh * 0.8 && b.bottom > hh) s.classList.add('on');
-      else if (on && (b.top >= vh || b.bottom <= hh)) s.classList.remove('on');
-    });
-  }
-
-  /* ───────── 한 화면에 한 번 그리는 고리 ───────── */
-  var lastT = 0;
-  function frame(t) {
-    requestAnimationFrame(frame);
-    var dt = lastT ? Math.min(0.05, (t - lastT) / 1000) : 0.016;
-    lastT = t;
-    ledFrame(t, dt);
-    if (D.on && (D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC)))) procFrame(t, dt);
-    if (!D.on) scrollFrame(t);
-  }
-
-  function sceneReset(n) {
-    if (n === HERO) { tour(false); pxReset(); }
-    if (n === INTRO) introAt = 0;
-    if (n === NET) { netReset(); if (!D.on) rowEls.forEach(function (r) { r.classList.remove('on'); }); }
-    if (n === REEL) EntReel.stop();
-    if (n === PROC) procReset();
-  }
   D.setup({
-    // PC(한 화면씩)
-    enter: function (n, scene, from) {
-      if (n === HERO) { tour(true); pxPlay(false); }
-      if (n === INTRO) introAt = now();
-      if (n === NET) netFlash(now());
-      if (n === REEL) reelStart();
-      if (n === PROC) procPlay(from === END);
-      // 바닥글의 글·로고는 흰 벽이 걷힌 뒤 떠오른다(바닥글 바탕까지 흐리게 하면 그 밑의 흰 바탕이 비쳐 번쩍였다)
-      if (n === END && from === PROC && !reduce) $$('.site-footer > *', endScene).forEach(function (el) { anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 360, delay: 260, easing: 'ease-out', fill: 'backwards' }); });
-    },
-    reset: sceneReset,
-    // 휴대폰·작은 창(스크롤): 보이면 펼치고, 화면 밖으로 완전히 나가면 처음 상태로(다시 보이면 또 펼친다)
-    seen: function (n, scene, instant) {
-      if (n === HERO) { tour(true); if (instant) pxShow(); else pxPlay(true); }
-      if (n === INTRO) introAt = instant ? now() - 600 : now();
-      if (n === REEL && !EntReel.running()) reelStart();
-    },
-    unseen: sceneReset,
-    move: function (from, to) {
-      if (reduce) return null;
-      if (from === PROC && to === END) return wall(false);
-      if (from === END && to === PROC) { procPlay(true); return wall(true); }
+    enter: function (n) { keyScene(n); if (n === HERO) tour(true); play(n, false); },
+    reset: function (n) { if (n === HERO) { if (D.on) tour(false); } else stopScene(n); },
+    seen: function (n, s, instant) { play(n, instant); },
+    unseen: function (n) { if (n !== HERO) stopScene(n); },
+    move: function (from, to, fromEl, toEl) {
+      if (from === PROC && to === END) return lightsOff(fromEl, toEl);
+      if (from === END && to === PROC) return lightsOn(fromEl, toEl);
       return null;
     },
-    start: function () { ledSize(); splitIntro(); clStyle(true); netReset(); },
-    stop: function () { ledSize(); splitIntro(); clStyle(false); netReset(); WL = null; }
+    start: function () { keyScene(D.cur); },
+    stop: function () { root.classList.remove('key-off'); tour(true); }
   });
-  /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-4, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
-     소개 점 글자: 위 ledFrame에서 스크롤만큼 더 흐르고 화면 가운데 띠가 밝다
-     네 분야: 화면 가운데에 가장 가까운 줄 뒤의 LED가 아래에서 위로 켜지고(위 ledFrame), 그 줄만 100%, 나머지 줄은 55%
-     과정 LED 무리: 단계마다 단계 위쪽 85% -> 55% 동안 가운데 점부터 바깥으로 켜진다
-     흰 문의 구역: 구역 위쪽 92% -> 40% 동안 점들이 커져 붙어 흰 면이 된다. 켜지는 물결이 위에서 아래로. 점마다 반지름 1px -> 간격의 0.75배는 PC 넘김과 같고, 물결은 PC(1.1)보다 빠른 1.35배라 반쯤 멈춰도 위쪽 글이 먼저 다 드러난다 */
-  var FLOW = { hot: -1, wall: 0 };
-  var wallc = document.createElement('canvas'), wg = wallc.getContext('2d');
-  wallc.className = 'wallc'; wallc.setAttribute('aria-hidden', 'true');
-  endScene.insertBefore(wallc, endScene.firstChild);
-  var INK = getComputedStyle(document.body).backgroundColor || '#0a0a0a';
-  var procDots = CL.map(function (c) { return $$('.d', c.svg); });
-  function flowWall(q, vh) {
-    FLOW.wall = q;
-    if (q >= 1) { wallc.classList.remove('on'); return; }
-    var w = endScene.clientWidth, h = Math.min(endScene.offsetHeight, Math.ceil(vh * 0.62) + S), d2 = Math.min(1.5, window.devicePixelRatio || 1);
-    if (wallc.width !== Math.round(w * d2) || wallc.height !== Math.round(h * d2)) {
-      wallc.width = Math.round(w * d2); wallc.height = Math.round(h * d2);
-      wallc.style.width = w + 'px'; wallc.style.height = h + 'px';
-    }
-    wallc.classList.add('on');
-    wg.setTransform(d2, 0, 0, d2, 0, 0);
-    wg.globalCompositeOperation = 'source-over';
-    wg.fillStyle = INK; wg.fillRect(0, 0, w, h);
-    if (q <= 0) return;
-    var tt = q * 1.35, depth = vh * 0.6, nc = Math.floor(w / S), ox = (w - nc * S) / 2 + S / 2, bk = [];
-    for (var r = 0; r * S < h + S; r++) for (var c = -1; c <= nc; c++) {
-      var x = ox + c * S, y = S / 2 + r * S;
-      var p = clamp((tt - 0.75 * Math.min(1, y / depth)) / 0.35, 0, 1);
-      if (p <= 0) continue;
-      var k = Math.round(p * 24);
-      (bk[k] = bk[k] || []).push(x, y);
-    }
-    wg.globalCompositeOperation = 'destination-out';
-    wg.fillStyle = '#000';
-    for (var j = 1; j <= 24; j++) {
-      var b = bk[j]; if (!b) continue;
-      var rad = Math.max(1, 1 + (0.75 * S - 1) * easeInOut(j / 24));
-      wg.beginPath();
-      for (var i = 0; i < b.length; i += 2) { wg.moveTo(b[i] + rad, b[i + 1]); wg.arc(b[i], b[i + 1], rad, 0, Math.PI * 2); }
-      wg.fill();
-    }
-  }
-  D.flow(function (vh, on) {
-    stepList.classList.toggle('flowled', on);
-    if (!on) {
-      FLOW.hot = -1; wallc.classList.remove('on');
-      rowEls.forEach(function (r) { r.classList.remove('dim'); });
-      return;
-    }
-    var hh = header.getBoundingClientRect().bottom, mid = hh + (vh - hh) / 2, nb = rowList.getBoundingClientRect(), best = -1, bd = 1e9;
-    if (nb.bottom > hh && nb.top < vh) rowEls.forEach(function (r, i) { var b = r.getBoundingClientRect(), dd = Math.abs(b.top + b.height / 2 - mid); if (dd < bd) { bd = dd; best = i; } });
-    FLOW.hot = best;
-    rowEls.forEach(function (r, i) { r.classList.toggle('dim', best >= 0 && i !== best); });
-    stepEls.forEach(function (st, i) {
-      var p = D.span(st, 0.85, 0.55, vh), n = Math.round(p * procDots[i].length);
-      procDots[i].forEach(function (d, k) { d.classList.toggle('lit', k < n); });
-    });
-    flowWall(D.spanEnd(endScene, 0.92, 0.4, vh), vh);
-  });
-  window.__entFlow = FLOW;
-
-  // 검사 도구가 읽는 값(tools/check-ent.mjs, film-ent.mjs)
-  window.__ent = {
-    state: function () {
-      var lit = 0; for (var n = 0; n < Vv.length; n++) if (Vv[n] >= 0.008) lit++;
-      return { px: { lines: pxMasks.map(function (m) { return m.classList.contains('lit'); }), dots: PX.levels ? PX.levels.map(function (L) { return L.dots.length / 5; }) : [], drawing: pxCv.style.visibility !== 'hidden' && !!PX.T, t0: PX.t0 ? PX.t0 + performance.timeOrigin : 0 }, S: S, NC: NC, NR: NR, lit: lit, font: fontOK, letters: { rows: letters.rows, cols: letters.cols, on: letters.bits ? letters.bits.reduce(function (a, b) { return a + b; }, 0) : 0 }, hot: NETS.hot, cols: cols.map(function (c) { return +c.v.toFixed(2) + '/' + +c.front.toFixed(2); }), wall: !!WL, L: { s: +L.s.toFixed(2), idle: L.idle } };
-    }
-  };
-  // 움직임 줄이기: 공통 틀이 아무것도 부르지 않는다. 카드는 첫 분야 무리에 멈춰 두고, 그림판은 쓰지 않는다
-  if (reduce) { EntReel.start(); return; }
-  ledSize();
-  if (document.fonts && document.fonts.load) document.fonts.load('700 100px "Bodoni Moda"').then(function () { fontOK = true; letters.rows = 0; splitIntro(); }, function () { fontOK = true; });
-  else fontOK = true;
-  var rt = 0;
-  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { ledSize(); splitIntro(); }, 120); if (PX.T && pxCv.style.visibility !== 'hidden') pxShow(); });
-  requestAnimationFrame(frame);
+  // 제목 반사광 겹: 공통 틀이 줄마다 감싼 뒤(setup) 줄마다 같은 글을 data-t에 담아 금빛 겹으로 그린다
+  $$('.le-hero h1 .mask > span').forEach(function (s) { s.setAttribute('data-t', s.textContent); });
+  // 움직임 줄이기: 공통 틀이 아무것도 부르지 않는다. 다 펼친 모습으로 둔다
+  if (reduce) { openRow(rows[0]); setNum('10', 'snap'); place(false); stepList.classList.add('run'); stepList.style.setProperty('--p', 1); steps.forEach(function (s) { s.classList.add('done'); }); }
 })();
 </script>
 <script src="site-menu.js"></script>
 <script type="speculationrules">{"prefetch": [{"source": "document", "where": {"selector_matches": ".site-header a, .menu-panel a"}, "eagerness": "moderate"}]}</script>
-<!-- 메뉴에 마우스를 올리면 그 쪽을 미리 받는다(쪽 사이 이동이 빨라진다) -->
 </body>
 </html>
