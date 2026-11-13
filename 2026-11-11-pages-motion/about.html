@@ -568,6 +568,9 @@ html.loc-lb, html.loc-lb body { overflow: hidden; }
     N.chain = []; N.last = null;
   }
   // 손가락·작은 창: 댄 자리의 별이 깨어난다(잇는 선은 없다)
+  // 휴대폰(마우스 없음): 손가락을 대지 않는 동안은 PC 마우스처럼 빛 점이 스스로 하늘을 천천히 지나가며 별을 깨우고 선으로 잇는다
+  // (가로 12~88%, 세로 20~80%, 약 18초 한 바퀴의 8자 길, 대표 11-14 "PC와 같은 효과를 모션그래픽으로")
+  var touchOnly = !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   window.addEventListener('pointerdown', function (e) { if (!D.on) N.touch = { x: e.clientX, y: e.clientY, t: performance.now() }; }, { passive: true });
   window.addEventListener('pointermove', function (e) { if (!D.on && (e.pointerType !== 'mouse' || e.buttons === 0)) N.touch = { x: e.clientX, y: e.clientY, t: performance.now() }; }, { passive: true });
 
@@ -612,6 +615,7 @@ html.loc-lb, html.loc-lb body { overflow: hidden; }
       if (!p && D.cur === HERO && !tr && HS.sweep && t >= HS.sweep) { p = { x: HS.x * W, y: HS.y * H }; chainOn = true; }
       if (!p && M.at) { p = { x: M.x, y: M.y }; chainOn = (D.cur === STORY || D.cur === HERO || D.cur === LOCATION) && !tr && !idle; }
     } else if (N.touch && t - N.touch.t < 1500) p = { x: N.touch.x, y: N.touch.y };
+    else if (touchOnly && !reduce) { var wa = t / 18000 * 6.283; p = { x: W * (0.5 + 0.38 * Math.sin(wa)), y: H * (0.5 + 0.3 * Math.sin(wa * 2 + 0.7)) }; chainOn = true; }
     var R = Math.max(160, W * 0.13);
 
     var ctx = nx;
@@ -712,6 +716,16 @@ html.loc-lb, html.loc-lb body { overflow: hidden; }
     HS.px += (-mx * 10 - HS.px) * lag(dt, 0.8); HS.py += (-my * 10 - HS.py) * lag(dt, 0.8);
     heroGL.style.transform = 'translate3d(' + HS.px.toFixed(2) + 'px,' + HS.py.toFixed(2) + 'px,0) scale(1.03)';
   }
+  // 휴대폰(마우스 없음): 홈 휴대폰과 같은 빛이 스스로 그림 위를 떠돈다(가로 20~80%, 세로 22~72%, 약 26초 8자 길, 세기 0.85, 반지름 가로 42%).
+  // 홈과 같은 시각 공식이라 홈에서 넘어와도 빛 자리가 이어진다
+  var PL = { x: 0, y: 0, i: 0, on: 0, last: 0 };
+  function phoneLight() {
+    var t = performance.now(), dt = Math.min(t - (PL.last || t), 100); PL.last = t;
+    var a = t / 26000 * 6.283, tx = 0.5 + 0.3 * Math.sin(a), ty = 0.47 + 0.25 * Math.sin(a * 2 + 0.6);
+    if (!PL.on) { PL.on = 1; PL.x = tx; PL.y = ty; }
+    PL.x += (tx - PL.x) * lag(dt, 0.6); PL.y += (ty - PL.y) * lag(dt, 0.6); PL.i += (0.85 - PL.i) * lag(dt, 0.7);
+    return [PL.x, PL.y, PL.i, 0.42];
+  }
   function heroEnter() { if (!HS.swept) { HS.swept = true; HS.armed = performance.now() + 50; HS.sweep = HS.armed + 550; HS.i = 1; } }
   var glOn = false;
   function startGL() {
@@ -725,7 +739,7 @@ html.loc-lb, html.loc-lb body { overflow: hidden; }
         if (D.on) return D.cur === HERO || !!(D.trans && (D.trans.from === HERO || D.trans.to === HERO));
         var r = heroGL.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight;
       },
-      function () { return D.on ? [HS.x, HS.y, HS.i, 0.18] : null; });
+      function () { return D.on ? [HS.x, HS.y, HS.i, 0.18] : touchOnly ? phoneLight() : null; });
   }
   startGL();
 

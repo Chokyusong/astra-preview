@@ -22,7 +22,7 @@
 
 /* ── 5-1. 초점 틀: ㄱ자 모서리 네 개. 한 화면씩 넘길 때만 보인다(마우스가 없는 화면에는 없다) ── */
 .vf { display: none; }
-html.deck .vf { display: block; position: fixed; left: 0; top: 0; z-index: 33; width: 84px; height: 56px; pointer-events: none; opacity: 0; color: #fff; --arm: calc(12px * var(--k, 1)); will-change: transform, opacity; }
+html.deck .vf, html.fx:not(.deck) .vf { display: block; position: fixed; left: 0; top: 0; z-index: 33; width: 84px; height: 56px; pointer-events: none; opacity: 0; color: #fff; --arm: calc(12px * var(--k, 1)); will-change: transform, opacity; }
 .vf i { position: absolute; width: var(--arm); height: var(--arm); border: 0 solid currentColor; }
 .vf .tl { left: 0; top: 0; border-top-width: 1.25px; border-left-width: 1.25px; }
 .vf .tr { right: 0; top: 0; border-top-width: 1.25px; border-right-width: 1.25px; }
@@ -462,6 +462,37 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     if (!D.on || !el.matches || !el.matches(':focus-visible')) { VF.kbd = null; return; }
     if (el.matches(TARGETS) || el.closest('.row, .step')) { VF.kbd = el; VF.kbdAt = now(); }
   });
+
+  // 휴대폰(마우스 없음): PC 초점 틀을 모션그래픽으로. 손가락으로 가리킬 수 없으니 내리는 동안 화면 가운데(높이 30~70%)에
+  // 가장 가까운 제목·글·앞 카드·과정 단계·버튼으로 틀이 스스로 옮겨 맞춰지고(0.32초), 맞춰진 순간 PC처럼 4px 줄었다 돌아온다.
+  // 맞출 것이 없으면 사라진다. 흰 문의 구역에서는 검정(대표 11-14 "PC와 같은 효과를 모션그래픽으로")
+  var VF_M = '.hero h1, .intro h2, .intro-text p, .section-title, .step, .cta .display, .cta .btn';
+  function vfFlow(t, dt) {
+    var vh = window.innerHeight, k = K(), best = null, bd = 1e9;
+    $$(VF_M).concat(front() ? [front()] : []).forEach(function (el) {
+      var r = el.getBoundingClientRect(), c = r.top + r.height / 2, d = Math.abs(c - vh / 2);
+      if (r.height > 0 && r.height < vh * 0.7 && c > vh * 0.3 && c < vh * 0.7 && d < bd) { bd = d; best = el; }
+    });
+    var tg = best;
+    if (tg) {
+      var r = tg.getBoundingClientRect(), pad = 8 * k, gx = r.left + r.width / 2, gy = r.top + r.height / 2, gw = r.width + pad * 2, gh = r.height + pad * 2;
+      if (VF.a < 0.02) { VF.x = gx; VF.y = gy; VF.w = gw; VF.h = gh; VF.tw = null; VF.tgt = tg; VF.pulse = t; }
+      else if (tg !== VF.tgt) { VF.tw = { x: VF.x, y: VF.y, w: VF.w, h: VF.h, t0: t, dur: 320 }; VF.tgt = tg; VF.pulse = 0; }
+      if (VF.tw) {
+        var u = clamp((t - VF.tw.t0) / VF.tw.dur, 0, 1), e = easeOut(u);
+        VF.x = VF.tw.x + (gx - VF.tw.x) * e; VF.y = VF.tw.y + (gy - VF.tw.y) * e; VF.w = VF.tw.w + (gw - VF.tw.w) * e; VF.h = VF.tw.h + (gh - VF.tw.h) * e;
+        if (u >= 1) { VF.tw = null; VF.pulse = t; }
+      } else { VF.x = gx; VF.y = gy; VF.w = gw; VF.h = gh; }
+    } else VF.tgt = null;
+    VF.a += ((tg ? 1 : 0) - VF.a) * lag(dt, tg ? 0.12 : 0.1);
+    if (VF.a < 0.005) VF.a = 0;
+    var w = VF.w, h = VF.h;
+    if (VF.pulse) { var p = (t - VF.pulse) / 150; if (p >= 1) VF.pulse = 0; else { var q = 4 * k * Math.sin(Math.PI * p); w -= q * 2; h -= q * 2; } }
+    vf.style.width = w.toFixed(1) + 'px'; vf.style.height = h.toFixed(1) + 'px';
+    vf.style.transform = 'translate3d(' + (VF.x - w / 2).toFixed(1) + 'px,' + (VF.y - h / 2).toFixed(1) + 'px,0)';
+    vf.style.opacity = VF.a.toFixed(3);
+    vf.style.color = VF.tgt && VF.tgt.closest('.cta') ? '#000' : '#fff';
+  }
 
   /* ───────── 5-3. 첫 화면 ───────── */
   var heroImg = $('.hero-video'), heroEye = $('.hero .eyebrow'), h1 = $('.hero h1');
@@ -1064,7 +1095,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       if (D.cur === STUDIO || RACK.card) { rackFrame(); stageFrame(dt); }
       if (D.cur === WHAT) whatFrame(t);
       if (D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC))) procFrame(t, dt);
-    } else scrollFrame();
+    } else { scrollFrame(); if (!fine && !reduce && D.flowOn()) vfFlow(t, dt); else if (VF.a) { VF.a = 0; vf.style.opacity = '0'; } }
     filmFrame(dt);
     heroVideoFrame();
   }

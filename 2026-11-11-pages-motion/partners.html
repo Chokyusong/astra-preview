@@ -199,6 +199,20 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   R.forEach(function (row) { row.flip = row.cells.map(function () { return 0; }); });
   var BASE = 50, MAX = 2400, PUSH = 7, TAU = 0.4, FLIP_MAX = 400;
   var L = { hot: null, drag: null, entering: 0, nudge: [0, 0], live: !reduce, moved: false };
+  // 휴대폰(마우스 없음): PC에서 마우스를 올린 칸이 뒤집히는 것을 모션그래픽으로. 손가락으로 누른 칸이 없으면 2.6초마다 두 줄을 번갈아
+  // 화면 가운데쯤(가로 30~70%)의 칸 하나가 스스로 뒤집혔다(1.5초) 돌아온다. 함께한 작업 사진은 마우스 대신 스스로 천천히 둘러본다(대표 11-14)
+  var touchOnly = !window.matchMedia('(hover: hover) and (pointer: fine)').matches, AF = { next: 0, until: 0, row: 0, cell: null };
+  function autoFlip(t) {
+    if (t >= AF.next) {
+      AF.next = t + 2600; AF.until = t + 1500; AF.cell = null;
+      var row = R[AF.row++ % 2], b = row.ul.getBoundingClientRect(), W = window.innerWidth, want = W * (0.3 + 0.4 * Math.random()), bd = 1e9;
+      if (b.bottom > 0 && b.top < window.innerHeight) row.cells.forEach(function (c) {
+        var r = c.getBoundingClientRect(), cx = r.left + r.width / 2, d = Math.abs(cx - want);
+        if (r.left > 0 && r.right < W && d < bd) { bd = d; AF.cell = c; }
+      });
+    }
+    return t < AF.until ? AF.cell : null;
+  }
   function measure() {
     R.forEach(function (row) {
       var w = row.cells[0].offsetWidth, g = parseFloat(getComputedStyle(row.ul).columnGap) || 0;
@@ -364,6 +378,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       // 마우스가 올라간 칸(한 화면씩 넘길 때). 줄이 빠르게(초당 400px 넘게) 흐르는 동안에는 뒤집기·커짐·다른 칸 물러남을 모두 걸지 않는다.
       // 이미 뒤집힌 칸도 줄이 빨라지면 놓는다(검토 010-2: 던진 직후 뒤집힌 칸이 커진 채 기울어 옆 칸과 겹쳤다)
       var hot = L.hot;
+      if (!D.on && touchOnly && !reduce && !L.hot) hot = autoFlip(t);
       if (D.on) {
         hot = null;
         if (D.cur === LOGOS && !D.trans && !L.drag && D.mouse.at) {
@@ -416,6 +431,14 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       var a = 1 - Math.exp(-dt / 0.18);
       P.x += (tx - P.x) * a; P.y += (ty - P.y) * a;
       panPaint();
+    } else if (!D.on && touchOnly && !reduce && FLOW.work >= 1) {
+      // 휴대폰: 사진이 다 열린 뒤 PC 마우스 둘러보기처럼 스스로 천천히 둘러본다(가로 ±5%·세로 ±4%, 약 16초·21초 주기, 1.14배)
+      var wr = work.getBoundingClientRect();
+      if (wr.bottom > 0 && wr.top < window.innerHeight) {
+        var q = t / 1000, Ww = wr.width, Wh = wr.height;
+        P.x = Math.sin(q / 16 * Math.PI * 2) * 0.05 * Ww; P.y = Math.sin(q / 21 * Math.PI * 2 + 1.1) * 0.04 * Wh;
+        panPaint();
+      }
     }
     requestAnimationFrame(frame);
   }

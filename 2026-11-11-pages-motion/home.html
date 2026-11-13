@@ -94,7 +94,7 @@
   // 마우스 반응: 회사소개 첫 화면과 같은 값. 마우스 둘레(창 가로의 18%)에서 별이 켜지고 소나무가 더 흔들리고
   // 기와·문양에 빛이 스치고 달빛이 밝아진다. 빛줄기는 마우스 쪽으로 기울며 밝아진다. 0.18초 늦게 따라오고,
   // 2.5초 쉬면 30% 세기로 24초에 한 바퀴 돈다. 그림 전체가 마우스 반대쪽으로 최대 10px(0.8초 늦게) 움직인다.
-  // 마우스가 있는 PC에서만. 휴대폰은 전과 같다
+  // 마우스가 있는 PC에서만. 휴대폰은 아래 phoneLight가 같은 빛을 스스로 움직인다(대표 11-14)
   var hover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var M = { x: 0, y: 0, at: 0 }, HS = { x: 0.5, y: 0.45, i: 0, px: 0, py: 0, last: 0 };
   var lag = function (dt, s) { return 1 - Math.exp(-dt / 1000 / s); };
@@ -117,13 +117,25 @@
     cv.style.transform = 'translate3d(' + HS.px.toFixed(2) + 'px,' + HS.py.toFixed(2) + 'px,0) scale(1.03)';
     return [HS.x, HS.y, HS.i, 0.18];
   }
+  // 휴대폰·마우스 없는 화면: PC 마우스 빛과 같은 효과를 모션그래픽으로. 손가락으로는 빛을 끌 수 없으니 빛이 스스로 그림 위를
+  // 천천히 떠돈다(가로 20~80%, 세로 22~72%, 약 26초에 한 바퀴의 8자 길). 세기는 PC 마우스(1)에 가까운 0.85,
+  // 반지름은 좁은 화면에 맞춰 가로의 42%. 처음 2초 동안 서서히 켜지고, 그림은 빛 반대쪽으로 최대 6px 움직인다
+  function phoneLight() {
+    var t = performance.now(), dt = Math.min(t - (HS.last || t), 100); HS.last = t;
+    var a = t / 26000 * 6.283, tx = 0.5 + 0.3 * Math.sin(a), ty = 0.47 + 0.25 * Math.sin(a * 2 + 0.6);
+    if (!HS.on) { HS.on = 1; HS.x = tx; HS.y = ty; }
+    HS.x += (tx - HS.x) * lag(dt, 0.6); HS.y += (ty - HS.y) * lag(dt, 0.6); HS.i += (0.85 - HS.i) * lag(dt, 0.7);
+    HS.px += (-(HS.x * 2 - 1) * 6 - HS.px) * lag(dt, 0.8); HS.py += (-(HS.y * 2 - 1) * 6 - HS.py) * lag(dt, 0.8);
+    cv.style.transform = 'translate3d(' + HS.px.toFixed(2) + 'px,' + HS.py.toFixed(2) + 'px,0) scale(1.03)';
+    return [HS.x, HS.y, HS.i, 0.42];
+  }
   // 회사소개로 넘어갈 때 빛·그림 위치를 넘겨 회사소개가 이어받는다(대표 11-13 "배경이랑 인터랙티브가 끊겨 보인다")
   window.HomeLeaveState = function () {
     return { x: HS.x, y: HS.y, i: HS.i, px: HS.px, py: HS.py, mx: M.x, my: M.y, W: window.innerWidth, H: window.innerHeight,
       live: !!(hover && M.at && performance.now() - M.at < 2500) };
   };
   // 배경: 확정 시험본처럼 늘 움직이고, 움직임 줄이기 설정이면 한 장만 그린다. 창이 안 보이면 쉰다
-  if (cv && window.HomeMotion) window.HomeMotion.start(cv, function () { return !reduce && !document.hidden; }, hover && !reduce ? mouse : null);
+  if (cv && window.HomeMotion) window.HomeMotion.start(cv, function () { return !reduce && !document.hidden; }, reduce ? null : hover ? mouse : phoneLight);
   if (reduce && cv) window.addEventListener('resize', function () { if (cv.__draw) cv.__draw(0); });
   // ASTRA: 글자마다 0.25초씩 늦게 가늘어졌다 두꺼워진다(캔버스 홈 판과 같은 값)
   if (!reduce) document.querySelectorAll('.astra-letter').forEach(function (el, i) {

@@ -139,6 +139,8 @@ html.fx .step.on .step-text > :nth-child(3) { transition-delay: 0.36s; }
 html.fx .steps.snap .step *, html.fx .process.snap .steps::before { transition: none !important; }
 .step { transition: opacity 0.4s; }
 .steps.focus .step:not(.hot) { opacity: 0.38; }
+/* 휴대폰은 읽으며 내리므로 가운데 단계 말고 나머지는 덜 흐리게 */
+@media (hover: none) { .steps.focus .step:not(.hot) { opacity: 0.6; } }
 /* 007 검토(설계 3-6 고침): PC에서는 겹 원을 1.7배(반지름 24·44·64·84px × 배율)로 키우고, 표시·가로 선·글 묶음을 제목 아래 남은 높이의 세로 가운데에 둔다.
    휴대폰·작은 창(스크롤)은 정지 시안과 같은 크기(72px·120px 상자, 반지름 14~50)를 그대로 쓴다. 반지름은 자바스크립트가 방식에 따라 넣는다 */
 html.deck .process { --ob: min(calc(200px * var(--k, 1)), 32vh); display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(16px, 4vh, 48px)) var(--gutter) clamp(28px, 7vh, 88px); }
@@ -752,11 +754,24 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   // 마우스가 표시 가운데에서 294px 안이면(바깥 원 가장자리에서 210px, 처음 값 260px과 같은 거리) 그 단계의 원 사이가 벌어지고(최대 +20%, 원 크기에 비례) 밝아진다.
   // 올려 두면 원이 퍼져 나가고(272px까지 0.9초, 1.2초마다. 처음 160px의 1.7배) 나머지는 38%.
   // GROW 표시는 3초에 5%씩 커졌다 작아진다(다음 넘김의 예고)
+  // 휴대폰(마우스 없음): PC에서 단계에 마우스를 올린 것을 모션그래픽으로. 내리는 동안 원 표시가 화면 높이 30~70%에 들어온 단계 하나가
+  // 원 사이가 벌어지며 밝아지고, 1.2초마다 원이 퍼져 나가고, 나머지 단계는 옅어진다(대표 11-14 "PC와 같은 효과를 모션그래픽으로")
+  var mHot = -1;
+  function procMobile() {
+    var on = !fine && !reduce && !D.on && D.flowOn(), vh = window.innerHeight, best = -1, bd = 1e9;
+    if (on) orbits.forEach(function (o, i) { var c = orbitCenter(i), d = Math.abs(c.y - vh / 2); if (c.y > vh * 0.3 && c.y < vh * 0.7 && d < bd) { bd = d; best = i; } });
+    if (best === mHot) return;
+    mHot = best;
+    orbits.forEach(function (o, i) { o.hot = i === best; if (o.hot) o.next = 0; steps[i].classList.toggle('hot', i === best); });
+    stepList.classList.toggle('focus', best >= 0);
+  }
   function procFrame(t, dt) {
     var live = D.on ? D.cur === PROC && !D.trans : true, M = D.mouse, k = K();
+    if (!fine) procMobile();
     orbits.forEach(function (o, i) {
       var c = orbitCenter(i), want = 0;
       if (live && fine && M.at && t - M.at < 4000) { var d = Math.hypot(M.x - c.x, M.y - c.y); want = clamp(1 - d / (294 * k), 0, 1); }
+      else if (!fine && i === mHot) want = 1;
       o.p += (want - o.p) * lag(dt, 0.25);
       var br = i === 3 ? 0.025 * (1 - Math.cos(t / 3000 * Math.PI * 2)) : 0;
       o.os.forEach(function (circ, j) { circ.setAttribute('r', (o.base[j] * (1 + 0.2 * o.p * (j + 1) / o.os.length + br)).toFixed(2)); circ.style.strokeOpacity = (0.72 + 0.28 * o.p).toFixed(3); });
