@@ -268,6 +268,11 @@ html.deck .scene-end.le-end { --scene-bg: var(--l-dark); }
 .le-end .site-footer { background: var(--l-dark); border-top: 1px solid rgba(255, 255, 255, 0.08); }
 html.deck .le-end .site-footer { background: var(--l-dark); }
 html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1))); }
+/* 스크롤하는 화면(휴대폰 등): 다른 쪽들과 같은 방식(대표 11-13 "다른 쪽들처럼"). 문의 구역이 화면 92% → 40% 높이로 올라오는 동안
+   구역 위쪽 가장자리의 마지막으로 손가락을 댄 가로 자리(없으면 가운데)에서 검은 원이 커지며 드러난다(PC의 마우스 자리 조명 꺼짐과 짝, 스크립트).
+   원 밖은 바로 위 과정 구역과 같은 옅은 색, 바닥글은 그대로 보인다 */
+html.fx:not(.deck) .le-end { background: var(--l-mist); }
+html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
 
 /* ── 휴대폰·태블릿 ── */
 @media (max-width: 900px) {
@@ -746,7 +751,20 @@ html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1
   stepList.addEventListener('pointerleave', function () { steps.forEach(function (x) { x.classList.remove('hot'); }); stepList.classList.remove('focus'); });
   // 휴대폰: 세로 줄. 단계 목록이 화면 높이의 80%에서 30%까지 올라오는 동안 금빛 선이 아래로 차고, 선이 닿은 단계가 켜진다
   var flowMobile = function () { return narrow.matches && !D.on; };
+  var endCta = $('.le-end .cta'), touchX = -1;
+  window.addEventListener('touchstart', function (e) { if (e.touches.length) touchX = e.touches[0].clientX; }, { passive: true });
   D.flow(function (vh, on) {
+    // 문의 구역(스크롤하는 화면 전부, 다른 쪽들과 같은 범위·원 크기): 손가락 자리에서 검은 원이 커진다. 쪽 끝이 짧으면 쪽 맨 아래에서 다 드러난다
+    if (!on || reduce) endCta.style.clipPath = '';
+    else {
+      var q = D.spanEnd(scenes[END], 0.92, 0.4, vh), cr = endCta.getBoundingClientRect();
+      if (q >= 1) endCta.style.clipPath = '';
+      else {
+        var cx = touchX >= 0 ? clamp(touchX - cr.left, 0, cr.width) : cr.width / 2;
+        var R = (Math.hypot(Math.max(cx, cr.width - cx), cr.height) + 24) * Math.pow(q, 1.25);
+        endCta.style.clipPath = 'circle(' + R.toFixed(0) + 'px at ' + cx.toFixed(0) + 'px 0px)';
+      }
+    }
     if (!narrow.matches) return;
     if (!on) { stepList.style.removeProperty('--p'); return; }
     var p = D.span(stepList, 0.8, 0.3, vh), top = stepList.getBoundingClientRect().top, h = stepList.offsetHeight;
