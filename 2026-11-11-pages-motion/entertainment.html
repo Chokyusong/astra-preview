@@ -77,8 +77,9 @@ html.key-lit:not(.key-off) .le-key { opacity: 1; }
 html.deck .le-hero { height: 100%; min-height: 0; }
 html.deck .le-hero .hero-bg { top: var(--header-h); }
 .le-hero .hero-bg::after { background: linear-gradient(180deg, rgba(10, 8, 5, 0.3), rgba(10, 8, 5, 0.12) 30%, rgba(10, 8, 5, 0.5) 100%), radial-gradient(60% 50% at 50% 50%, rgba(10, 8, 5, 0.42), rgba(10, 8, 5, 0)); }
-html.fx .le-hero .hero-bg { filter: brightness(0.16); transition: filter 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s; }
-html.deck .le-hero.in .hero-bg, html.fx:not(.deck) .le-hero.seen .hero-bg { filter: none; }
+/* 어두운 데서 시작해 밝아진다. 밝아질 때만 천천히(어두워지는 쪽에도 천천히를 두면 처음 열 때 밝은 그림에서 어두워지다 말고 바로 밝아져 어두운 순간이 보이지 않았다, 11-14) */
+html.fx .le-hero .hero-bg { filter: brightness(0.16); }
+html.deck .le-hero.in .hero-bg, html.fx:not(.deck) .le-hero.seen .hero-bg { filter: none; transition: filter 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.1s; }
 html.fx .hero-tour.tour-off .hero-bg img[class] { animation: none; }
 html.fx .hero-tour.tour-off .hero-bg .t1 { opacity: 1; transform: scale(1.02); }
 .le-hero-copy { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--l-paper); padding: 0 24px; }
@@ -89,6 +90,12 @@ html.deck .le-hero-copy { top: var(--header-h); }
 .le-hero h1 .mask, .le-hero h1 .mask > span { display: block; }
 .le-hero h1 br { display: none; }
 .le-hero h1 .mask > span { position: relative; }
+/* 제목이 LED 화소로 켜졌다가 또렷한 글자로 맺힌다(어두운 판 4-3에서 되살림, 대표 11-14 "원래 엔터테인먼트에 글자 효과 있었잖아"). 배경이 어두운 동안 켜진다 */
+.hero-px { display: none; }
+html.fx .hero-px { display: block; position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; filter: drop-shadow(0 2px 10px rgba(10, 10, 10, 0.55)); }
+html.fx .le-hero h1.px .mask > span { opacity: 0; transform: none; transition: none; }
+html.fx .le-hero h1.px .mask.lit > span { opacity: 1; transition: opacity 0.25s linear; }
+html.fx .le-hero h1.px .mask.lit.now > span { transition: none; }
 .le-hero h1 .mask > span[data-t]::after { content: attr(data-t); position: absolute; inset: 0; color: #f4d49b; pointer-events: none; -webkit-mask-image: linear-gradient(105deg, transparent 0%, transparent 42%, #000 50%, transparent 58%, transparent 100%); mask-image: linear-gradient(105deg, transparent 0%, transparent 42%, #000 50%, transparent 58%, transparent 100%); -webkit-mask-size: 320% 100%; mask-size: 320% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
 html.deck .le-hero.in h1 .mask > span::after, html.fx:not(.deck) .le-hero.seen h1 .mask > span::after { animation: le-sheen 9s cubic-bezier(0.4, 0, 0.6, 1) 1.9s infinite; }
 @keyframes le-sheen { 0% { -webkit-mask-position: 100% 0; mask-position: 100% 0; } 36% { -webkit-mask-position: 0% 0; mask-position: 0% 0; } 100% { -webkit-mask-position: 0% 0; mask-position: 0% 0; } }
@@ -359,7 +366,7 @@ html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
 <section class="le-hero hero-tour scene" data-name="첫 화면">
   <div class="hero-bg" aria-hidden="true"><img class="t1" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t2" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t3" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t4" src="../2026-11-10-pages/img/ent-studio.webp" alt=""><img class="t5" src="../2026-11-10-pages/img/ent-studio.webp" alt=""></div>
   <div class="le-hero-copy">
-    <h1 class="rise" data-lines="0">사람의 가능성을 발견하고<br>플랫폼을 넘어 영향력으로 확장합니다.</h1>
+    <h1 data-lines="0">사람의 가능성을 발견하고<br>플랫폼을 넘어 영향력으로 확장합니다.</h1>
     <div class="le-rule" aria-hidden="true"></div>
     <p class="le-tags"><span style="--i:0"><b class="tag-pc">Personal broadcasting</b><b class="tag-mo">Broadcasting</b></span><span style="--i:1"><i>/</i>Youtube</span><span style="--i:2"><i>/</i>Tiktok</span><span style="--i:3"><i>/</i>Influencer</span></p>
     <div class="le-cta rise" style="--i:16"><a class="btn le-btn-white" href="contact.html#apply">크리에이터 지원하기</a></div>
@@ -493,6 +500,147 @@ html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
 
   /* ── 첫 화면: 떠나 있는 동안 둘러보기를 멈추고, 돌아오면 첫 장면부터 ── */
   function tour(on) { hero.classList.toggle('tour-off', !on); }
+
+  var now = function () { return performance.now(); };
+  /* ───────── 화면 1 제목: LED 화소로 켜졌다가 또렷한 글자로 맺힌다(4-3, 어두운 판에서 되살림 11-14) ─────────
+     글자마다 실제 자리를 재서 보이지 않는 그림판에 같은 글꼴로 그리고, 점 간격 칸마다 글자가 덮은 넓이를 읽어 점을 만든다.
+     PC: 굵은 점(간격 = 글자 크기의 21%)이 왼쪽부터 0.35초에 켜짐 → 0.8초 동안 두 번 쪼개짐(1/2, 1/4, 단계마다 0.25초 겹침) → 0.25초에 실제 글자로.
+     줄마다, 둘째 줄은 0.18초 늦게. 휴대폰은 한 번만 쪼개지고 0.9초 */
+  var h1 = $('h1', hero), pxMasks = [], pxCv = document.createElement('canvas'), pc = pxCv.getContext('2d');
+  pxCv.className = 'hero-px'; pxCv.setAttribute('aria-hidden', 'true'); hero.appendChild(pxCv);
+  var PXT = {
+    pc: { delay: 800, lag: 180, reveal: 350, splits: [[450, 700], [850, 1100]], fade: [1150, 1400], ks: [1, 0.5, 0.25] },
+    mobile: { delay: 500, lag: 120, reveal: 300, splits: [[330, 580]], fade: [650, 900], ks: [1, 0.5] }
+  };
+  var PX = { run: 0, t0: 0, T: null, levels: null, rows: null, ox: 0, oy: 0, fontOK: false, raf: 0 };
+  if (!reduce) { h1.classList.add('px'); hero.classList.add('px-on'); }
+  var pxFont = (document.fonts && document.fonts.load) ? document.fonts.load('500 66px "Noto Serif KR"', h1.textContent).then(function () { PX.fontOK = true; }, function () { PX.fontOK = true; }) : (PX.fontOK = true, null);
+  function pxLit(on, instant) { pxMasks.forEach(function (m) { m.classList.toggle('lit', on); m.classList.toggle('now', !!instant); }); hero.classList.toggle('px-done', on); }
+  function pxStop() { PX.run++; cancelAnimationFrame(PX.raf); pc.setTransform(1, 0, 0, 1, 0, 0); pc.clearRect(0, 0, pxCv.width, pxCv.height); pxCv.style.visibility = 'hidden'; }
+  function pxReset() { pxStop(); pxLit(false); }
+  function pxShow() { pxStop(); pxLit(true, true); }
+  function smooth(u) { u = clamp(u, 0, 1); return u * u * (3 - 2 * u); }
+  function pxBuild(T) {
+    var cs = getComputedStyle(h1), fs = parseFloat(cs.fontSize), s0 = fs * 0.21;
+    var font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + fs + 'px ' + cs.fontFamily;
+    var hb = hero.getBoundingClientRect(), hr = h1.getBoundingClientRect(), pad = Math.ceil(s0);
+    var cw = Math.ceil(hr.width + pad * 2), ch = Math.ceil(hr.height + pad * 2), ox = hr.left - pad, oy = hr.top - pad;
+    // 글자마다 자리(화면에 실제로 놓인 곳)를 재서 줄(보이는 줄)로 묶는다
+    var rng = document.createRange(), rows = [];
+    pxMasks.forEach(function (m, li) {
+      var w = document.createTreeWalker(m, NodeFilter.SHOW_TEXT), node;
+      while ((node = w.nextNode())) {
+        for (var i = 0; i < node.data.length; i++) {
+          if (/\s/.test(node.data[i])) continue;
+          rng.setStart(node, i); rng.setEnd(node, i + 1);
+          var r = rng.getBoundingClientRect(); if (!r.width) continue;
+          var row = null;
+          for (var k = 0; k < rows.length; k++) if (rows[k].li === li && Math.abs(rows[k].top - r.top) < fs * 0.5) { row = rows[k]; break; }
+          if (!row) { row = { li: li, top: r.top, bottom: r.bottom, left: r.left, right: r.right, ch: [] }; rows.push(row); }
+          row.left = Math.min(row.left, r.left); row.right = Math.max(row.right, r.right); row.bottom = Math.max(row.bottom, r.bottom);
+          row.ch.push({ c: node.data[i], x: r.left, y: r.top });
+        }
+      }
+    });
+    // 보이지 않는 그림판(2배)에 같은 글꼴로 글자마다 그 자리에 그린다
+    var q = 2, c = document.createElement('canvas'), x = c.getContext('2d');
+    c.width = cw * q; c.height = ch * q;
+    x.scale(q, q); x.font = font; x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
+    var mt = x.measureText('가'), asc = mt.fontBoundingBoxAscent || fs * 1.16;
+    rows.forEach(function (row) { row.ch.forEach(function (o) { x.fillText(o.c, o.x - ox, o.y - oy + asc); }); });
+    var d = x.getImageData(0, 0, c.width, c.height).data, iw = c.width + 1, sat = new Float32Array(iw * (c.height + 1));
+    for (var yy = 0; yy < c.height; yy++) {
+      var run = 0;
+      for (var xx = 0; xx < c.width; xx++) { run += d[(yy * c.width + xx) * 4 + 3] / 255; sat[(yy + 1) * iw + xx + 1] = sat[yy * iw + xx + 1] + run; }
+    }
+    function area(x0, y0, x1, y1) {
+      x0 = clamp(Math.round(x0 * q), 0, c.width); x1 = clamp(Math.round(x1 * q), 0, c.width); y0 = clamp(Math.round(y0 * q), 0, c.height); y1 = clamp(Math.round(y1 * q), 0, c.height);
+      var n = (x1 - x0) * (y1 - y0); if (n <= 0) return 0;
+      return (sat[y1 * iw + x1] - sat[y0 * iw + x1] - sat[y1 * iw + x0] + sat[y0 * iw + x0]) / n;
+    }
+    // 단계마다 점 격자. 칸을 글자가 덮은 넓이로 점을 켠다. 가장 굵은 단계는 켜짐·꺼짐만(멀리서 본 LED 글자처럼 거칠게)
+    var levels = T.ks.map(function (kk, li) {
+      var sp = s0 * kk, dots = [], first = li === 0;
+      for (var gy = sp / 2; gy < ch; gy += sp) for (var gx = sp / 2; gx < cw; gx += sp) {
+        var a = area(gx - sp / 2, gy - sp / 2, gx + sp / 2, gy + sp / 2);
+        if (a < (first ? 0.2 : 0.12)) continue;
+        var ry = gy + oy, ri = 0, best = 1e9;
+        rows.forEach(function (row, k) { var m = ry < row.top ? row.top - ry : ry > row.bottom ? ry - row.bottom : 0; if (m < best) { best = m; ri = k; } });
+        var row = rows[ri], u = (gx + ox - row.left) / Math.max(1, row.right - row.left);
+        dots.push(gx, gy, first ? 1 : Math.min(1, a * 2.6), ri, clamp(u, 0, 1));
+      }
+      return { r: sp * 0.36, dots: dots };
+    });
+    var dpr2 = Math.min(window.devicePixelRatio || 1, 2);
+    pxCv.width = Math.round(cw * dpr2); pxCv.height = Math.round(ch * dpr2);
+    pxCv.style.width = cw + 'px'; pxCv.style.height = ch + 'px';
+    pxCv.style.transform = 'translate(' + (ox - hb.left).toFixed(1) + 'px,' + (oy - hb.top).toFixed(1) + 'px)';
+    PX.levels = levels; PX.rows = rows; PX.dpr = dpr2;
+  }
+  // 단계 k의 세기: 들어와서(0단계는 왼쪽부터 켜짐) 다음 단계가 들어오는 동안 빠지고, 마지막 단계는 실제 글자가 나오는 동안 빠진다
+  //   겹쳐 바뀔 때 새 단계가 먼저 다 켜지고(구간의 앞 60%) 앞 단계가 늦게 빠진다(뒤 60%). 둘이 같이 반쯤 흐려져 제목이 어두워 보이지 않게
+  function pxLevelA(T, k, u) {
+    var w;
+    var a = k === 0 ? 1 : (w = T.splits[k - 1], smooth((u - w[0]) / ((w[1] - w[0]) * 0.6)));
+    var out = k < T.splits.length ? (w = T.splits[k], smooth((u - w[0] - (w[1] - w[0]) * 0.4) / ((w[1] - w[0]) * 0.6))) : clamp((u - T.fade[0]) / (T.fade[1] - T.fade[0]), 0, 1);
+    return a * (1 - out);
+  }
+  var BK = 10, buckets = [];
+  function pxFrame(id) {
+    if (id !== PX.run) return;
+    while (buckets.length <= BK) buckets.push([]);
+    var T = PX.T, t = now() - PX.t0, done = true;
+    var lineU = pxMasks.map(function (m, li) { return t - li * T.lag; });
+    lineU.forEach(function (u, li) {
+      if (u < T.fade[1] + 40) done = false;
+      if (u >= T.fade[0] && !pxMasks[li].classList.contains('lit')) { pxMasks[li].classList.add('lit'); pxMasks[li].classList.remove('now'); }
+    });
+    if (pxMasks.every(function (m) { return m.classList.contains('lit'); })) hero.classList.add('px-done');
+    pc.setTransform(PX.dpr, 0, 0, PX.dpr, 0, 0);
+    pc.clearRect(0, 0, pxCv.width, pxCv.height);
+    pc.fillStyle = '#fff';
+    PX.levels.forEach(function (L, k) {
+      var dots = L.dots, j, n;
+      for (j = 0; j <= BK; j++) buckets[j].length = 0;
+      for (n = 0; n < dots.length; n += 5) {
+        var u = lineU[PX.rows[dots[n + 3]].li];
+        if (u <= 0) continue;
+        var la = pxLevelA(T, k, u);
+        if (k === 0) la *= clamp((u / T.reveal - dots[n + 4] * 0.85) / 0.15, 0, 1);
+        var a = la * dots[n + 2];
+        if (a < 0.03) continue;
+        buckets[Math.round(a * BK)].push(dots[n], dots[n + 1]);
+      }
+      for (j = 1; j <= BK; j++) {
+        var b = buckets[j]; if (!b.length) continue;
+        pc.globalAlpha = j / BK; pc.beginPath();
+        for (n = 0; n < b.length; n += 2) { pc.moveTo(b[n] + L.r, b[n + 1]); pc.arc(b[n], b[n + 1], L.r, 0, 6.2832); }
+        pc.fill();
+      }
+    });
+    pc.globalAlpha = 1;
+    if (done) { pxStop(); pxLit(true); return; }
+    PX.raf = requestAnimationFrame(function () { pxFrame(id); });
+  }
+  function pxPlay(mobile) {
+    if (reduce) return;
+    pxMasks = $$('.mask', h1);
+    pxReset();
+    var id = PX.run, T = PX.T = mobile ? PXT.mobile : PXT.pc, at = now();
+    function go() {
+      if (id !== PX.run) return;
+      try { pxBuild(T); } catch (e) { pxShow(); return; }
+      PX.t0 = at + T.delay; pxCv.style.visibility = '';
+      PX.raf = requestAnimationFrame(function () { pxFrame(id); });
+    }
+    if (PX.fontOK || !pxFont) go();
+    else {
+      // 글꼴이 늦으면 2.5초까지 기다리고, 그래도 없으면 글을 그냥 보인다
+      var giveUp = setTimeout(function () { if (id === PX.run) pxShow(); }, 2500);
+      pxFont.then(function () { clearTimeout(giveUp); if (id === PX.run) { at = Math.max(at, now() - T.delay + 200); go(); } });
+    }
+  }
+
 
   /* ── 네 분야: 올린 줄(또는 누른 줄)만 펼쳐진다. 들어오면 첫 줄이 펼쳐진다 ── */
   var rowsBox = $('.le-rows'), rows = $$('.le-row');
@@ -897,9 +1045,9 @@ html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
   supReset();
 
   D.setup({
-    enter: function (n) { keyScene(n); if (n === HERO) tour(true); play(n, false); },
-    reset: function (n) { if (n === HERO) { if (D.on) tour(false); } else stopScene(n); },
-    seen: function (n, s, instant) { play(n, instant); },
+    enter: function (n) { keyScene(n); if (n === HERO) { tour(true); pxPlay(false); } play(n, false); },
+    reset: function (n) { if (n === HERO) { if (D.on) tour(false); pxReset(); } else stopScene(n); },
+    seen: function (n, s, instant) { if (n === HERO) { if (instant) pxShow(); else pxPlay(true); } play(n, instant); },
     unseen: function (n) { if (n !== HERO) stopScene(n); },
     move: function (from, to, fromEl, toEl) {
       if (from === PROC && to === END) return lightsOff(fromEl, toEl);
@@ -911,6 +1059,7 @@ html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
   });
   // 제목 반사광 겹: 공통 틀이 줄마다 감싼 뒤(setup) 줄마다 같은 글을 data-t에 담아 금빛 겹으로 그린다
   $$('.le-hero h1 .mask > span').forEach(function (s) { s.setAttribute('data-t', s.textContent); });
+  window.addEventListener('resize', function () { if (PX.T && pxCv.style.visibility !== 'hidden') pxShow(); });
   // 움직임 줄이기: 공통 틀이 아무것도 부르지 않는다. 다 펼친 모습으로 둔다
   if (reduce) { openRow(rows[0]); setNum('10', 'snap'); place(false); stepList.classList.add('run'); stepList.style.setProperty('--p', 1); steps.forEach(function (s) { s.classList.add('done'); }); }
 })();
