@@ -1123,6 +1123,38 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
       if (t >= 0.85 && !swapped) { swapped = true; mDark.style.opacity = '0'; }
     };
   }
+  // 휴대폰·작은 창: 맨 위 첫 화면에서 아래로 넘기면(손가락·휠) PC처럼 조명이 켜지며 소개로 한 번에 넘어간다(대표 11-14).
+  // 흰빛이 화면을 덮은 사이(0.85초)에 소개 맨 위로 옮긴다. 그 뒤로는 평소처럼 스크롤한다(첫 화면 말고는 한 번에 넘기지 않는다)
+  var mJump = false, jumpY = -1;
+  function atHeroTop() {
+    return !deck && fx && !mJump && !root.classList.contains('menu-open') && window.scrollY < Math.max(40, hero.offsetHeight * 0.3);
+  }
+  function jumpIntro() {
+    mJump = true;
+    mLevel = 1; // 스크롤로 켜지는 조명은 다시 틀지 않는다
+    var draw = drawOnM(), moved = false, hdr = $('.site-header');
+    playRig(1.5, function (t) {
+      draw(t);
+      // 첫 화면 사진이 조명을 받아 하얗게 날아간다(PC 넘김과 같은 값)
+      hero.style.filter = t < 0.85 ? 'brightness(' + (1 + 1.8 * sm(t, 0.15, 0.75)).toFixed(3) + ') contrast(' + (1 - 0.35 * sm(t, 0.15, 0.75)).toFixed(3) + ')' : '';
+      if (t >= 0.85 && !moved) {
+        moved = true;
+        var y = introSec.getBoundingClientRect().top + window.scrollY - (hdr ? hdr.offsetHeight : 0);
+        window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
+      }
+    }, function () { hero.style.filter = ''; mJump = false; });
+  }
+  window.addEventListener('touchstart', function (e) { jumpY = e.touches.length === 1 ? e.touches[0].clientY : -1; }, { passive: true });
+  window.addEventListener('touchmove', function (e) {
+    if (mJump) { e.preventDefault(); return; }
+    if (jumpY < 0 || !atHeroTop()) return;
+    if (jumpY - e.touches[0].clientY > 14) { e.preventDefault(); jumpY = -1; jumpIntro(); }
+  }, { passive: false });
+  window.addEventListener('wheel', function (e) {
+    if (deck || e.ctrlKey) return;
+    if (mJump) { e.preventDefault(); return; }
+    if (e.deltaY > 0 && atHeroTop()) { e.preventDefault(); jumpIntro(); }
+  }, { passive: false });
   // 2 → 1: 천장 줄 → 보조광 → 주 조명 순서로 꺼지고, 주 조명은 잔광을 남겼다 사그라든다(0.9초)
   function drawOnBack(from, to) {
     var W = window.innerWidth, H = window.innerHeight;
