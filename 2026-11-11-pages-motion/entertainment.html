@@ -158,7 +158,9 @@ html.deck .scene.in .le-sup-list::before, html.fx:not(.deck) .scene.seen .le-sup
 .le-item { position: relative; display: grid; grid-template-columns: 52px 1fr; gap: 4px 10px; padding: clamp(10px, 2vh, 18px) 16px clamp(10px, 2vh, 18px) 4px; border-bottom: 1px solid var(--l-hair); transition: background 0.4s, padding 0.5s var(--ease); }
 .le-item::before { content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0; background: var(--l-gold); transition: width 0.6s var(--ease); }
 .le-item { z-index: 1; }
-.le-item.hot { padding-left: 16px; }
+/* 올린 항목의 글만 12px 옆으로(칸 크기는 그대로 — 여백을 늘리면 설명이 두 줄로 접혀 칸이 커지고 목록이 흔들렸다, 대표 11-13) */
+.le-item > * { transition: transform 0.5s var(--ease); }
+.le-item.hot > * { transform: translateX(12px); }
 /* 올린 항목 뒤 흰 칸: 항목 사이를 미끄러지듯 따라다닌다(대표 11-13) */
 .le-sup-hl { position: absolute; left: 0; top: 0; z-index: 0; list-style: none; background: var(--l-paper); box-shadow: 0 22px 44px -28px rgba(40, 30, 15, 0.3); opacity: 0; pointer-events: none; transition: transform 0.5s var(--ease), width 0.5s var(--ease), height 0.5s var(--ease), opacity 0.35s; }
 .le-sup-hl::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--l-gold); }
