@@ -159,14 +159,38 @@ html.deck .scene.in .le-sup-list::before, html.fx:not(.deck) .scene.seen .le-sup
 .le-item::before { content: ''; position: absolute; left: 0; bottom: -1px; height: 1px; width: 0; background: var(--l-gold); transition: width 0.6s var(--ease); }
 .le-item { z-index: 1; }
 /* 올린 항목의 글만 12px 옆으로(칸 크기는 그대로 — 여백을 늘리면 설명이 두 줄로 접혀 칸이 커지고 목록이 흔들렸다, 대표 11-13) */
-.le-item > * { transition: transform 0.5s var(--ease); }
-.le-item.hot > * { transform: translateX(12px); }
-/* 올린 항목 뒤 흰 칸: 항목 사이를 미끄러지듯 따라다닌다(대표 11-13) */
-.le-sup-hl { position: absolute; left: 0; top: 0; z-index: 0; list-style: none; background: var(--l-paper); box-shadow: 0 22px 44px -28px rgba(40, 30, 15, 0.3); opacity: 0; pointer-events: none; transition: transform 0.5s var(--ease), width 0.5s var(--ease), height 0.5s var(--ease), opacity 0.35s; }
-.le-sup-hl::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--l-gold); }
+.le-item > * { transition: transform 0.6s var(--ease), opacity 0.45s var(--ease), color 0.45s; }
+.le-item.hot > * { transform: translateX(10px); }
+/* 올린 항목만 또렷하게: 나머지는 뒤로 물러나고(위 이력·아래 과정 목록과 같은 방식), 올린 항목 밑줄은 금색 선이 왼쪽부터 그어진다(대표 11-14 "상자 뜨는 게 어색") */
+.le-sup-list.focus .le-item:not(.hot) > * { opacity: 0.38; }
+.le-item.hot::before { width: 100%; }
+/* 올린 항목 뒤 옅은 금빛: 모서리 없이 왼쪽에서 번져 오른쪽으로 사라지고, 항목 사이를 미끄러지듯 따라다닌다 */
+.le-sup-hl { position: absolute; left: 0; top: 0; z-index: 0; list-style: none; background: radial-gradient(120% 140% at 6% 50%, rgba(164, 134, 90, 0.17), rgba(164, 134, 90, 0.05) 45%, transparent 75%); -webkit-mask-image: linear-gradient(to right, transparent, #000 16%), linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent); mask-image: linear-gradient(to right, transparent, #000 16%), linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent); -webkit-mask-composite: source-in; mask-composite: intersect; opacity: 0; pointer-events: none; transition: transform 0.6s var(--ease), width 0.6s var(--ease), height 0.6s var(--ease), opacity 0.45s; }
 .le-sup-hl.on { opacity: 1; }
 .le-item-num { font-family: var(--display); font-size: clamp(18px, min(1.5vw, 2.6vh), 22px); color: var(--l-gold); line-height: 1.2; grid-row: span 2; }
-.le-item h3 { font-size: clamp(15px, min(1.2vw, 2.1vh), 17px); font-weight: 700; letter-spacing: -0.01em; color: var(--l-ink); }
+.le-item h3 { position: relative; font-size: clamp(15px, min(1.2vw, 2.1vh), 17px); font-weight: 700; letter-spacing: -0.01em; color: var(--l-ink); }
+/* ── 올린 항목 모션(대표 11-14 "고퀄리티로 모션그래픽도") ── */
+/* ① 번호가 계기판처럼 한 칸 굴러 짙은 금빛 같은 번호로 바뀐다(오른쪽 큰 숫자와 같은 움직임) */
+.le-item-num .nr { display: block; height: 1.2em; overflow: hidden; }
+.le-item-num .nr > span { display: block; transition: transform 0.7s cubic-bezier(0.2, 0.75, 0.2, 1); }
+.le-item-num .nr i { display: block; height: 1.2em; font-style: normal; }
+.le-item-num .nr i + i { color: #7a5c30; }
+.le-item.hot .le-item-num .nr > span { transform: translateY(-1.2em); }
+/* ② 제목 글자 위로 금빛이 한 번 스쳐 지나간다(첫 화면 제목 반사광과 같은 방식, 같은 글을 금빛 겹으로 얹고 띠 모양으로만 보이게) */
+.le-item h3[data-t]::after { content: attr(data-t); position: absolute; inset: 0; color: #c99a52; pointer-events: none; -webkit-mask-image: linear-gradient(105deg, transparent 0%, transparent 40%, #000 50%, transparent 60%, transparent 100%); mask-image: linear-gradient(105deg, transparent 0%, transparent 40%, #000 50%, transparent 60%, transparent 100%); -webkit-mask-size: 320% 100%; mask-size: 320% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+.le-item.hot h3[data-t]::after { animation: le-sheen-once 1.1s cubic-bezier(0.4, 0, 0.3, 1) 0.12s both; }
+@keyframes le-sheen-once { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0% 0; mask-position: 0% 0; } }
+/* ③ 금색 밑줄 끝에 빛 알갱이가 달려 선을 그으며 지나가고 사라진다 */
+.le-item::after { content: ''; position: absolute; left: 0; right: 0; bottom: -5px; height: 9px; pointer-events: none; opacity: 0; background: radial-gradient(closest-side, #fff4dc 0%, rgba(214, 176, 112, 0.9) 35%, rgba(164, 134, 90, 0) 100%) no-repeat; background-size: 22px 9px; background-position: 0% 50%; }
+.le-item.hot::after { animation: le-spark 0.75s var(--ease) both; }
+@keyframes le-spark { 0% { opacity: 0; background-position: 0% 50%; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; background-position: 100% 50%; } }
+/* ④ 오른쪽 이름·설명은 낱말마다 흐릿하게 떠올라 차례로 또렷해지고, 설명 위 짧은 금색 선이 다시 그어진다 */
+.le-focus .w { display: inline-block; animation: le-word 0.75s var(--ease) both; animation-delay: calc(var(--w, 0) * 0.028s); }
+@keyframes le-word { from { opacity: 0; transform: translateY(0.55em); filter: blur(6px); } to { opacity: 1; transform: none; filter: blur(0); } }
+.le-detail::before { content: ''; display: block; width: 56px; height: 1px; margin-bottom: clamp(12px, 2vh, 18px); background: var(--l-gold); transform: scaleX(0); transform-origin: left; }
+.le-detail.draw::before { animation: le-draw 0.9s var(--ease) both; }
+@keyframes le-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .le-item.hot h3[data-t]::after, .le-item.hot::after, .le-focus .w { animation: none; } .le-detail.draw::before { animation: none; transform: none; } }
 .le-item p { font-size: clamp(13px, min(1vw, 1.8vh), 14.5px); color: var(--l-sub); line-height: 1.6; }
 .le-item .le-full { display: none; }
 html.fx .le-item { opacity: 0; transform: translateY(12px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease), background 0.4s, padding 0.5s var(--ease); }
@@ -512,9 +536,28 @@ html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
     supCur = n; clearTimeout(countT);
     setNum(n);
     clearTimeout(supT); box.classList.add('swap');
-    supT = setTimeout(function () { cap.textContent = c; det.textContent = d; box.classList.remove('swap'); }, 220);
+    supT = setTimeout(function () {
+      words(cap, c); words(det, d);
+      det.classList.remove('draw'); if (d) { void det.offsetWidth; det.classList.add('draw'); }
+      box.classList.remove('swap');
+    }, 220);
   }
-  // 흰 칸이 올린 항목으로 미끄러진다. 처음 나타날 때는 그 자리에서 바로
+  // 낱말마다 감싸 차례로 떠오르게 한다(--w가 차례 번호)
+  function words(el, text) {
+    el.textContent = '';
+    text.split(' ').forEach(function (t, k) {
+      if (k) el.appendChild(document.createTextNode(' '));
+      var s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--w', k); s.textContent = t; el.appendChild(s);
+    });
+  }
+  // 목록 번호는 같은 번호 두 개를 세로로 쌓아 굴리고, 제목은 같은 글을 금빛 겹(data-t)으로 얹는다. 번호 원문은 data-n에 둔다
+  items.forEach(function (li) {
+    var num = $('.le-item-num', li), n = num.textContent.trim();
+    li.dataset.n = n;
+    num.innerHTML = '<span class="nr"><span><i>' + n + '</i><i aria-hidden="true">' + n + '</i></span></span>';
+    $('h3', li).setAttribute('data-t', $('h3', li).textContent);
+  });
+  // 옅은 금빛이 올린 항목으로 미끄러진다. 처음 나타날 때는 그 자리에서 바로
   var hl = $('.le-sup-hl'), supList = $('.le-sup-list');
   function hlTo(li) {
     var first = !hl.classList.contains('on');
@@ -528,11 +571,11 @@ html.fx:not(.deck) .le-end .cta { background: var(--l-dark); }
     li.addEventListener('pointerenter', function (e) {
       if (e.pointerType !== 'mouse') return;
       items.forEach(function (x) { x.classList.toggle('hot', x === li); });
-      hlTo(li);
-      supShow($('.le-item-num', li).textContent, $('h3', li).textContent, $('.le-full', li).textContent);
+      hlTo(li); supList.classList.add('focus');
+      supShow(li.dataset.n, $('h3', li).textContent, $('.le-full', li).textContent);
     });
   });
-  supList.addEventListener('pointerleave', function () { items.forEach(function (x) { x.classList.remove('hot'); }); hl.classList.remove('on'); supShow('10', '가지 지원', ''); });
+  supList.addEventListener('pointerleave', function () { items.forEach(function (x) { x.classList.remove('hot'); }); hl.classList.remove('on'); supList.classList.remove('focus'); supShow('10', '가지 지원', ''); });
   // 들어오면 0.5초 뒤 00에서 10으로: 일의 자리가 한 바퀴 돌고, 마지막에 십의 자리가 1로 넘어간다
   function countUp() {
     clearTimeout(countT);
