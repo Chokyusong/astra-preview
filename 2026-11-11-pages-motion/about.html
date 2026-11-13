@@ -33,7 +33,7 @@ html.from-home::view-transition-old(root), html.from-home::view-transition-new(r
 <link rel="stylesheet" href="deck.css">
 <style>
 /* 회사소개 2판 — 밤하늘 (설계 pages-motion-design.md 2절, 지시서 012).
-   하나의 생각: 마우스가 별을 깨우고 잇는다. 화면 4개: 첫 화면 → 소개 → OUR VISION(별자리) → 문의 + 바닥글.
+   하나의 생각: 마우스가 별을 깨우고 잇는다. 화면 5개: 첫 화면 → 소개 → OUR VISION(별자리) → 오시는 길(2-11) → 문의 + 바닥글.
    문구·순서·배치·색·글꼴·사진은 정지 시안(../2026-11-10-pages/about.html) 그대로다. 크기는 큰 창 배율 --k(공통 틀)를 쓴다. */
 .vision { --scene-bg: var(--tile); }
 .pine svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -125,6 +125,75 @@ html.fx .sky .dust { display: none; }
 html.deck .cta .display { font-size: min(10.5vw, 30vh, calc(151.2px * var(--k, 1))); }
 html.deck .cta-row p { font-size: max(20px, min(2vw, 4vh, calc(28.8px * var(--k, 1)))); }
 html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px * var(--k, 1)); font-size: calc(18px * var(--k, 1)); }
+
+/* 화면 4 오시는 길(2-11, 지시서 016): 별 하나가 내려앉아 회사 자리가 된다. 지도는 아직 넣지 않는다(지도 자리만 비워 둔다).
+   휴대폰·작은 창: 사진 → 제목 → 지도 자리 → 주소·교통편·버튼 순으로 쌓는다 */
+.location { padding: var(--section) var(--gutter); }
+.loc-photo { position: relative; overflow: hidden; width: 100%; max-width: 640px; height: min(62vh, calc(min(100vw - 2 * var(--gutter), 640px) * 1.3364)); background: #050505; }
+.loc-zoom { position: absolute; inset: 0; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.loc-zoom:focus-visible { outline: 3px solid var(--paper); outline-offset: -3px; }
+/* 사진은 비율 그대로 두고 틀에 맞춰 자른다(아래쪽 70%를 기준으로 맞춰 간판이 보이게). 층 가림은 이 상자 안의 비율이라 잘려도 층과 어긋나지 않는다 */
+.loc-pic { position: absolute; left: 0; top: 70%; translate: 0 -70%; display: block; width: 100%; aspect-ratio: 1085 / 1450; }
+.loc-pic img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.loc-dark { filter: brightness(0.22); }
+/* 불 켜진 사진 네 장을 층마다 잘라 겹친다(층 경계는 사진의 조명 띠 높이: 1층 57.5%, 2층 34.5%, 3층 12%). 아래쪽 가장자리만 부드럽게 해 두 층이 다 켜지면 경계가 보이지 않는다 */
+.loc-lit[data-floor="0"] { -webkit-mask-image: linear-gradient(to bottom, transparent 56.3%, #000 58.7%); mask-image: linear-gradient(to bottom, transparent 56.3%, #000 58.7%); }
+.loc-lit[data-floor="1"] { -webkit-mask-image: linear-gradient(to bottom, transparent 33.3%, #000 35.7%, #000 58.7%, transparent 58.7%); mask-image: linear-gradient(to bottom, transparent 33.3%, #000 35.7%, #000 58.7%, transparent 58.7%); }
+.loc-lit[data-floor="2"] { -webkit-mask-image: linear-gradient(to bottom, transparent 10.8%, #000 13.2%, #000 35.7%, transparent 35.7%); mask-image: linear-gradient(to bottom, transparent 10.8%, #000 13.2%, #000 35.7%, transparent 35.7%); }
+.loc-lit[data-floor="3"] { -webkit-mask-image: linear-gradient(to bottom, #000 13.2%, transparent 13.2%); mask-image: linear-gradient(to bottom, #000 13.2%, transparent 13.2%); }
+/* 다 켜진 뒤 조명이 아주 천천히 숨 쉰다(6초에 밝기 ±4%, 층마다 0.4초씩 엇갈림) */
+.loc-photo.breathe .loc-lit { animation: loc-breathe 6s ease-in-out infinite; }
+.loc-photo.breathe .loc-lit[data-floor="1"] { animation-delay: 0.4s; }
+.loc-photo.breathe .loc-lit[data-floor="2"] { animation-delay: 0.8s; }
+.loc-photo.breathe .loc-lit[data-floor="3"] { animation-delay: 1.2s; }
+@keyframes loc-breathe { 0%, 100% { filter: brightness(1); } 25% { filter: brightness(1.04); } 75% { filter: brightness(0.96); } }
+.loc-body { display: flex; flex-direction: column; gap: 22px; max-width: 640px; margin-top: clamp(28px, 6vw, 48px); }
+.location h2 { margin-top: 10px; font-family: var(--serif-ko); font-size: clamp(30px, 4.4vw, 60px); font-weight: 400; line-height: 1.3; letter-spacing: -0.015em; color: var(--paper); }
+/* 지도 자리: 밤하늘보다 한 단계 밝은 면, 흰색 14% 테두리. 지도는 .loc-slot에 끼운다(위치 별·빛·선은 그 위 따로) */
+.loc-map { position: relative; height: clamp(220px, 38vh, 360px); overflow: hidden; background: #131313; border: 1px solid rgba(255, 255, 255, 0.14); }
+.loc-slot { position: absolute; inset: 0; }
+.loc-fx { position: absolute; inset: 0; pointer-events: none; }
+.loc-fx svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.loc-line { stroke: #fff; stroke-width: 1; stroke-linecap: round; opacity: 0; }
+.loc-glow { position: absolute; left: 50%; top: 48%; width: 100px; height: 100px; margin: -50px 0 0 -50px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0)); opacity: 0; }
+.loc-star { position: absolute; z-index: 2; left: 50%; top: 48%; width: 36px; height: 36px; margin: -18px 0 0 -18px; filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 12px rgba(255, 255, 255, 0.45)); }
+.loc-star svg { transition: transform 0.5s var(--ease); }
+.loc-map.near .loc-star svg { transform: scale(1.5) rotate(15deg); }
+.loc-map.wait .loc-star { opacity: 0; }
+.loc-label { position: absolute; left: 16px; bottom: 12px; font-size: 12px; line-height: 1.4; letter-spacing: 0.02em; color: rgba(255, 255, 255, 0.42); }
+.loc-addr { font-family: var(--serif-ko); font-size: clamp(20px, 2vw, 28px); font-weight: 500; line-height: 1.4; color: var(--paper); }
+.loc-transit { margin-top: 10px; padding: 0; list-style: none; font-size: 16px; line-height: 1.7; }
+.loc-transit li { transition: opacity 0.3s; }
+.loc-transit .tk { font-weight: 600; color: var(--paper); }
+.loc-transit.pick li:not(.hot) { opacity: 0.55; }
+.loc-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.loc-actions .btn { font-family: inherit; cursor: pointer; }
+/* PC 한 화면: 왼쪽 사진(창 높이의 74%), 오른쪽 제목·지도 자리·주소·교통편·버튼. 오른쪽 이동 표시 자리를 비운다 */
+html.deck .location { display: flex; align-items: center; gap: clamp(32px, 4vw, calc(72px * var(--k, 1))); padding: calc(var(--header-h) + clamp(10px, 2.2vh, 30px)) max(var(--gutter), 80px) clamp(16px, 3vh, 40px) var(--gutter); }
+html.deck .loc-photo { flex: none; width: auto; max-width: none; height: 74vh; aspect-ratio: 1085 / 1450; }
+html.deck .loc-pic { transform: scale(1.08); will-change: transform; }
+html.deck .loc-body { flex: 1 1 0; min-width: 0; max-width: none; margin: 0; gap: clamp(12px, 2.4vh, calc(28px * var(--k, 1))); }
+html.deck .location .eyebrow { font-size: max(15px, min(1.4vw, 2.3vh, calc(20px * var(--k, 1)))); }
+html.deck .location h2 { margin-top: clamp(2px, 0.8vh, 10px); font-size: max(28px, min(3.4vw, 6vh, calc(52px * var(--k, 1)))); }
+html.deck .loc-map { height: 38vh; }
+html.deck .loc-star { width: calc(36px * var(--k, 1)); height: calc(36px * var(--k, 1)); margin: calc(-18px * var(--k, 1)) 0 0 calc(-18px * var(--k, 1)); }
+html.deck .loc-label { font-size: calc(12px * var(--k, 1)); }
+html.deck .loc-addr { font-size: max(18px, min(1.7vw, 3.2vh, calc(26px * var(--k, 1)))); }
+html.deck .loc-transit { margin-top: clamp(2px, 0.8vh, 10px); font-size: max(14px, min(1.15vw, 2.3vh, calc(17px * var(--k, 1)))); }
+html.deck .loc-actions { margin-top: clamp(8px, 2vh, calc(26px * var(--k, 1))); }
+html.deck .loc-actions .btn { min-height: max(44px, min(7vh, calc(56px * var(--k, 1)))); padding: 0 calc(30px * var(--k, 1)); font-size: max(15px, min(1.2vw, 2.6vh, calc(17px * var(--k, 1)))); }
+/* 글은 사옥이 켜지는 동안 0.08초 간격으로 떠오른다 */
+html.deck .location.in .rise { transition-delay: calc(0.1s + var(--i, 0) * 0.08s); }
+/* 사진 크게 보기: 화면 가득, 마우스로 둘러본다(미디어 "들어가 보기"와 같은 방식) */
+.loc-stage { position: fixed; z-index: 60; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background: #050505; cursor: zoom-out; }
+.loc-stage img { position: absolute; left: 0; top: 0; display: block; max-width: none; will-change: transform; }
+.loc-stage-close { position: absolute; z-index: 2; top: 24px; right: clamp(20px, 3vw, 56px); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: rgba(10, 10, 10, 0.55); color: var(--paper); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35); cursor: pointer; opacity: 0; transition: opacity 0.25s; }
+.loc-stage.ready .loc-stage-close { opacity: 1; }
+.loc-stage-close:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+html.loc-lb, html.loc-lb body { overflow: hidden; }
+/* 내려앉는 별이 지나온 길 */
+.fly .trail { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.fly .trail polyline { fill: none; stroke: #fff; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
 </style>
 </head>
 <body>
@@ -170,6 +239,37 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     <p class="vt">각 분야를 따로 바라보는 데 그치지 않고, 서로의 강점을 연결해 더 큰 시너지를 만듭니다. 아스트라는 현재에 머무르지 않고, 종합 미디어 엔터테인먼트 기업으로 성장해 나갑니다.</p>
   </div>
 </section>
+<section class="location scene" data-name="오시는 길">
+  <figure class="loc-photo">
+    <button class="loc-zoom" type="button" aria-label="사옥 사진 크게 보기"><span class="loc-pic">
+      <img class="loc-dark" src="../2026-11-10-pages/img/about-office.webp" alt="밤에 조명이 켜진 아스트라엔터테인먼트 사옥" width="1085" height="1450">
+      <img class="loc-lit" data-floor="0" src="../2026-11-10-pages/img/about-office.webp" alt="" aria-hidden="true">
+      <img class="loc-lit" data-floor="1" src="../2026-11-10-pages/img/about-office.webp" alt="" aria-hidden="true">
+      <img class="loc-lit" data-floor="2" src="../2026-11-10-pages/img/about-office.webp" alt="" aria-hidden="true">
+      <img class="loc-lit" data-floor="3" src="../2026-11-10-pages/img/about-office.webp" alt="" aria-hidden="true">
+    </span></button>
+  </figure>
+  <div class="loc-body">
+    <div class="loc-head">
+      <p class="eyebrow rise" style="--i:0">LOCATION</p>
+      <h2 class="rise" style="--i:1">오시는 길</h2>
+    </div>
+    <div class="loc-map">
+      <div class="loc-slot" data-map-slot aria-hidden="true"></div>
+      <div class="loc-fx" aria-hidden="true"><span class="loc-glow"></span><svg><line class="loc-line" x1="0" y1="0" x2="0" y2="0"></line></svg></div>
+      <span class="loc-star pine" aria-hidden="true"></span>
+      <p class="loc-label">지도 자리 · 네이버 지도 연결 예정</p>
+    </div>
+    <div class="loc-info">
+      <p class="loc-addr rise" style="--i:2">서울 강남구 역삼동 664-7</p>
+      <ul class="loc-transit rise" style="--i:3">
+        <li><span class="tk">지하철</span> · 확인 뒤 입력</li>
+        <li><span class="tk">버스</span> · 확인 뒤 입력</li>
+      </ul>
+      <div class="loc-actions rise" style="--i:4"><a class="btn btn-solid" href="https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%20%EA%B0%95%EB%82%A8%EA%B5%AC%20%EC%97%AD%EC%82%BC%EB%8F%99%20664-7" target="_blank" rel="noopener">네이버 지도에서 길찾기</a><button class="btn btn-line loc-copy" type="button">주소 복사</button></div>
+    </div>
+  </div>
+</section>
 <div class="scene scene-end" data-name="문의" data-light>
 <section class="cta">
   <p class="display" data-words>WE MAKE NEXT.</p>
@@ -209,10 +309,11 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
    이 쪽이 하는 일: 첫 화면 그림의 마우스 반응, 밤하늘 층, 다섯 낱말, 날아가는 별, 살아 있는 별자리, 빛살 넘김. 값은 README.md */
 (function () {
   var D = window.Deck, $ = D.$, $$ = D.$$, reduce = D.reduce, anim = D.anim;
-  var hero = $('.hero'), story = $('.story'), vision = $('.vision'), endScene = $('.scene-end');
+  var hero = $('.hero'), story = $('.story'), vision = $('.vision'), locScene = $('.location'), endScene = $('.scene-end');
   var photo = $('.story-photo'), skyBox = $('.sky'), heroGL = $('.hero-gl'), lead = $('.story-text .lead');
+  var locPhoto = $('.loc-photo'), locPic = $('.loc-pic'), lits = $$('.loc-lit'), locMap = $('.loc-map'), locStar = $('.loc-star'), locGlow = $('.loc-glow'), locLine = $('.loc-line'), transit = $('.loc-transit'), copyBtn = $('.loc-copy');
   var ns = 'http://www.w3.org/2000/svg';
-  var HERO = 0, STORY = 1, VISION = 2, END = 3;
+  var HERO = 0, STORY = 1, VISION = 2, LOCATION = 3, END = 4;
   var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
   var lag = function (dt, tau) { return 1 - Math.exp(-dt / tau); }; // 남은 거리 중 이번 화면에 다가갈 비율
   var ease = function (u) { return u < 0.5 ? 8 * u * u * u * u : 1 - Math.pow(-2 * u + 2, 4) / 2; }; // 넘김(0.76,0,0.24,1)과 비슷한 곡선
@@ -453,7 +554,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   document.body.appendChild(night);
   var N = { stars: [], W: 0, H: 0, r: 1, off: 0, drift: 0, chain: [], last: null, lastP: null, lastAt: 0, sweep: null, swept: false, showing: false, until: 0, touch: null, base: 0, allWake: 0 };
   // 글 위에서 깨어난 별은 밝기 60%(읽기를 방해하지 않게)
-  var textEls = $$('.hero .eyebrow, .hero h1, .story-text p, .vision .eyebrow, .vision h2, .vision-text p');
+  var textEls = $$('.hero .eyebrow, .hero h1, .story-text p, .vision .eyebrow, .vision h2, .vision-text p, .location .eyebrow, .location h2, .loc-addr, .loc-transit li');
   function seed() {
     var W = window.innerWidth, H = window.innerHeight, r = Math.min(window.devicePixelRatio || 1, 1.5);
     N.W = W; N.H = H; N.r = r;
@@ -475,20 +576,22 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     // 보이는 때: 한 화면씩이면 첫 화면·소개·OUR VISION(첫 화면은 깨어난 별과 잇는 선만), OUR VISION → 문의로 넘어가는 동안.
     // 스크롤이면 소개·OUR VISION 구역이 화면에 있을 때
     var show, sr = null, vr = null;
-    if (deck) show = D.cur === HERO || D.cur === STORY || D.cur === VISION || !!(tr && tr.from === VISION && tr.to === END);
-    else { sr = story.getBoundingClientRect(); vr = vision.getBoundingClientRect(); show = (sr.bottom > 0 && sr.top < H) || (vr.bottom > 0 && vr.top < H); }
+    // 오시는 길(2-11)에서도 같은 값으로 돈다(사진 위에는 그리지 않는다). 오시는 길 → 문의로 넘어가는 동안도
+    var lr = null;
+    if (deck) show = D.cur === HERO || D.cur === STORY || D.cur === VISION || D.cur === LOCATION || !!(tr && tr.from === LOCATION && tr.to === END);
+    else { sr = story.getBoundingClientRect(); vr = vision.getBoundingClientRect(); lr = locScene.getBoundingClientRect(); show = (sr.bottom > 0 && sr.top < H) || (vr.bottom > 0 && vr.top < H) || (lr.bottom > 0 && lr.top < H); }
     if (show !== N.showing) { N.showing = show; night.classList.toggle('show', show); }
     if (show) N.until = t + 1000;
     // 평소 별(깨지 않은 별)은 소개·OUR VISION에서만 보인다. 첫 화면에서는 그림 속에 별이 있어 그리지 않는다(0.9초에 오간다)
-    var baseTo = !deck || D.cur === STORY || D.cur === VISION ? 1 : 0;
+    var baseTo = !deck || D.cur === STORY || D.cur === VISION || D.cur === LOCATION ? 1 : 0;
     N.base = baseTo > N.base ? Math.min(baseTo, N.base + dt / 0.9) : Math.max(baseTo, N.base - dt / 0.9);
     if (!tr) N.allWake = 0;
     if (t > N.until) return;
     // 하늘 위치: 넘길 때 내용보다 느리게(화면 높이의 30%), 스크롤할 때도 30%
     var off;
     if (deck) {
-      // OUR VISION ↔ 문의는 빛이 번지며 넘어가므로 하늘을 옮기지 않는다(꼬리가 생기지 않게)
-      if (tr && (tr.from === END || tr.to === END)) off = -VISION * 0.3 * H;
+      // 오시는 길 ↔ 문의는 빛이 번지며 넘어가므로 하늘을 옮기지 않는다(꼬리가 생기지 않게)
+      if (tr && (tr.from === END || tr.to === END)) off = -LOCATION * 0.3 * H;
       else if (tr) { var u = clamp((t - tr.t0) / tr.dur, 0, 1); off = -(tr.from + (tr.to - tr.from) * ease(u)) * 0.3 * H; }
       else off = -D.cur * 0.3 * H;
     } else off = -window.pageYOffset * 0.3;
@@ -507,7 +610,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       }
       // 첫 화면의 처음 한 번: 그림의 빛이 훑고 지나가는 자리를 따라 별도 깨어나고 이어진다
       if (!p && D.cur === HERO && !tr && HS.sweep && t >= HS.sweep) { p = { x: HS.x * W, y: HS.y * H }; chainOn = true; }
-      if (!p && M.at) { p = { x: M.x, y: M.y }; chainOn = (D.cur === STORY || D.cur === HERO) && !tr && !idle; }
+      if (!p && M.at) { p = { x: M.x, y: M.y }; chainOn = (D.cur === STORY || D.cur === HERO || D.cur === LOCATION) && !tr && !idle; }
     } else if (N.touch && t - N.touch.t < 1500) p = { x: N.touch.x, y: N.touch.y };
     var R = Math.max(160, W * 0.13);
 
@@ -518,11 +621,13 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     // 사진 위에는 그리지 않는다. 스크롤할 때는 소개·OUR VISION 구역 안에만
     ctx.beginPath();
     if (deck) ctx.rect(0, 0, W, H);
-    else { ctx.rect(sr.left, sr.top, sr.width, sr.height); ctx.rect(vr.left, vr.top, vr.width, vr.height); }
+    else { ctx.rect(sr.left, sr.top, sr.width, sr.height); ctx.rect(vr.left, vr.top, vr.width, vr.height); ctx.rect(lr.left, lr.top, lr.width, lr.height); }
     var pr = photo.getBoundingClientRect();
     // 한 화면씩일 때 사진은 소개 화면(또는 그리로 넘어가는 동안)에만 있다. 다른 화면에서도 사진 자리를 빼면 첫 화면 오른쪽에서 마우스를 따르던 별이 끊겼다(대표 11-12)
     var photoOn = !deck || D.cur === STORY || !!(tr && (tr.from === STORY || tr.to === STORY));
     if (photoOn && pr.bottom > 0 && pr.top < H && pr.width) ctx.rect(pr.left, pr.top, pr.width, pr.height);
+    var or = locPhoto.getBoundingClientRect(), officeOn = !deck || D.cur === LOCATION || !!(tr && (tr.from === LOCATION || tr.to === LOCATION));
+    if (officeOn && or.bottom > 0 && or.top < H && or.width) ctx.rect(or.left, or.top, or.width, or.height);
     ctx.clip('evenodd');
     ctx.globalCompositeOperation = 'lighter';
     ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff'; ctx.lineCap = 'round';
@@ -760,8 +865,8 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     later('fly', stopFly, 900 + 4 * 60 + 300);
   }
 
-  // ── 화면 3 → 4: 별들이 번져 하나의 빛이 된다(2-6) ──
-  // 여섯째 별이 먼저(없으면 가운데 Entertainment 별), 이어서 별자리의 별이 시작점에서 가까운 순서로 0.07초 간격.
+  // ── 화면 4 → 5: 빛이 번져 흰 화면이 된다(2-6을 오시는 길로 옮김, 2-11) ──
+  // 위치 별이 먼저, 이어서 사옥의 조명 띠 자리 세 곳(1층 간판, 2층 띠, 3층 띠)에서 0.07초 간격.
   // 별 자리마다 가장자리가 부드러운 둥근 흰 빛(번짐 폭은 반지름의 35%)이 처음 0.25초는 60px까지 천천히, 그 뒤 빠르게 커져
   // 서로 합쳐지며 흰 면(문의 화면)이 된다. 모두 1.1초. 되돌아갈 때는 같은 움직임을 거꾸로 돌린다.
   // 문의 화면에 둥근 가림(mask) 여섯 겹을 씌우고, 반지름은 등록한 CSS 값(--glow0~5)을 움직여 바꾼다. 못 쓰는 브라우저는 공통 넘김(아래에서 덮기)
@@ -773,12 +878,11 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       glowOK = true;
     }
   } catch (e) { glowOK = false; }
+  // 사진 안 조명 자리(가로, 세로 비율): 1층 간판, 2층 띠, 3층 띠
+  var BANDS = [[0.63, 0.61], [0.6, 0.4], [0.62, 0.195]];
   function glowSources() {
-    var K = PC, r = K.svg.getBoundingClientRect(), sc = r.width / 1100, o = burstPoint(), pts = [];
-    if (K.six && K.six.a > 0.5) pts.push(o);
-    var rest = K.stars.map(function (s) { return { x: r.left + (s.x + s.dx) * sc, y: r.top + (s.y + s.dy) * sc }; });
-    rest.sort(function (a, b) { return Math.hypot(a.x - o.x, a.y - o.y) - Math.hypot(b.x - o.x, b.y - o.y); });
-    return pts.concat(rest).slice(0, GLOWS);
+    var s = locStar.getBoundingClientRect(), r = locPic.getBoundingClientRect();
+    return [{ x: s.left + s.width / 2, y: s.top + s.height / 2 }].concat(BANDS.map(function (b) { return { x: r.left + r.width * b[0], y: r.top + r.height * b[1] }; }));
   }
   function clearGlow() { endScene.style.webkitMaskImage = ''; endScene.style.maskImage = ''; clearT('glow'); }
   // 되돌아갈 때 빛이 줄어들기 시작하는 크기(012 대표 지적): 처음 크기(혼자서 화면을 다 덮는 크기)에서 거꾸로 돌리면
@@ -821,6 +925,226 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     return anims;
   }
 
+  // ── 화면 4 오시는 길(2-11): 별 하나가 내려앉아 회사 자리가 된다 ──
+  locStar.innerHTML = pine(1.2);
+  var LOC = { px: 0, py: 0, near: false, la: 0, flowLanded: false, copyAt: 0 };
+  // 사옥 불: 아래층부터 0.28초 간격으로 켜진다(켜질 때 0.12초 동안 조금 더 밝았다가 내려앉는다). 다 켜지면 숨 쉬기
+  var LIT_ON = [{ opacity: 0, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(1.35)', offset: 0.68 }, { opacity: 1, filter: 'brightness(1)' }];
+  function lightsOff() {
+    clearT('loc');
+    locPhoto.classList.remove('breathe');
+    lits.forEach(function (e) { e.getAnimations().forEach(function (a) { a.cancel(); }); e.style.opacity = '0'; });
+  }
+  function lightsOn(instant, delay) {
+    if (instant) { lits.forEach(function (e) { e.style.opacity = '1'; }); locPhoto.classList.add('breathe'); return; }
+    lits.forEach(function (e, i) {
+      later('loc', function () { e.style.opacity = '1'; anim(e, LIT_ON, { duration: 380, easing: 'ease-out' }); }, delay + i * 280);
+    });
+    later('loc', function () { locPhoto.classList.add('breathe'); }, delay + 3 * 280 + 420);
+  }
+  // 내려앉는 순간: 위치 별이 1.6배로 커졌다 제 크기로, 그 자리에서 둥근 빛이 지도 자리 가로의 60%까지 한 번 퍼진다(0.5초)
+  function land(big) {
+    var s = big || 1.6;
+    anim(locStar, [{ transform: 'scale(1)' }, { transform: 'scale(' + s + ')', offset: 0.3 }, { transform: 'scale(1)' }], { duration: 560, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)' });
+    var w = locMap.clientWidth * 0.6 / 100;
+    anim(locGlow, [{ transform: 'scale(0.05)', opacity: 0.95 }, { transform: 'scale(' + (w * 0.7).toFixed(2) + ')', opacity: 0.6, offset: 0.55 }, { transform: 'scale(' + w.toFixed(2) + ')', opacity: 0 }], { duration: 500, easing: 'ease-out' });
+  }
+  // 한 번 반짝(교통편 줄에 올릴 때)
+  function twinkle() { anim(locStar, [{ transform: 'scale(1) rotate(0deg)' }, { transform: 'scale(1.35) rotate(20deg)', offset: 0.4 }, { transform: 'scale(1) rotate(0deg)' }], { duration: 450, easing: 'ease-out' }); }
+  // 다른 화면에서 건너뛰어 왔을 때·처음 열었을 때: 위치 별이 지도 자리 위에서 내려앉고 불이 켜진다
+  function locIntro(delay) {
+    locMap.classList.remove('wait');
+    var h = locMap.clientHeight * 0.55;
+    anim(locStar, [{ transform: 'translateY(' + (-h).toFixed(0) + 'px) scale(0.7)', opacity: 0 }, { transform: 'translateY(' + (-h * 0.75).toFixed(0) + 'px) scale(0.85)', opacity: 1, offset: 0.25 }, { transform: 'none', opacity: 1 }], { duration: 700, delay: delay, easing: 'cubic-bezier(0.5, 0, 0.85, 0.45)', fill: 'backwards' });
+    later('loc', function () { land(); }, delay + 700);
+    lightsOn(false, delay + 900);
+  }
+  function locReset() {
+    lightsOff();
+    locMap.classList.remove('wait', 'near');
+    locStar.getAnimations().forEach(function (a) { a.cancel(); });
+    locGlow.getAnimations().forEach(function (a) { a.cancel(); });
+    LOC.near = false; LOC.la = 0; locLine.style.opacity = '0';
+    transit.classList.remove('pick');
+    $$('li', transit).forEach(function (li) { li.classList.remove('hot'); });
+  }
+
+  // 화면 3 ↔ 4: 별 하나가 휘어진 길로 내려온다(0.9초, 처음은 천천히 뒤는 빠르게). 지나온 길에 가는 선(1.25px, 60%)이 남았다가 0.6초에 사라진다.
+  // 되돌아갈 때는 위치 별이 떠올라 별자리의 제자리(Entertainment)로 간다. 별은 화면마다 그리며 옮긴다(선이 별을 정확히 따라오게)
+  var dropEl = document.createElement('span');
+  dropEl.className = 'fly-star pine'; dropEl.innerHTML = pine(1.4);
+  fly.appendChild(dropEl);
+  var trailSvg = document.createElementNS(ns, 'svg'), trail = document.createElementNS(ns, 'polyline');
+  trailSvg.setAttribute('class', 'trail'); trailSvg.appendChild(trail); fly.appendChild(trailSvg);
+  var DROP = null;
+  function centerOf(el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+  // 길은 위로 솟았다가 내려오는 곡선이다(위치 별이 Entertainment 별보다 위에 있어 곧장 가면 올라가는 것으로 보였다). 꼭짓점은 두 별 중 높은 쪽보다 창 높이의 30% 위
+  function dropGo(a, b, back, s0, s1) {
+    var top = Math.max(60, Math.min(a.y, b.y) - Math.max(140, window.innerHeight * 0.3));
+    DROP = { a: a, b: b, c: { x: a.x + (b.x - a.x) * (back ? 0.65 : 0.35), y: top }, t0: performance.now(), dur: 900, back: back, s0: s0, s1: s1, pts: [], landAt: 0 };
+    trail.setAttribute('points', ''); trailSvg.style.opacity = '0.6';
+    dropEl.style.opacity = '1';
+  }
+  function dropStop() { DROP = null; dropEl.style.opacity = '0'; trail.setAttribute('points', ''); }
+  function dropFrame(t) {
+    var P = DROP;
+    if (!P) return;
+    var u = clamp((t - P.t0) / P.dur, 0, 1);
+    if (!P.landAt) {
+      var e = P.back ? 1 - Math.pow(1 - u, 2.4) : 0.1 * u + 0.9 * Math.pow(u, 2.6);
+      var x = (1 - e) * (1 - e) * P.a.x + 2 * (1 - e) * e * P.c.x + e * e * P.b.x, y = (1 - e) * (1 - e) * P.a.y + 2 * (1 - e) * e * P.c.y + e * e * P.b.y;
+      // 떨어져 나올 때 빛나며 커졌다가(1.6배) 내려앉으며 위치 별 크기가 된다
+      var sc = P.s0 + (P.s1 - P.s0) * e + P.s0 * 0.6 * Math.sin(Math.PI * Math.min(1, e * 1.6));
+      dropEl.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(' + sc.toFixed(3) + ') rotate(' + (e * 160).toFixed(0) + 'deg)';
+      P.pts.push(x.toFixed(1) + ',' + y.toFixed(1));
+      trail.setAttribute('points', P.pts.join(' '));
+      if (u >= 1) {
+        P.landAt = t; dropEl.style.opacity = '0';
+        if (!P.back) { locMap.classList.remove('wait'); land(); lightsOn(false, 200); }
+        else if (PC) PC.stars[2].g.classList.add('on');
+      }
+    } else {
+      var f = (t - P.landAt) / 600;
+      trailSvg.style.opacity = (0.6 * (1 - clamp(f, 0, 1))).toFixed(3);
+      if (f >= 1) dropStop();
+    }
+  }
+  function visionStar() {
+    var K = PC, r = K.svg.getBoundingClientRect(), sc = r.width / 1100, s = K.stars[2];
+    return { x: r.left + s.x * sc, y: r.top + s.y * sc, sc: sc };
+  }
+
+  // 마우스: 사진은 1.08배로 두고 마우스 반대쪽으로 가로·세로 3%까지(0.3초 늦게). 지도 자리 안이면 위치 별 빛살이 자라고, 240px 안이면 별과 마우스 사이에 가는 선
+  function locFrame(t, dt) {
+    var tr = D.trans, on = D.cur === LOCATION || !!(tr && (tr.from === LOCATION || tr.to === LOCATION));
+    if (!on) return;
+    var M = D.mouse, W = window.innerWidth, H = window.innerHeight;
+    var mx = M.at ? clamp(M.x / W * 2 - 1, -1, 1) : 0, my = M.at ? clamp(M.y / H * 2 - 1, -1, 1) : 0, k = lag(dt, 0.3);
+    LOC.px += (-mx * 3 - LOC.px) * k; LOC.py += (-my * 3 - LOC.py) * k;
+    locPic.style.transform = 'translate(' + LOC.px.toFixed(3) + '%,' + LOC.py.toFixed(3) + '%) scale(1.08)';
+    var r = locMap.getBoundingClientRect(), active = D.cur === LOCATION && !tr && !LB.open;
+    var inside = active && M.at && M.x >= r.left && M.x <= r.right && M.y >= r.top && M.y <= r.bottom;
+    if (inside !== LOC.near) { LOC.near = inside; locMap.classList.toggle('near', inside); }
+    var sx = r.width * 0.5, sy = r.height * 0.48, qx = M.x - r.left, qy = M.y - r.top, d = inside ? Math.hypot(qx - sx, qy - sy) : 1e9;
+    var want = d < 240 ? 0.55 * clamp((240 - d) / 60, 0, 1) : 0;
+    LOC.la += (want - LOC.la) * lag(dt, 0.12);
+    if (LOC.la > 0.01) {
+      // 선은 별 가장자리에서 시작한다
+      var ux = d > 0.5 ? (qx - sx) / d : 0, uy = d > 0.5 ? (qy - sy) / d : 0, r0 = 14 * D.k;
+      locLine.setAttribute('x1', (sx + ux * r0).toFixed(1)); locLine.setAttribute('y1', (sy + uy * r0).toFixed(1));
+      locLine.setAttribute('x2', qx.toFixed(1)); locLine.setAttribute('y2', qy.toFixed(1));
+      locLine.style.opacity = d > r0 ? LOC.la.toFixed(3) : '0';
+    } else if (locLine.style.opacity !== '0') locLine.style.opacity = '0';
+  }
+  // 교통편 줄에 올리면 그 줄만 100%, 다른 줄은 55%, 위치 별이 한 번 반짝
+  $$('li', transit).forEach(function (li) {
+    li.addEventListener('pointerenter', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      transit.classList.add('pick'); li.classList.add('hot');
+      if (!reduce) twinkle();
+    });
+    li.addEventListener('pointerleave', function () { li.classList.remove('hot'); transit.classList.remove('pick'); });
+  });
+  // 주소 복사: 복사하고 버튼 글이 1.5초 동안 "복사했습니다", 위치 별이 한 번 크게 반짝
+  var copyLabel = copyBtn.textContent;
+  function copyDone() {
+    copyBtn.style.minWidth = copyBtn.offsetWidth + 'px';
+    copyBtn.textContent = '복사했습니다';
+    LOC.copyAt = performance.now();
+    if (!reduce) land(2.2);
+    setTimeout(function () { if (performance.now() - LOC.copyAt >= 1450) { copyBtn.textContent = copyLabel; copyBtn.style.minWidth = ''; } }, 1500);
+  }
+  function copyOld(text) {
+    var ta = document.createElement('textarea'), ok = false;
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove(); copyBtn.focus({ preventScroll: true });
+    return ok;
+  }
+  copyBtn.addEventListener('click', function () {
+    var text = $('.loc-addr').textContent.trim();
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(copyDone, function () { if (copyOld(text)) copyDone(); });
+    else if (copyOld(text)) copyDone();
+  });
+
+  // 사진 크게 보기: 누르면 사진 자리에서 화면 가득 커진다. 마우스를 쓰면 마우스 쪽을 보듯 사진 전체를 둘러보고(위·아래 끝까지), 손가락이면 사진 전체를 보여 준다.
+  // Esc·닫기 단추·사진을 누르면 닫힌다. 열려 있는 동안 휠·키보드로 화면이 넘어가지 않는다
+  var LB = { el: null, img: null, btn: null, open: false, busy: false, tx: 0, ty: 0, iw: 0, ih: 0 };
+  var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+  function lbSize() {
+    var W = window.innerWidth, H = window.innerHeight, ratio = 1450 / 1085, iw, ih;
+    if (finePointer.matches && !reduce) { iw = Math.max(W * 1.08, H / ratio * 1.08); ih = iw * ratio; }
+    else { ih = Math.min(H, W * ratio); iw = ih / ratio; }
+    LB.iw = iw; LB.ih = ih;
+    LB.img.style.width = iw.toFixed(0) + 'px'; LB.img.style.height = ih.toFixed(0) + 'px';
+    LB.img.style.left = ((W - iw) / 2).toFixed(0) + 'px'; LB.img.style.top = ((H - ih) / 2).toFixed(0) + 'px';
+  }
+  function lbBuild() {
+    var el = document.createElement('div');
+    el.className = 'loc-stage';
+    el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', '사옥 사진 크게 보기');
+    el.innerHTML = '<img src="../2026-11-10-pages/img/about-office.webp" alt="밤에 조명이 켜진 아스트라엔터테인먼트 사옥" draggable="false">' +
+      '<button type="button" class="loc-stage-close" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+    el.style.display = 'none';
+    document.body.appendChild(el);
+    LB.el = el; LB.img = el.querySelector('img'); LB.btn = el.querySelector('button');
+    LB.btn.addEventListener('click', function (e) { e.stopPropagation(); lbClose(); });
+    el.addEventListener('click', function () { lbClose(); });
+  }
+  function rectOf(el) { var r = el.getBoundingClientRect(); return { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }; }
+  // 크게 보기 속 사진의 처음·끝 자리: 처음은 쪽에 놓인 사진 그대로(틀 기준), 끝은 화면 가득 + 둘러보기 자리
+  function lbImgFrom() {
+    var f = locPhoto.getBoundingClientRect(), p = locPic.getBoundingClientRect();
+    return { left: (p.left - f.left) + 'px', top: (p.top - f.top) + 'px', width: p.width + 'px', height: p.height + 'px', transform: 'translate(0px, 0px)' };
+  }
+  function lbImgTo() { return { left: LB.img.style.left, top: LB.img.style.top, width: LB.img.style.width, height: LB.img.style.height, transform: 'translate(' + LB.tx.toFixed(1) + 'px, ' + LB.ty.toFixed(1) + 'px)' }; }
+  function lbLook(instant) {
+    var W = window.innerWidth, H = window.innerHeight, M = D.mouse;
+    var mx = finePointer.matches && M.at ? clamp(M.x / W - 0.5, -0.5, 0.5) : 0, my = finePointer.matches && M.at ? clamp(M.y / H - 0.5, -0.5, 0.5) : 0;
+    var tx = -mx * 2 * Math.max(0, LB.iw - W) / 2, ty = -my * 2 * Math.max(0, LB.ih - H) / 2;
+    if (instant) { LB.tx = tx; LB.ty = ty; }
+    return { tx: tx, ty: ty };
+  }
+  function lbOpen() {
+    if (LB.open || LB.busy) return;
+    if (!LB.el) lbBuild();
+    LB.open = true; LB.busy = true;
+    document.documentElement.classList.add('loc-lb');
+    LB.el.style.display = '';
+    lbSize(); lbLook(true);
+    LB.img.style.transform = 'translate(' + LB.tx.toFixed(1) + 'px,' + LB.ty.toFixed(1) + 'px)';
+    LB.el.classList.remove('ready');
+    var done = function () { LB.busy = false; LB.el.classList.add('ready'); LB.btn.focus({ preventScroll: true }); };
+    if (reduce) { done(); return; }
+    LB.el.animate([rectOf(locPhoto), { left: '0px', top: '0px', width: window.innerWidth + 'px', height: window.innerHeight + 'px' }], { duration: 750, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+    LB.img.animate([lbImgFrom(), lbImgTo()], { duration: 750, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+    later('lb', done, 760);
+  }
+  function lbClose() {
+    if (!LB.open) return;
+    LB.open = false; LB.el.classList.remove('ready');
+    var el = LB.el, fin = function () { el.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); }); el.style.display = 'none'; LB.busy = false; document.documentElement.classList.remove('loc-lb'); };
+    $('.loc-zoom').focus({ preventScroll: true });
+    if (reduce || !el.offsetWidth) { fin(); return; }
+    LB.busy = true;
+    LB.img.animate([lbImgTo(), lbImgFrom()], { duration: 650, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' });
+    el.animate([{ left: '0px', top: '0px', width: window.innerWidth + 'px', height: window.innerHeight + 'px' }, rectOf(locPhoto)], { duration: 650, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' }).onfinish = fin;
+  }
+  function lbFrame(dt) {
+    if (!LB.open || LB.busy || !finePointer.matches) return;
+    var g = lbLook(false), k = lag(dt, 0.25);
+    LB.tx += (g.tx - LB.tx) * k; LB.ty += (g.ty - LB.ty) * k;
+    LB.img.style.transform = 'translate(' + LB.tx.toFixed(1) + 'px,' + LB.ty.toFixed(1) + 'px)';
+  }
+  $('.loc-zoom').addEventListener('click', lbOpen);
+  document.addEventListener('keydown', function (e) {
+    if (!LB.open) return;
+    if (e.key === 'Escape') { e.preventDefault(); lbClose(); }
+    else if (e.key === 'Tab') { e.preventDefault(); LB.btn.focus(); }
+  });
+  window.addEventListener('resize', function () { if (LB.open) { lbSize(); lbLook(true); } });
+
   // ── 한 화면에 한 번 그리는 고리 ──
   var lastT = 0;
   function frame(t) {
@@ -830,6 +1154,9 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     if (D.on && (D.cur === HERO || (D.trans && (D.trans.from === HERO || D.trans.to === HERO)))) heroFrame(t, dt);
     nightFrame(t, dt);
     skies.forEach(function (K) { skyFrame(K, t, dt); });
+    if (D.on) locFrame(t, dt);
+    dropFrame(t);
+    lbFrame(dt);
   }
 
   // 사진·별자리는 마우스 반대쪽으로 조금(사진 12px, 별자리 14px). 글은 움직이지 않는다
@@ -846,11 +1173,12 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   }, { passive: true });
 
   var flewIn = false;
-  if (!reduce) { leadReset(); unlight(); }
+  if (!reduce) { leadReset(); unlight(); lightsOff(); }
   function sceneReset(n) {
-    // 휴대폰 스크롤 반응(12-2)이 켜져 있으면 낱말·별자리·흰 구역은 스크롤 자리대로 둔다(큰 문장과 글만 다시 떠오르게)
+    // 휴대폰 스크롤 반응(12-2)이 켜져 있으면 낱말·별자리·사옥 불·흰 구역은 스크롤 자리대로 둔다(큰 문장과 글만 다시 떠오르게)
     if (D.flowOn()) { if (n === VISION) vision.classList.remove('title-on', 'text-on'); return; }
     if (n === STORY) leadReset();
+    if (n === LOCATION) locReset();
     if (n === END) clearGlow();
     if (n === VISION) { unlight(); skies.forEach(function (K) { K.links.forEach(function (l) { l.g0 = -1; l.glow.style.opacity = '0'; }); }); }
   }
@@ -866,6 +1194,11 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       }
       if (n === VISION && !(from === STORY && flewIn)) lightSeq(false);
       flewIn = false;
+      // 오시는 길: OUR VISION에서 오면 내려앉는 별이, 문의에서 오면 넘김(move)이 이미 했다. 다른 화면에서 건너뛰어 오면 위치 별이 지도 자리 위에서 내려앉는다
+      if (n === LOCATION) {
+        if (from === END) lightsOn(true);
+        else if (from !== VISION) locIntro(150);
+      }
     },
     reset: sceneReset,
     // 스크롤하는 화면(설계 2-8): 구역이 화면 밖으로 완전히 나가면 처음 상태로 돌려, 다시 보일 때 소개 문장 낱말·별자리가 처음부터 다시 켜진다
@@ -879,18 +1212,44 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     move: function (from, to, fromEl, toEl) {
       if (from === STORY && to === VISION && PC) { flewIn = true; flyForward(); return { cover: true }; }
       if (from === VISION && to === STORY && PC) { flyBack(); return { cover: true }; }
-      if (glowOK && PC && from === VISION && to === END) { N.allWake = performance.now(); return { dur: 1100, anims: glow(toEl, false), light: 700, enter: 560 }; }
-      if (glowOK && PC && from === END && to === VISION) {
-        // 거꾸로: 하늘의 별이 다 깨어 있다가 다시 잠든다
+      // 화면 3 → 4(2-11): 별 하나가 떨어져 나와 위치 별 자리로 내려앉는다(0.9초). 별자리와 글은 0.3초에 사라지고, 새 화면은 별이 내려오는 동안 어두운 채로 자리를 잡는다
+      if (from === VISION && to === LOCATION && PC) {
+        var a = burstPoint(), vs = visionStar();
+        locReset(); locMap.classList.add('wait');
+        dropStop(); dropGo(a, centerOf(locStar), false, 30 * vs.sc / 40, locStar.offsetWidth / 40);
+        // 넘김이 붙잡는 시간은 1.1초(다른 넘김과 같은 길이로 휠·키를 받는다). 내려앉은 뒤의 빛·불은 화면의 시계가 이어서 한다
+        return { dur: 1100, enter: 900, anims: [
+          anim(fromEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-out', fill: 'both' }),
+          anim(toEl, [{ opacity: 0 }, { opacity: 1 }], { duration: 700, delay: 150, easing: 'ease-out', fill: 'both' })
+        ] };
+      }
+      // 거꾸로: 위치 별이 떠올라 별자리의 제자리로 돌아간다
+      if (from === LOCATION && to === VISION && PC) {
+        var b = visionStar();
+        locMap.classList.add('wait');
+        dropStop(); dropGo(centerOf(locStar), b, true, locStar.offsetWidth / 40, 30 * b.sc / 40);
+        return { dur: 1100, enter: 300, anims: [
+          anim(fromEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-out', fill: 'both' }),
+          anim(toEl, [{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: 100, easing: 'ease-out', fill: 'both' })
+        ] };
+      }
+      // 화면 4 → 5: 위치 별과 사옥 불에서 빛이 번져 흰 화면이 된다
+      if (glowOK && from === LOCATION && to === END) { N.allWake = performance.now(); return { dur: 1100, anims: glow(toEl, false), light: 700, enter: 560 }; }
+      if (glowOK && from === END && to === LOCATION) {
+        // 거꾸로: 흰 면이 네 빛으로 줄어들어 위치 별과 사옥의 불이 된다. 하늘의 별이 다 깨어 있다가 다시 잠든다
+        locReset(); lightsOn(true);
         N.stars.forEach(function (s) { s.wake = 1; s.prox = 0.6; });
         return { dur: 1100, anims: glow(fromEl, true), light: 420, enter: 380 };
       }
       return null;
     },
+    // 사진을 크게 본 채로 휠·키보드를 쓰면 화면을 넘기지 않는다
+    step: function () { return LB.open; },
     start: function () { startGL(); clearGlow(); },
     stop: function () {
-      stopFly(); clearGlow();
+      stopFly(); clearGlow(); dropStop();
       heroGL.style.transform = '';
+      locPic.style.transform = ''; locMap.classList.remove('near', 'wait'); locLine.style.opacity = '0'; LOC.near = false;
       skies.forEach(function (K) {
         K.stars.forEach(function (s) { s.dx = s.dy = s.vx = s.vy = 0; s.g.removeAttribute('transform'); });
         drawLinks(K);
@@ -901,16 +1260,17 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   // ── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-2, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ──
   // 소개 다섯 낱말: 소개 구역 위쪽이 화면 85% → 35% 높이로 올라오는 동안 차례로 켜진다(낱말마다 작은 별). 다 켜지면 문장 전체가 밝아진다
   // 별자리: OUR VISION 구역 위쪽 80% → 30% 동안 별이 하나씩(다섯 단계) 켜지고 두 끝이 켜진 선이 그어진다. 다 켜지면 선을 따라 빛 점이 흐른다
-  // 흰 문의 구역: 구역 위쪽 92% → 40% 동안 위쪽 가장자리에 가로로 놓인 별 다섯 자리에서 부드러운 빛이 번져 합쳐진다(가운데가 먼저, 양옆은 0.1씩 늦게)
-  var GLOW_X = [0.5, 0.3, 0.7, 0.1, 0.9], GLOW_D = [0, 0.1, 0.1, 0.2, 0.2];
+  // 사옥 불(2-11): 사진 위쪽이 화면 85% → 35%로 올라오는 동안 아래층부터 켜진다(올리면 꺼진다). 위치 별: 지도 자리 위쪽 90% → 50% 동안 위에서 내려앉는다
+  // 흰 문의 구역: 구역 위쪽 92% → 40% 동안 위쪽 가장자리의 네 자리(위치 별과 사옥 불 세 곳의 가로 자리)에서 부드러운 빛이 번져 합쳐진다(위치 별이 먼저, 사옥 불은 0.1·0.15·0.2씩 늦게)
+  var GLOW_D = [0, 0.1, 0.15, 0.2];
   function flowGlow(q, vh) {
     if (q >= 1) { endScene.style.webkitMaskImage = ''; endScene.style.maskImage = ''; return; }
-    var W = endScene.clientWidth, H = vh * 0.6, masks = [];
-    GLOW_X.forEach(function (fx, i) {
-      var u = Math.max(0, Math.min(1, (q - GLOW_D[i]) / (1 - GLOW_D[i])));
-      // 다 번졌을 때 이웃 별 사이(가로 20%)와 화면 아래 끝까지 빛의 안쪽 65%가 덮는다
-      var R = Math.max(0.5, Math.hypot(W * 0.12, H) / 0.65 * Math.pow(u, 1.25));
-      masks.push('radial-gradient(circle ' + R.toFixed(1) + 'px at ' + (W * fx).toFixed(1) + 'px 0px, #000 ' + (R * 0.65).toFixed(1) + 'px, transparent ' + R.toFixed(1) + 'px)');
+    var W = endScene.clientWidth, H = vh * 0.6, er = endScene.getBoundingClientRect(), masks = [];
+    glowSources().forEach(function (p, i) {
+      var u = Math.max(0, Math.min(1, (q - GLOW_D[i]) / (1 - GLOW_D[i]))), fx = clamp(p.x - er.left, 0, W);
+      // 다 번졌을 때 그 자리에서 먼 쪽 가장자리와 화면 아래 끝까지 빛의 안쪽 65%가 덮는다
+      var R = Math.max(0.5, Math.hypot(Math.max(fx, W - fx), H) / 0.65 * Math.pow(u, 1.25));
+      masks.push('radial-gradient(circle ' + R.toFixed(1) + 'px at ' + fx.toFixed(1) + 'px 0px, #000 ' + (R * 0.65).toFixed(1) + 'px, transparent ' + R.toFixed(1) + 'px)');
     });
     var m = masks.join(', ');
     endScene.style.webkitMaskImage = m; endScene.style.maskImage = m;
@@ -918,8 +1278,19 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   D.flow(function (vh, on) {
     if (!on) {
       endScene.style.webkitMaskImage = ''; endScene.style.maskImage = '';
+      locStar.style.transform = locStar.style.opacity = '';
       return;
     }
+    // 사옥 불
+    var lp = D.span(locPhoto, 0.85, 0.35, vh);
+    lits.forEach(function (e, i) { e.style.opacity = clamp(lp * 4 - i, 0, 1).toFixed(3); });
+    locPhoto.classList.toggle('breathe', lp >= 1);
+    // 위치 별: 위에서 내려앉고, 다 내려오면 한 번 커졌다 빛이 퍼진다
+    var mq = D.span(locMap, 0.9, 0.5, vh);
+    locStar.style.transform = mq >= 1 ? '' : 'translateY(' + (-(1 - easeOut(mq)) * locMap.clientHeight * 0.55).toFixed(1) + 'px)';
+    locStar.style.opacity = mq <= 0 ? '0' : mq < 0.15 ? (mq / 0.15).toFixed(2) : '';
+    if (mq >= 1 && !LOC.flowLanded) { LOC.flowLanded = true; land(); }
+    else if (mq < 0.9) LOC.flowLanded = false;
     // 소개 낱말
     var p = D.span(story, 0.85, 0.35, vh);
     keys.forEach(function (k, i) { k.classList.toggle('on', p > (i + 0.2) / keys.length); });
