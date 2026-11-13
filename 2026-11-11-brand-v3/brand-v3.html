@@ -268,11 +268,12 @@ body.fab-open .fab-button .x { display: block; }
 .deck-index, .haze { display: none; }
 
 /* 스크롤하는 화면(휴대폰, 태블릿, 작은 창)에 PC의 반응 세 가지를 스크롤에 맞춰 옮겼다 (html.fx: 스크립트가 켜져 있고 움직임 줄이기 설정이 아닐 때).
-   1) 소개 제목: 윤곽선만 있다가 화면에 올라오는 만큼 왼쪽부터 흰 글자로 채워진다
+   1) 소개 제목: 윤곽선만 있다가 화면에 올라오면 빛이 왼쪽에서 오른쪽으로 훑고 그 뒤 천천히 떠돌며, 빛 자리만 글자가 채워진다(PC와 같은 효과)
    2) 작업 사진: 화면 가운데에 오면 흑백에서 색이 돌아온다
    3) 문의 구역: 화면에 올라오는 만큼 위쪽에서 빛이 번지며 흰 면이 드러난다 (동작 코드에서 잘라내기 영역을 키운다) */
 html.fx:not(.deck) .reveal-title { position: relative; color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, 0.46); }
-html.fx:not(.deck) .reveal-title::after { content: attr(data-text); position: absolute; left: 0; right: 0; top: 0; color: var(--paper); -webkit-text-stroke: 0 transparent; -webkit-mask-image: linear-gradient(to right, #000 calc(var(--p, 0) * 125% - 25%), transparent calc(var(--p, 0) * 125%)); mask-image: linear-gradient(to right, #000 calc(var(--p, 0) * 125% - 25%), transparent calc(var(--p, 0) * 125%)); }
+/* 휴대폰·작은 창도 PC와 같은 조명 효과: 빛이 닿은 자리만 글자가 채워진다. 마우스가 없으니 빛이 스스로 움직인다(대표 11-14 "PC와 똑같은 효과를 모션그래픽으로") */
+html.fx:not(.deck) .reveal-title::after { content: attr(data-text); position: absolute; left: 0; right: 0; top: 0; color: var(--paper); -webkit-text-stroke: 0 transparent; -webkit-mask-image: radial-gradient(circle var(--lr, 0px) at var(--lx, -50%) var(--ly, 50%), #000 0, #000 28%, transparent 100%); mask-image: radial-gradient(circle var(--lr, 0px) at var(--lx, -50%) var(--ly, 50%), #000 0, #000 28%, transparent 100%); }
 html.fx:not(.deck) .work-frame img { filter: grayscale(1) brightness(0.6); transition: filter 0.7s; }
 html.fx:not(.deck) .work.lit .work-frame img { filter: none; }
 
@@ -949,6 +950,9 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
   var steps = $$('.step'), stepsBox = $('.steps'), fill = $('.steps-fill');
   var frames = $$('.work-frame');
   var fx = false; // 스크롤 반응 세 가지를 쓰는가(움직임 줄이기 설정이 아닐 때 켠다)
+  // 소개 제목 조명(스크롤하는 화면): 제목이 화면에 올라오면 빛이 왼쪽에서 오른쪽으로 한 번 훑고(PC 소개에 들어올 때와 같은 1.7초),
+  // 그 뒤로는 PC에서 마우스를 놓아 둔 것처럼 제목 위를 천천히 떠돈다. 제목이 화면 아래로 빠졌다 다시 올라오면 또 훑는다
+  var mSwept = false, mSweepAt = 0, mLamp = null;
   var flowTitle = $('.reveal-title'), flowCta = $('.cta'), touchX = -1;
   // 화이트·골드: 스크롤하는 화면에서 소개 구역을 덮는 어둠(조명이 켜지며 걷힌다)과 문의 구역에 남는 빛(조명이 꺼지며 줄어든다)
   var introSec = $('.intro'), procSec = $('.process'), mDark = document.createElement('div'), mLight = document.createElement('div'), mLevel = -1;
@@ -962,7 +966,8 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
     if (fx) {
       // 소개 제목: 화면 아래 92%에서 46%까지 올라오는 동안 왼쪽부터 흰 글자로 채워진다
       var tr = flowTitle.getBoundingClientRect();
-      flowTitle.style.setProperty('--p', Math.max(0, Math.min(1, (vh * 0.92 - tr.top) / (vh * 0.46))).toFixed(3));
+      if (tr.top > vh) { mSwept = false; mSweepAt = 0; }
+      else if (!mSwept && tr.top < vh * 0.8) { mSwept = true; mSweepAt = performance.now(); }
       // 작업 사진: 사진 가운데가 화면의 18%~82% 높이에 있으면 색이 돌아온다
       frames.forEach(function (f) {
         var r = f.getBoundingClientRect(), c = r.top + r.height / 2;
@@ -1129,6 +1134,22 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
   function atHeroTop() {
     return !deck && fx && !mJump && !root.classList.contains('menu-open') && window.scrollY < Math.max(40, hero.offsetHeight * 0.3);
   }
+  function titleLight(now) {
+    requestAnimationFrame(titleLight);
+    if (deck || !fx) return;
+    var tr = flowTitle.getBoundingClientRect(), vh = window.innerHeight, W = window.innerWidth;
+    if (tr.bottom < 0 || tr.top > vh) return;
+    var tx, ty, k, u = mSweepAt ? (now - mSweepAt) / 1700 : -1;
+    if (u < 0) { tx = -W * 0.6; ty = tr.height * 0.5; k = 1; }
+    else if (u <= 1) { var e = u * u * (3 - 2 * u); tx = -W * 0.3 + (tr.width + W * 0.6) * e; ty = tr.height * 0.5; k = 0.3; }
+    else { var q = (now - mSweepAt) / 1000; tx = tr.width * (0.5 + 0.45 * Math.sin(q * 0.5 + 2.2)); ty = tr.height * (0.5 + 0.3 * Math.sin(q * 0.8)); k = 0.04; }
+    if (!mLamp) mLamp = { x: tx, y: ty };
+    mLamp.x += (tx - mLamp.x) * k; mLamp.y += (ty - mLamp.y) * k;
+    flowTitle.style.setProperty('--lx', mLamp.x.toFixed(1) + 'px');
+    flowTitle.style.setProperty('--ly', mLamp.y.toFixed(1) + 'px');
+    flowTitle.style.setProperty('--lr', Math.round(Math.max(170, W * 0.5)) + 'px');
+  }
+  requestAnimationFrame(titleLight);
   function jumpIntro() {
     mJump = true;
     mLevel = 1; // 스크롤로 켜지는 조명은 다시 틀지 않는다
@@ -1139,6 +1160,8 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
       hero.style.filter = t < 0.85 ? 'brightness(' + (1 + 1.8 * sm(t, 0.15, 0.75)).toFixed(3) + ') contrast(' + (1 - 0.35 * sm(t, 0.15, 0.75)).toFixed(3) + ')' : '';
       if (t >= 0.85 && !moved) {
         moved = true;
+        // 소개 제목은 빛이 꺼진 채로 옮기고, 흰빛이 걷히기 시작하면 빛이 왼쪽에서 오른쪽으로 훑는다
+        mSwept = true; mSweepAt = performance.now() + 150; mLamp = null;
         var y = introSec.getBoundingClientRect().top + window.scrollY - (hdr ? hdr.offsetHeight : 0);
         window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
       }
