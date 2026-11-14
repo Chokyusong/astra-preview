@@ -13,10 +13,9 @@
 <style>
 @import url('../2026-11-10-pages/pages.css') layer(site);
 
-/* CONTACT — 내 표지가 만들어지는 지원서 (시안 1 잡지 표지, 대표가 네 가지 중 고름 2026-11-14)
+/* CONTACT — 흰 바탕에 지원·문의 양식만(대표 11-14: 잡지 표지와 위쪽 제목·설명·안내 칸을 뺌)
    공통 틀(pages.css)은 아래 층(layer site)으로 불러 이 쪽 규칙이 늘 이긴다. 머리말·메뉴·바닥글·떠 있는 버튼은 다른 쪽과 같다.
    이 쪽 이름이 공통 틀과 겹치는 것(contact·field 등)은 k- 를 붙였다.
-   지원서를 쓰는 동안 옆의 잡지 표지가 실시간으로 조판된다. 다 채우면 금색 도장 READY.
    아무것도 보내거나 저장하지 않는다(fetch·브라우저 저장소 없음). */
 :root {
   --c-paper: #ffffff; --paper-2: #f5f4f1; --warm: #dedcda; --c-ink: #141414; --ink-2: #6d6a65; --line: #e5e1da;
@@ -27,103 +26,21 @@
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 24px); }
-/* 이 쪽 기본 글씨는 본문(.k-contact)과 따라오는 작은 표지에만. 머리말·메뉴·바닥글은 공통 틀 그대로 둔다 */
+/* 이 쪽 기본 글씨는 본문(.k-contact)에만. 머리말·메뉴·바닥글은 공통 틀 그대로 둔다 */
 body { margin: 0; background: var(--c-paper); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-.k-contact, .mini { color: var(--c-ink); font-family: var(--c-sans); font-size: 16px; line-height: 1.6; }
-:where(.k-contact, .mini) a { color: inherit; }
-:where(.k-contact) :where(button, input, textarea), :where(.mini) { font: inherit; color: inherit; }
-.k-contact :focus-visible, .mini:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
+.k-contact { color: var(--c-ink); font-family: var(--c-sans); font-size: 16px; line-height: 1.6; }
+:where(.k-contact) a { color: inherit; }
+:where(.k-contact) :where(button, input, textarea) { font: inherit; color: inherit; }
+.k-contact :focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .slot-box { border: 1px dashed #b9b2a6; color: var(--ink-2); font-size: 13px; padding: 12px 14px; line-height: 1.5; }
 
+/* ── 양식 한 칸(가운데) ── */
 
-/* ── 본문 두 칸: 왼쪽 표지(화면에 붙음), 오른쪽 양식 ── */
-.k-contact { display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
-.desk { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); min-height: 600px; background: var(--paper-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 28px 40px 22px; border-right: 1px solid var(--line); }
-.cover-frame { position: relative; width: min(100%, calc((100vh - var(--header-h) - 110px) * 0.75)); aspect-ratio: 3 / 4; box-shadow: 0 1px 0 rgba(20,20,20,0.06), 0 30px 60px -30px rgba(60,48,30,0.35); }
-.desk-cap { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; width: min(100%, calc((100vh - var(--header-h) - 110px) * 0.75)); font-size: 12px; color: var(--ink-2); letter-spacing: 0.02em; }
-.desk-cap b { font-family: var(--serif-en); font-style: italic; font-weight: 500; font-size: 14px; color: var(--c-ink); letter-spacing: 0; margin-right: 8px; }
-.desk-cap .cnt { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.desk-cap .cnt em { font-style: normal; color: var(--gold-ink); font-weight: 600; }
-
-/* ── 표지: 600×800 설계 크기로 그리고 틀에 맞춰 줄인다 ── */
-.cv { position: absolute; left: 0; top: 0; width: 600px; height: 800px; transform-origin: 0 0; overflow: hidden; background: #efebe5; color: var(--c-ink); font-family: var(--serif-en); }
-.ed { position: absolute; inset: 0; z-index: 0; }
-.ed[hidden] { display: block; visibility: hidden; }
-.ed-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ed[data-ed="apply"] .ed-photo { object-position: 50% 26%; }
-.ed[data-ed="business"] .ed-photo { object-position: 50% 30%; }
-.ed-wash { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(249,247,243,0.72) 0, rgba(249,247,243,0.18) 30%, rgba(249,247,243,0) 52%, rgba(249,247,243,0.35) 72%, rgba(249,247,243,0.88) 100%); }
-.cv-top { position: absolute; left: 28px; right: 28px; top: 20px; display: flex; justify-content: space-between; font-family: var(--c-sans); font-size: 10.5px; font-weight: 600; letter-spacing: 0.26em; text-transform: uppercase; z-index: 3; }
-.cv-top .ed-label { color: var(--gold-ink); }
-.cv-mast { position: absolute; left: 0; top: 30px; width: 600px; height: 190px; z-index: 3; overflow: visible; }
-.cv-mast text { font-family: 'Bodoni Moda', serif; font-weight: 500; font-variation-settings: 'opsz' 96; fill: var(--c-ink); }
-.kick { display: block; font-family: var(--c-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold-ink); margin-bottom: 6px; }
-.ln { position: absolute; z-index: 2; }
-.s { display: inline; }
-.s .ph { color: rgba(20,20,20,0.4); font-style: italic; font-family: 'Bodoni Moda', serif; }
-.l-field { left: 28px; top: 232px; width: 290px; }
-.l-field > .s { font-family: var(--serif-en); font-weight: 600; font-size: 38px; line-height: 1.12; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
-.rule { display: block; width: 44px; height: 1px; background: var(--c-ink); margin: 18px 0 16px; }
-.l-sub { font-family: var(--c-sans); font-size: 17px; font-weight: 500; line-height: 1.3; margin-bottom: 16px; }
-.l-sub .s { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
-.l-sub.handle .s { font-family: 'Bodoni Moda', 'Noto Serif KR', serif; font-style: italic; font-size: 22px; font-weight: 500; }
-.l-quote { right: 28px; top: 420px; width: 210px; text-align: right; }
-.l-quote .s { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; font-family: var(--serif-kr); font-weight: 400; font-size: 16px; line-height: 1.55; word-break: keep-all; }
-.l-quote .q { display: block; font-family: 'Bodoni Moda', serif; font-size: 64px; line-height: 0.6; height: 28px; color: var(--gold); }
-.l-name { left: 28px; right: 28px; bottom: 74px; }
-.nm { display: block; white-space: nowrap; font-family: var(--serif-en); font-weight: 600; line-height: 1; letter-spacing: -0.02em; font-size: 112px; }
-.nm .ph { font-weight: 400; letter-spacing: -0.03em; }
-.cv-foot { position: absolute; left: 28px; right: 28px; bottom: 22px; display: flex; align-items: flex-end; justify-content: space-between; z-index: 2; font-family: var(--c-sans); font-size: 10.5px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; }
-.cv-foot .hw .s { letter-spacing: 0.08em; font-size: 12px; }
-.cv-foot .hw .s .ph { font-family: var(--c-sans); font-style: normal; }
-.bar { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-size: 8.5px; letter-spacing: 0.2em; }
-.bar i { display: block; width: 92px; height: 28px; background: repeating-linear-gradient(90deg, #141414 0 2px, transparent 2px 4px, #141414 4px 5px, transparent 5px 8px, #141414 8px 11px, transparent 11px 12px, #141414 12px 13px, transparent 13px 16px); }
-/* 제안서 판 */
-.l-prop-head { left: 26px; top: 224px; font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400; font-size: 104px; line-height: 1; letter-spacing: -0.03em; }
-.l-idea { left: 28px; top: 350px; width: 300px; }
-.l-idea .s { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-family: var(--serif-kr); font-weight: 500; font-size: 28px; line-height: 1.32; word-break: keep-all; letter-spacing: -0.01em; }
-.l-idea .s .ph { font-size: 30px; }
-/* 금색 도장 */
-.stamp { position: absolute; z-index: 4; width: 184px; height: 184px; right: 20px; top: 226px; color: #8c6b36; opacity: 0; transform: rotate(-12deg) scale(1.9); pointer-events: none; }
-.stamp.on { filter: drop-shadow(0 0 1px rgba(255,250,240,0.6)); }
-.stamp svg { width: 100%; height: 100%; display: block; }
-.stamp.on { opacity: 1; transform: rotate(-12deg) scale(1); }
-html.fx .stamp.on { animation: thump 0.62s cubic-bezier(0.2, 0.9, 0.25, 1) both; }
-html.fx .stamp.off { transition: opacity 0.3s, transform 0.3s; }
-@keyframes thump { 0% { opacity: 0; transform: rotate(-4deg) scale(2.1); } 55% { opacity: 1; transform: rotate(-13deg) scale(0.93); } 75% { transform: rotate(-11.5deg) scale(1.02); } 100% { opacity: 1; transform: rotate(-12deg) scale(1); } }
-html.fx .cv.press { animation: press 0.42s 0.3s ease-out; }
-@keyframes press { 0% { transform: var(--cvT) translateY(0); } 30% { transform: var(--cvT) translateY(2px); } 100% { transform: var(--cvT) translateY(0); } }
-/* 판 바꾸기: 새 판이 아래에서 덮인다 */
-html.fx .ed.enter { animation: edIn 0.75s var(--ease) both; z-index: 1; }
-@keyframes edIn { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
-/* 조판: 친 글자가 금색으로 찍혔다가 먹색으로 마른다 */
-.ch { display: inline-block; }
-html.fx .ch.new { animation: setIn 0.5s var(--ease) both; }
-html.fx .chi.new { animation: setInl 0.6s ease both; }
-@keyframes setIn { 0% { opacity: 0; transform: translateY(-0.32em) scale(1.12); color: var(--gold); filter: blur(3px); } 45% { opacity: 1; filter: blur(0); color: var(--gold); } 100% { opacity: 1; transform: none; } }
-@keyframes setInl { 0% { opacity: 0; color: var(--gold); } 45% { opacity: 1; color: var(--gold); } 100% { opacity: 1; } }
-html.fx .s .ph { animation: phIn 0.4s ease both; }
-@keyframes phIn { from { opacity: 0; } }
-/* 지금 쓰는 칸의 자리 표시: 인쇄 재단 표시(모서리 네 개) */
-.marks { position: absolute; z-index: 5; pointer-events: none; opacity: 0; left: 0; top: 0; width: 10px; height: 10px; }
-.marks.on { opacity: 1; }
-html.fx .marks { transition: left 0.45s var(--ease), top 0.45s var(--ease), width 0.45s var(--ease), height 0.45s var(--ease), opacity 0.3s; }
-.marks i { position: absolute; width: 14px; height: 14px; border: 0 solid var(--gold); }
-.marks i:nth-child(1) { left: -8px; top: -8px; border-left-width: 1.5px; border-top-width: 1.5px; }
-.marks i:nth-child(2) { right: -8px; top: -8px; border-right-width: 1.5px; border-top-width: 1.5px; }
-.marks i:nth-child(3) { left: -8px; bottom: -8px; border-left-width: 1.5px; border-bottom-width: 1.5px; }
-.marks i:nth-child(4) { right: -8px; bottom: -8px; border-right-width: 1.5px; border-bottom-width: 1.5px; }
-
-/* ── 양식 쪽 ── */
-.k-sheet { padding: 72px 80px 96px 80px; max-width: 760px; }
-.k-eyebrow { display: flex; align-items: baseline; gap: 14px; margin: 0 0 22px; font-size: 12.5px; color: var(--ink-2); letter-spacing: 0.04em; }
+.k-sheet { padding: 72px 40px 96px; max-width: 760px; margin: 0 auto; }
+.k-eyebrow { display: flex; align-items: baseline; gap: 14px; margin: 0; font-weight: 400; font-size: 12.5px; color: var(--ink-2); letter-spacing: 0.04em; }
 .k-eyebrow b { font-family: 'Bodoni Moda', serif; font-weight: 500; font-size: 15px; letter-spacing: 0.3em; color: var(--c-ink); }
-.title { margin: 0; font-family: var(--serif-kr); font-weight: 500; font-size: 46px; line-height: 1.24; letter-spacing: -0.025em; word-break: keep-all; }
-.title em { font-style: normal; color: var(--gold-ink); }
-.lead { margin: 18px 0 0; color: var(--ink-2); font-size: 15.5px; max-width: 30em; word-break: keep-all; }
-.notice { margin-top: 26px; max-width: 420px; }
-.k-switch { display: flex; gap: 40px; margin: 52px 0 6px; border-bottom: 1px solid var(--line); }
+.k-switch { display: flex; gap: 40px; margin: 40px 0 6px; border-bottom: 1px solid var(--line); }
 .k-switch button { position: relative; background: none; border: 0; padding: 0 0 14px; cursor: pointer; font-family: var(--serif-kr); font-size: 21px; font-weight: 500; color: #8d8981; letter-spacing: -0.01em; }
 .k-switch button small { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 14px; margin-right: 8px; color: inherit; }
 .k-switch button[aria-pressed="true"] { color: var(--c-ink); }
@@ -137,7 +54,6 @@ html.fx .k-switch button::after { transition: transform 0.4s var(--ease); }
 .k-field label { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); letter-spacing: 0.01em; }
 .k-field label::before { content: counter(fld, decimal-leading-zero); font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 13px; color: #a29d94; font-variant-numeric: tabular-nums; min-width: 18px; }
 .k-field label .req { color: var(--gold-ink); font-size: 11.5px; font-weight: 600; }
-.k-field label .oncv { margin-left: auto; font-size: 10.5px; letter-spacing: 0.16em; color: #9b8869; font-weight: 600; white-space: nowrap; }
 .k-field:focus-within label { color: var(--c-ink); }
 .k-field:focus-within label::before { color: var(--gold-ink); }
 .k-box { display: block; width: 100%; border: 0; border-bottom: 1px solid var(--line-2); background: transparent; padding: 8px 0 10px; font-size: 18px; line-height: 1.4; border-radius: 0; outline: none; }
@@ -175,27 +91,16 @@ html.fx .send span { transition: transform 0.3s var(--ease); }
 .done .tiny { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
 .done .send { margin-top: 40px; }
 
-/* ── 바닥글 ── */
+/* ── 바닥글이 화면 아래에 붙게 ── */
 .col { min-width: 0; display: flex; flex-direction: column; min-height: calc(100vh - var(--header-h)); }
 .col main { flex: 1; }
 
-/* ── 휴대폰 따라오는 작은 표지 ── */
-.mini { display: none; }
-
 @media (max-width: 1180px) and (min-width: 901px) {
   .k-sheet { padding: 56px 48px 80px; }
-  .title { font-size: 38px; }
-  .desk { padding: 24px 28px 20px; }
 }
 @media (max-width: 900px) {
   :root { --cg: 16px; }
-  .k-contact { display: block; }
-  .k-intro { padding: 30px var(--cg) 0; }
-  .desk { position: relative; top: 0; height: auto; min-height: 0; border-right: 0; background: none; padding: 22px var(--cg) 6px; gap: 12px; }
-  .cover-frame, .desk-cap { width: min(70vw, 300px); }
-  .desk-cap { font-size: 11px; }
-  .desk-cap b { font-size: 12.5px; }
-  .k-sheet { padding: 0 var(--cg) 64px; max-width: none; }
+  .k-sheet { padding: 36px var(--cg) 64px; max-width: none; }
   .k-switch { margin-top: 28px; gap: 28px; }
   .k-switch button { font-size: 18px; }
   .k-fields { grid-template-columns: 1fr; }
@@ -207,24 +112,6 @@ html.fx .send span { transition: transform 0.3s var(--ease); }
   .col { min-height: 0; }
   .done { padding-top: 36px; }
   .done h2 { font-size: 30px; }
-  .mini { display: flex; position: fixed; z-index: 25; left: 0; right: 0; top: var(--header-h); height: 82px; align-items: center; gap: 14px; padding: 0 var(--cg); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0; border-bottom: 1px solid var(--line); border-radius: 0; text-align: left; width: 100%; cursor: pointer; transform: translateY(-110%); visibility: hidden; font: inherit; color: var(--c-ink); }
-  .mini.show { transform: none; visibility: visible; }
-  html.fx .mini { transition: transform 0.4s var(--ease), visibility 0.4s; }
-  .mini-frame { position: relative; flex: none; width: 48px; height: 64px; overflow: hidden; box-shadow: 0 6px 14px -8px rgba(60,48,30,0.5); }
-  .mini-txt { min-width: 0; flex: 1; }
-  .mini-txt .kick { margin-bottom: 2px; font-size: 9.5px; }
-  .mini-name { display: block; font-family: var(--serif-en); font-weight: 600; font-size: 22px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .mini-name .ph { font-weight: 400; font-style: italic; color: #a29d94; font-family: 'Bodoni Moda', serif; }
-  .mini-cnt { flex: none; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; line-height: 1.3; }
-  .mini-cnt em { font-style: normal; color: var(--gold-ink); font-weight: 700; font-size: 15px; }
-  html { scroll-padding-top: calc(var(--header-h) + 100px); }
-  .title { font-size: 30px; }
-  .lead { font-size: 14.5px; margin-top: 12px; }
-  .notice { margin-top: 18px; }
-}
-@media (max-width: 370px) {
-  .title { font-size: 27px; }
-  .cover-frame, .desk-cap { width: min(74vw, 300px); }
 }
 /* 이름 판이 바뀌면 그 판의 글만 보인다 */
 body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-for="apply"] { display: none !important; }
@@ -242,29 +129,9 @@ body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-
 .site-header .menu-button[aria-controls="menu-panel"] { color: var(--c-ink); }
 /* 바닥글은 다른 쪽처럼 검은 바탕(이 쪽 바탕은 흰색이라 따로 깐다) */
 .site-footer { background: var(--ink); }
-/* 공통 틀의 img 규칙(가로·세로 100%)이 표지 안 그림에 번지지 않게 */
-.k-contact img:not(.ed-photo), .mini img { width: auto; height: auto; }
-/* 휴대폰: 따라오는 작은 표지가 떠 있는 버튼과 겹치지 않게 버튼은 그대로, 바닥글은 공통 */
 </style>
 </head>
 <body data-mode="apply">
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <defs>
-    <!-- 어두운 예시 사진을 밝고 따뜻한 잡지 인쇄 톤으로: 흑백 뒤 어두운 쪽을 들어 올린다 -->
-    <filter id="hikey" color-interpolation-filters="sRGB">
-      <feColorMatrix type="saturate" values="0.12"/>
-      <feComponentTransfer>
-        <feFuncR type="table" tableValues="0.50 0.74 0.90 0.98 1"/>
-        <feFuncG type="table" tableValues="0.47 0.71 0.87 0.96 0.99"/>
-        <feFuncB type="table" tableValues="0.42 0.65 0.82 0.92 0.96"/>
-      </feComponentTransfer>
-    </filter>
-    <filter id="ink" x="-10%" y="-10%" width="120%" height="120%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/>
-    </filter>
-  </defs>
-</svg>
 
 <header class="site-header solid">
   <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
@@ -286,55 +153,12 @@ body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-
   </div>
 </nav>
 
-
-<button class="mini" type="button" aria-label="내 표지 보기" tabindex="-1">
-  <span class="mini-frame" aria-hidden="true"></span>
-  <span class="mini-txt"><span class="kick">Live cover</span><span class="mini-name" data-for="apply"><span class="s" data-slot="a-name" data-ph="Your Name"></span></span><span class="mini-name" data-for="business"><span class="s" data-slot="b-name" data-ph="Your Name"></span></span></span>
-  <span class="mini-cnt">필수<br><em class="n-done">0</em> / <span class="n-all">6</span></span>
-</button>
-
 <div class="k-contact">
-  <div class="k-intro m-only-block" hidden></div>
-  <aside class="desk" aria-label="내 표지 미리보기">
-    <div class="cover-frame" id="coverFrame">
-      <div class="cv" id="cover" aria-hidden="true">
-        <div class="ed" data-ed="apply">
-          <img class="ed-photo" id="coverPhoto" alt="">
-          <script>/* 쪽을 열 때마다 표지 사진 여섯 장 중 하나를 골라 그 뒤로는 고정(대표 11-14: 새로 열 때만 바뀜, 보는 중에는 안 바뀜) */(function () { var n = ['', '-2', '-3', '-4', '-5', '-6'][Math.floor(Math.random() * 6)]; document.getElementById('coverPhoto').src = 'img/contact-cover-portrait' + n + '.webp'; })();</script>
-          <div class="ed-wash"></div>
-          <div class="ln l-field"><span class="kick">Field</span><span class="s" data-slot="a-field" data-ph="Your Field" data-wrap></span>
-            <span class="rule"></span>
-            <div class="l-sub"><span class="kick">Via</span><span class="s" data-slot="a-ref" data-ph="Your Route"></span></div>
-            <div class="l-sub handle"><span class="kick">Profile</span><span class="s" data-slot="a-url" data-ph="@yourprofile" data-fmt="handle"></span></div>
-          </div>
-          <div class="ln l-quote"><span class="kick">In my words</span><span class="q">“</span><span class="s" data-slot="a-msg" data-ph="Your Words" data-fmt="first" data-max="70" data-wrap></span></div>
-          <div class="ln l-name"><span class="kick">On the cover</span><span class="nm s" data-slot="a-name" data-ph="Your Name" data-fit></span></div>
-          <div class="cv-foot"><span class="hw">H / W&nbsp;&nbsp;<span class="s" data-slot="a-hw" data-ph="— / —"></span></span><span class="bar"><i></i>ASTRA · 2026.11</span></div>
-        </div>
-        <div class="ed" data-ed="business" hidden>
-          <img class="ed-photo" src="img/contact-cover-proposal.webp" alt="">
-          <div class="ed-wash"></div>
-          <div class="ln l-prop-head">Proposal</div>
-          <div class="ln l-idea"><span class="kick">The idea</span><span class="s" data-slot="b-prop" data-ph="Your Proposal" data-fmt="first" data-max="56" data-wrap></span></div>
-          <div class="ln l-name"><span class="kick">Presented by</span><span class="nm s" data-slot="b-name" data-ph="Your Name" data-fit></span></div>
-          <div class="cv-foot"><span>For partners &amp; brands</span><span class="bar"><i></i>ASTRA · 2026.11</span></div>
-        </div>
-        <div class="cv-top"><span>November 2026</span><span>✦ Astra Entertainment</span><span class="ed-label"><span data-for="apply">Creator Issue</span><span data-for="business">Business Issue</span></span></div>
-        <svg class="cv-mast" viewBox="0 0 600 190"><text x="300" y="172" text-anchor="middle" font-size="200">ASTRA</text></svg>
-        <div class="stamp" aria-hidden="true"><svg viewBox="0 0 160 160"><defs><path id="ring" d="M80 80 m-58 0 a58 58 0 1 1 116 0 a58 58 0 1 1 -116 0"/></defs><g filter="url(#ink)" fill="none" stroke="currentColor"><circle cx="80" cy="80" r="74" stroke-width="3.2"/><circle cx="80" cy="80" r="68" stroke-width="1"/><circle cx="80" cy="80" r="44" stroke-width="1"/></g><g filter="url(#ink)" fill="currentColor"><text font-family="Pretendard Variable, sans-serif" font-size="10.5" font-weight="700" letter-spacing="3.1"><textPath href="#ring">ASTRA ENTERTAINMENT ✦ NOVEMBER 2026 ✦</textPath></text><text x="80" y="90" text-anchor="middle" font-family="Bodoni Moda, serif" font-size="27" font-weight="700" letter-spacing="1">READY</text><path d="M80 52 q-1 8.4 -8 8 q7 -.4 8 8 q1 -8.4 8 -8 q-7 .4 -8 -8z"/><path d="M80 98 q-.6 5 -5 4.8 q4.4 -.2 5 4.8 q.6 -5 5 -4.8 q-4.4 .2 -5 -4.8z"/></g></svg></div>
-        <div class="marks"><i></i><i></i><i></i><i></i></div>
-      </div>
-    </div>
-    <p class="desk-cap"><span><b>Live cover</b>쓰는 대로 표지에 실립니다</span><span class="cnt">필수 <em class="n-done">0</em> / <span class="n-all">6</span></span></p>
-  </aside>
 
   <div class="col">
   <main>
   <section class="k-sheet" aria-labelledby="pg-title">
-    <p class="k-eyebrow"><b>CONTACT</b><span>지원 · 문의</span></p>
-    <h1 class="title" id="pg-title"><span data-for="apply">지원서를 쓰면,<br><em>표지</em>가 됩니다.</span><span data-for="business">제안을 쓰면,<br><em>표지</em>가 됩니다.</span></h1>
-    <p class="lead">한 칸씩 채울 때마다 표지에 그대로 실립니다. 필수 칸을 모두 채우면 표지가 완성됩니다.</p>
-    <div class="notice slot-box">안내 문구 (자료 받으면 입력)</div>
+    <h1 class="k-eyebrow" id="pg-title"><b>CONTACT</b><span>지원 · 문의</span></h1>
 
     <div class="k-switch" role="group" aria-label="문의 종류">
       <button type="button" aria-pressed="true" data-mode="apply" aria-controls="form-apply"><small>I.</small>지원하기</button>
@@ -343,15 +167,15 @@ body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-
 
     <form class="form" id="form-apply" data-kind="apply" novalidate aria-label="지원하기">
       <div class="k-fields">
-        <div class="k-field full" data-req><label for="a-field">지원분야 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><input class="k-box" id="a-field" name="field_of_interest" type="text" required aria-required="true" aria-describedby="a-field-e" maxlength="40"><p class="err" id="a-field-e">이 칸을 채워 주세요</p></div>
-        <div class="k-field full" data-req><label for="a-name">이름 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><input class="k-box" id="a-name" name="name" type="text" required aria-required="true" aria-describedby="a-name-e" autocomplete="name" maxlength="30"><p class="err" id="a-name-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="a-field">지원분야 <span class="req">필수</span></label><input class="k-box" id="a-field" name="field_of_interest" type="text" required aria-required="true" aria-describedby="a-field-e" maxlength="40"><p class="err" id="a-field-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="a-name">이름 <span class="req">필수</span></label><input class="k-box" id="a-name" name="name" type="text" required aria-required="true" aria-describedby="a-name-e" autocomplete="name" maxlength="30"><p class="err" id="a-name-e">이 칸을 채워 주세요</p></div>
         <div class="k-field" data-req><label for="a-phone">연락처 <span class="req">필수</span></label><input class="k-box" id="a-phone" name="phone" type="tel" required aria-required="true" aria-describedby="a-phone-e" autocomplete="tel" placeholder="010-0000-0000"><p class="err" id="a-phone-e">이 칸을 채워 주세요</p></div>
         <div class="k-field" data-req><label for="a-birth">생년월일 <span class="req">필수</span></label><input class="k-box" id="a-birth" name="birth_date" type="text" required aria-required="true" aria-describedby="a-birth-e" autocomplete="bday" inputmode="numeric" placeholder="2000.01.01"><p class="err" id="a-birth-e">이 칸을 채워 주세요</p></div>
         <div class="k-field" data-req><label for="a-gender">성별 <span class="req">필수</span></label><input class="k-box" id="a-gender" name="gender" type="text" required aria-required="true" aria-describedby="a-gender-e"><p class="err" id="a-gender-e">이 칸을 채워 주세요</p></div>
-        <div class="k-field"><label for="a-hw">신장 체중<span class="oncv">✦ 표지</span></label><input class="k-box" id="a-hw" name="height_weight" type="text" placeholder="170 / 52" maxlength="20"></div>
-        <div class="k-field"><label for="a-ref">지원경로<span class="oncv">✦ 표지</span></label><input class="k-box" id="a-ref" name="referral" type="text" maxlength="40"></div>
-        <div class="k-field"><label for="a-url">인스타 및 프로필 개인 URL<span class="oncv">✦ 표지</span></label><input class="k-box" id="a-url" name="profile_url" type="text" inputmode="url" autocomplete="url"></div>
-        <div class="k-field full"><label for="a-msg">하고싶은말<span class="oncv">✦ 표지</span></label><textarea class="k-box" id="a-msg" name="message" rows="3"></textarea></div>
+        <div class="k-field"><label for="a-hw">신장 체중</label><input class="k-box" id="a-hw" name="height_weight" type="text" placeholder="170 / 52" maxlength="20"></div>
+        <div class="k-field"><label for="a-ref">지원경로</label><input class="k-box" id="a-ref" name="referral" type="text" maxlength="40"></div>
+        <div class="k-field"><label for="a-url">인스타 및 프로필 개인 URL</label><input class="k-box" id="a-url" name="profile_url" type="text" inputmode="url" autocomplete="url"></div>
+        <div class="k-field full"><label for="a-msg">하고싶은말</label><textarea class="k-box" id="a-msg" name="message" rows="3"></textarea></div>
       </div>
       <div class="agree-wrap">
         <div class="agree-row"><label class="k-agree"><input type="checkbox" id="a-agree" name="agree" required aria-required="true" aria-describedby="a-agree-e">개인정보 수집·이용 동의 (필수)</label><button class="more" type="button" aria-expanded="false" aria-controls="a-terms">내용 보기</button></div>
@@ -363,9 +187,9 @@ body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-
 
     <form class="form" id="form-business" data-kind="business" novalidate aria-label="비즈니스 문의" hidden>
       <div class="k-fields">
-        <div class="k-field full" data-req><label for="b-name">담당자 이름 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><input class="k-box" id="b-name" name="contact_name" type="text" required aria-required="true" aria-describedby="b-name-e" autocomplete="name" maxlength="30"><p class="err" id="b-name-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="b-name">담당자 이름 <span class="req">필수</span></label><input class="k-box" id="b-name" name="contact_name" type="text" required aria-required="true" aria-describedby="b-name-e" autocomplete="name" maxlength="30"><p class="err" id="b-name-e">이 칸을 채워 주세요</p></div>
         <div class="k-field full" data-req><label for="b-phone">연락처 <span class="req">필수</span></label><input class="k-box" id="b-phone" name="phone" type="tel" required aria-required="true" aria-describedby="b-phone-e" autocomplete="tel" placeholder="010-0000-0000"><p class="err" id="b-phone-e">이 칸을 채워 주세요</p></div>
-        <div class="k-field full" data-req><label for="b-prop">제안 내용 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><textarea class="k-box" id="b-prop" name="proposal" rows="5" required aria-required="true" aria-describedby="b-prop-e"></textarea><p class="err" id="b-prop-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="b-prop">제안 내용 <span class="req">필수</span></label><textarea class="k-box" id="b-prop" name="proposal" rows="5" required aria-required="true" aria-describedby="b-prop-e"></textarea><p class="err" id="b-prop-e">이 칸을 채워 주세요</p></div>
       </div>
       <div class="agree-wrap">
         <div class="agree-row"><label class="k-agree"><input type="checkbox" id="b-agree" name="agree" required aria-required="true" aria-describedby="b-agree-e">개인정보 수집·이용 동의 (필수)</label><button class="more" type="button" aria-expanded="false" aria-controls="b-terms">내용 보기</button></div>
@@ -417,161 +241,24 @@ body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var FX = document.documentElement.classList.contains('fx');
   var body = document.body;
-  var cover = $('#cover'), frame = $('#coverFrame');
 
-  /* 휴대폰 따라오는 작은 표지: 큰 표지를 그대로 복사해 줄여 쓴다 */
-  var mini = $('.mini'), miniFrame = $('.mini-frame');
-  var miniCv = cover.cloneNode(true); miniCv.removeAttribute('id');
-  $$('.marks', miniCv).forEach(function (m) { m.remove(); });
-  miniFrame.appendChild(miniCv);
-
-  function fitCovers() {
-    var k = frame.clientWidth / 600;
-    cover.style.setProperty('--cvT', 'scale(' + k + ')'); cover.style.transform = 'scale(' + k + ')';
-    var km = miniFrame.clientWidth / 600 || 0.08;
-    miniCv.style.setProperty('--cvT', 'scale(' + km + ')'); miniCv.style.transform = 'scale(' + km + ')';
-    placeMarks();
-  }
-  if (window.ResizeObserver) new ResizeObserver(fitCovers).observe(frame); else window.addEventListener('resize', fitCovers);
-
-  /* 칸 → 표지 글 */
-  function fmt(el, v) {
-    v = (v || '').replace(/\s+$/, '');
-    var f = el.getAttribute('data-fmt');
-    if (f === 'handle') {
-      var m = v.match(/instagram\.com\/([A-Za-z0-9._]+)/i);
-      if (m) return '@' + m[1];
-      if (/^@/.test(v)) return v;
-      return v.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
-    }
-    if (f === 'first') {
-      v = v.replace(/^\s+/, '').split(/\n/)[0];
-      var mx = +el.getAttribute('data-max') || 60;
-      if (v.length > mx) v = v.slice(0, mx).replace(/\s+\S*$/, '') + '…';
-    }
-    return v;
-  }
-  function setSlot(el, text) {
-    var prev = el.__v || '';
-    if (prev === text && el.__init) return;
-    el.__init = true;
-    var wrap = el.hasAttribute('data-wrap');
-    if (!text) {
-      el.textContent = ''; el.__v = '';
-      var ph = document.createElement('span'); ph.className = 'ph'; ph.textContent = el.getAttribute('data-ph') || '';
-      el.appendChild(ph); return;
-    }
-    if (!prev) el.textContent = '';
-    var a = Array.from(prev), b = Array.from(text), p = 0;
-    while (p < a.length && p < b.length && a[p] === b[p]) p++;
-    var kids = Array.prototype.slice.call(el.childNodes);
-    for (var i = kids.length - 1; i >= p; i--) el.removeChild(kids[i]);
-    var step = Math.min(34, 560 / Math.max(1, b.length - p));
-    for (var j = p; j < b.length; j++) {
-      var c = b[j], n;
-      if (c === ' ' || c === '\n') n = document.createTextNode(' ');
-      else {
-        n = document.createElement('span'); n.className = wrap ? 'chi' : 'ch'; n.textContent = c;
-        if (FX) { n.classList.add('new'); n.style.animationDelay = Math.round((j - p) * step) + 'ms'; }
-      }
-      el.appendChild(n);
-    }
-    el.__v = text;
-  }
-  function render(id) {
-    var inp = document.getElementById(id); if (!inp) return;
-    $$('[data-slot="' + id + '"]').forEach(function (el) { setSlot(el, fmt(el, inp.value)); });
-    if (id === 'a-name' || id === 'b-name') fitNames();
-  }
-  /* 제호 ASTRA: 표지 폭에 꼭 맞게 글자 크기를 정한다 */
-  function fitMast() {
-    $$('.cv-mast text').forEach(function (t) {
-      t.setAttribute('font-size', 200);
-      var w = t.getComputedTextLength(); if (!w) return;
-      t.setAttribute('font-size', (200 * 552 / w).toFixed(1));
-    });
-  }
-  /* 이름 크기: 한 줄에 맞게 줄인다 */
-  var meas = document.createElement('span');
-  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-family:"Bodoni Moda","Noto Serif KR",serif;font-weight:600;letter-spacing:-0.02em;font-size:100px;left:-9999px;top:0';
-  document.body.appendChild(meas);
-  function fitNames() {
-    ['a-name', 'b-name'].forEach(function (id) {
-      var v = document.getElementById(id).value.trim();
-      meas.style.fontStyle = v ? 'normal' : 'italic'; meas.style.fontWeight = v ? 600 : 400;
-      meas.textContent = v || 'Your Name';
-      var w = meas.offsetWidth || 1, max = 544, base = id === 'a-name' ? 112 : 96;
-      var fs = Math.max(40, Math.min(base, 100 * max / w));
-      $$('[data-slot="' + id + '"][data-fit]').forEach(function (el) { el.style.fontSize = fs + 'px'; });
-    });
-  }
-
-  /* 판(지원서 / 제안서) */
+  /* 판(지원하기 / 비즈니스 문의) */
   var mode = 'apply';
-  function setMode(m, quiet) {
-    if (m === mode && !quiet) return;
+  function setMode(m) {
     mode = m; body.setAttribute('data-mode', m);
     $$('.k-switch button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === m)); });
     $('#form-apply').hidden = m !== 'apply'; $('#form-business').hidden = m !== 'business';
-    [cover, miniCv].forEach(function (cv) {
-      $$('.ed', cv).forEach(function (ed) {
-        var on = ed.getAttribute('data-ed') === m;
-        clearTimeout(ed.__t); ed.classList.remove('enter');
-        if (on) { ed.hidden = false; if (FX && !quiet) { void ed.offsetWidth; ed.classList.add('enter'); } }
-        else if (FX && !quiet) ed.__t = setTimeout(function () { ed.hidden = true; }, 760);
-        else ed.hidden = true;
-      });
-    });
-    $$('.n-all').forEach(function (n) { n.textContent = m === 'apply' ? 6 : 4; });
-    lastFocus = null; placeMarks(); check(true);
   }
   $$('.k-switch button').forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); }); });
 
-  /* 필수 채움 → 도장 */
-  var ready = false;
-  function check(silent) {
-    var f = $('#form-' + mode), req = $$('[data-req] .k-box', f), ag = $('input[type=checkbox]', f);
-    var n = req.filter(function (x) { return x.value.trim(); }).length + (ag.checked ? 1 : 0);
-    $$('.n-done').forEach(function (x) { x.textContent = n; });
-    var r = n === req.length + 1;
-    if (r !== ready || silent) {
-      ready = r;
-      [cover, miniCv].forEach(function (cv) {
-        var st = $('.stamp', cv);
-        st.classList.toggle('off', !r);
-        if (r) {
-          st.classList.remove('on'); if (FX && !silent) void st.offsetWidth; st.classList.add('on');
-          if (FX && !silent) { cv.classList.remove('press'); void cv.offsetWidth; cv.classList.add('press'); }
-        } else st.classList.remove('on');
-      });
-    }
-  }
-
-  /* 지금 쓰는 칸의 표지 자리에 재단 표시 */
-  var marks = $('.marks', cover), lastFocus = null;
-  function placeMarks() {
-    if (!lastFocus) { marks.classList.remove('on'); return; }
-    var slot = $('.ed:not([hidden]) [data-slot="' + lastFocus + '"]', cover);
-    if (!slot) { marks.classList.remove('on'); return; }
-    var host = slot.closest('.ln') || slot.parentNode;
-    if (lastFocus === 'a-hw') host = slot.parentNode;
-    var cr = cover.getBoundingClientRect(), r = host.getBoundingClientRect(), k = cr.width / 600 || 1;
-    marks.style.left = (r.left - cr.left) / k + 'px'; marks.style.top = (r.top - cr.top) / k + 'px';
-    marks.style.width = r.width / k + 'px'; marks.style.height = r.height / k + 'px';
-    marks.classList.add('on');
-  }
-
+  /* 채우면 빈 칸 안내를 지운다 */
   $$('.form .k-box').forEach(function (inp) {
     inp.addEventListener('input', function () {
-      render(inp.id);
       var fd = inp.closest('.k-field'); if (fd && inp.value.trim()) { fd.classList.remove('bad'); inp.removeAttribute('aria-invalid'); }
-      check(); if (lastFocus === inp.id) requestAnimationFrame(placeMarks);
     });
-    inp.addEventListener('focus', function () { lastFocus = inp.id; placeMarks(); });
-    inp.addEventListener('blur', function () { setTimeout(function () { if (!document.activeElement || !document.activeElement.classList.contains('k-box')) { lastFocus = null; placeMarks(); } }, 0); });
   });
   $$('.form input[type=checkbox]').forEach(function (c) {
-    c.addEventListener('change', function () { if (c.checked) { c.closest('.agree-wrap').classList.remove('bad'); c.removeAttribute('aria-invalid'); } check(); });
+    c.addEventListener('change', function () { if (c.checked) { c.closest('.agree-wrap').classList.remove('bad'); c.removeAttribute('aria-invalid'); } });
   });
   $$('.more').forEach(function (m) {
     m.addEventListener('click', function () {
@@ -608,36 +295,14 @@ body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-
       $$('.terms', f).forEach(function (t) { t.hidden = true; });
       $$('.more', f).forEach(function (m) { m.setAttribute('aria-expanded', 'false'); m.textContent = '내용 보기'; });
     });
-    ['a-field', 'a-name', 'a-ref', 'a-url', 'a-msg', 'a-hw', 'b-name', 'b-prop'].forEach(render);
     $('#done').hidden = true; $('.k-switch').hidden = false;
-    setMode('apply', true);
-    var top = $('.k-sheet').getBoundingClientRect().top + window.scrollY - 80;
-    window.scrollTo({ top: window.innerWidth <= 900 ? 0 : Math.max(0, top), behavior: 'auto' });
+    setMode('apply');
+    window.scrollTo({ top: 0, behavior: 'auto' });
     $('.k-switch button').focus({ preventScroll: true });
   });
 
-  /* 휴대폰: 큰 표지가 머리말 뒤로 지나가면 작은 표지 띠를 보인다 */
-  var mq = window.matchMedia('(max-width: 900px)');
-  if (window.IntersectionObserver) {
-    new IntersectionObserver(function (es) {
-      es.forEach(function (e) { mini.classList.toggle('show', mq.matches && !e.isIntersecting && e.boundingClientRect.top < 0); });
-    }, { rootMargin: '-60px 0px 0px 0px', threshold: 0 }).observe(frame);
-  }
-  mini.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: FX ? 'smooth' : 'auto' }); });
-
-  /* 휴대폰에서는 제목 묶음을 표지 위로 옮긴다 */
-  var intro = $('.k-intro'), sheet = $('.k-sheet'), headBits = [$('.k-eyebrow'), $('.title'), $('.lead'), $('.notice')];
-  function placeIntro() {
-    if (mq.matches) { intro.hidden = false; headBits.forEach(function (n) { intro.appendChild(n); }); }
-    else { intro.hidden = true; for (var i = headBits.length - 1; i >= 0; i--) sheet.insertBefore(headBits[i], sheet.firstChild); }
-  }
-  placeIntro(); if (mq.addEventListener) mq.addEventListener('change', placeIntro);
-
-  ['a-field', 'a-name', 'a-ref', 'a-url', 'a-msg', 'a-hw', 'b-name', 'b-prop'].forEach(render);
-  fitMast(); fitCovers(); check(true);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitMast(); fitNames(); placeMarks(); });
   // 다른 쪽의 "지원하기"(contact.html#apply)·주소 끝 #business로 들어오면 그 양식을 연다
-  function fromHash() { var h = location.hash.slice(1); if (h === 'business' || h === 'apply') setMode(h, true); }
+  function fromHash() { var h = location.hash.slice(1); if (h === 'business' || h === 'apply') setMode(h); }
   fromHash(); window.addEventListener('hashchange', fromHash);
 })();
 </script>
