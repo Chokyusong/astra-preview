@@ -1,5 +1,5 @@
 /* 휴대폰 메뉴: 브랜드 3판과 같은 모양·동작·값이다(대표 11-14 "퀄리티 있게", "한 화면에", "일곱 쪽에도").
-   잡지 목차처럼 왼쪽 정렬, 번호 + 큰 영문(Bodoni) + 작은 한글, 지금 쪽은 금색과 ✦. 아래에 지원하기·상담 채널·회사 이름.
+   잡지 목차처럼 왼쪽 정렬, 번호 + 큰 영문(Bodoni) + 작은 한글, 지금 쪽은 금색과 ✦. 아래에 지원하기·상담 채널.
    여덟 줄이 남는 높이를 나눠 가져 어느 휴대폰에서도 한 화면에 들어간다(모양은 pages.css).
    열 때 판이 위에서 내려오고 영문이 한 줄씩 떠오르며 아래 묶음이 뒤따른다. ×·Esc·메뉴 항목·넓은 화면 전환으로 닫는다.
    열린 동안 뒤쪽은 스크롤되지 않는다. 움직임 줄이기 설정이면 바로 나타난다.
@@ -43,8 +43,7 @@
       '<a href="#" aria-label="카카오톡 상담"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5c-4.7 0-8.5 2.9-8.5 6.5 0 2.3 1.6 4.4 4 5.5l-.9 3.3 3.8-2.5c.5.1 1 .1 1.6.1 4.7 0 8.5-2.9 8.5-6.4S16.7 4.5 12 4.5z"/></svg></a>' +
       '<a href="#" aria-label="인스타그램"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.9" cy="7.1" r=".6" fill="currentColor" stroke="none"/></svg></a>' +
       '<a href="#" aria-label="블로그"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19l1-4L15.5 5.5a2.1 2.1 0 0 1 3 3L9 18l-4 1z"/><path d="M13.5 7.5l3 3"/></svg></a>' +
-    '</div>' +
-    '<p class="menu-copy">ASTRA ENTERTAINMENT</p>';
+    '</div>';
   panel.appendChild(foot);
 
   function setMenu(open, back) {
