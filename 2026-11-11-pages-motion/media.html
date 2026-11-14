@@ -74,16 +74,32 @@ html:not(.deck) .bgl { overflow: clip; }
 html:not(.deck) .intro, html:not(.deck) .rows, html:not(.deck) .process { position: relative; overflow-x: clip; }
 .intro > :not(.bgl), .rows > :not(.bgl), .process > :not(.bgl) { position: relative; z-index: 1; }
 
-/* 소개(5-4): 글 뒤로 스튜디오 사진 여섯 장의 필름 띠가 흐른다. 평소 밝기 38%, 마우스 아래 틀만 80%·또렷, 나머지는 흐림(미리 흐리게 한 겹) */
-.film { position: absolute; left: 0; top: 50%; height: 58%; display: flex; will-change: transform; }
-html:not(.deck) .film { height: 62%; }
-.ff { position: relative; flex: none; height: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 6px; }
-.ff .soft { opacity: 0; transition: opacity 0.3s ease; }
-.ff i { position: absolute; inset: 0; background: #000; opacity: 0.55; transition: opacity 0.3s ease; }
-.film.has-fo .ff:not(.fo) .soft { opacity: 1; }
-.ff.fo i { opacity: 0.2; }
-/* 글 덩어리 뒤 어두운 번짐: 글은 늘 읽힌다 */
-.intro-head::before, .intro-text::before { content: ""; position: absolute; inset: -16% -10%; z-index: -1; background: radial-gradient(farthest-side, rgba(0, 0, 0, 0.72) 45%, rgba(0, 0, 0, 0)); pointer-events: none; }
+/* 소개(대표 11-15): 글 뒤로 시그 영상 20개가 위 10칸·아래 10칸 두 줄로 붙어 흐른다(1:1, 간격 없음, 위는 왼쪽·아래는 오른쪽).
+   평소 검정 58%로 눌러 두고, 마우스 곁 칸은 밝아지고 마우스 아래 칸은 떠올라 금빛 테두리. 들어올 때 흩어진 퍼즐 조각이 제자리에 맞춰진다 */
+.sig { position: absolute; left: 0; right: 0; top: 50%; }
+.sg { position: absolute; left: 0; top: 0; overflow: hidden; background: #111; will-change: transform; backface-visibility: hidden; transform-origin: 50% 50%; }
+.sg img, .sg video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; display: block; }
+.sg img, .sg video { transition: filter 0.3s ease; }
+.sg video { opacity: 0; transition: opacity 0.35s ease, filter 0.3s ease; }
+/* 초점(전 필름 띠와 같은 생각): 떠오른 칸만 또렷하고 나머지 칸은 흐림 3px(휴대폰은 칸이 작아 2px). PC는 마우스를 올린 동안, 휴대폰은 내리는 동안 화면 가운데 칸을 따라간다 */
+.sig.has-fo .sg:not(.fo) img, .sig.has-fo .sg:not(.fo) video { filter: blur(3px); }
+html:not(.deck) .sig.has-fo .sg:not(.fo) img, html:not(.deck) .sig.has-fo .sg:not(.fo) video { filter: blur(2px); }
+.sg video.on { opacity: 1; }
+.sg i { position: absolute; inset: 0; background: #000; opacity: 0.68; }
+/* 칸 사이 머리카락 같은 이음선(퍼즐 판) */
+.sg b { position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55); }
+/* 맞춰지는 순간 번쩍이는 금빛 테두리 */
+.sg u { position: absolute; inset: 0; opacity: 0; box-shadow: inset 0 0 0 2px #e8c88e, inset 0 0 34px rgba(232, 200, 142, 0.5); }
+.sg.fo { box-shadow: 0 0 0 1.5px #d9b97f, 0 26px 60px -14px rgba(0, 0, 0, 0.95); }
+/* 벽 위를 가끔 지나가는 금빛 빛줄(9초마다 2.5초 동안) */
+.sig-sheen { position: absolute; top: 0; bottom: 0; left: 0; width: 34%; z-index: 4; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(100deg, rgba(255, 228, 176, 0) 22%, rgba(255, 228, 176, 0.14) 50%, rgba(255, 228, 176, 0) 78%);
+  transform: translateX(-110%); animation: sigSheen 9s cubic-bezier(0.45, 0.05, 0.35, 1) 1.6s infinite; }
+@keyframes sigSheen { 0% { transform: translateX(-110%); } 28% { transform: translateX(310%); } 100% { transform: translateX(310%); } }
+/* 글이 읽히게: 글 덩어리 뒤에는 옅은 번짐(42%)만 두고, 글자마다 검은 그림자를 붙인다.
+   (11-15 대표 "휴대폰은 글자 뒤 검정 배경 때문에 잘 안 보이고 PC도 왼쪽이 잘 안 보여": 짙은 번짐 84%가 벽을 가려 그림자로 바꿈) */
+.intro-head::before, .intro-text::before { content: ""; position: absolute; inset: -18% -10%; z-index: -1; background: radial-gradient(farthest-side, rgba(0, 0, 0, 0.42) 30%, rgba(0, 0, 0, 0)); pointer-events: none; }
+.intro .eyebrow, .intro h2, .intro-text p { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 0, 0, 0.85), 0 0 32px rgba(0, 0, 0, 0.6); }
 
 /* ── 화면 3 스튜디오 카드(5-5): 확정된 캐러셀(client/design-refs/media-carousel.html)의 모양·값 그대로.
    더한 것: 뒤 카드의 얕은 초점(한 겹마다 흐림 2px, 밝기 -18%), 끌어서 넘기기(--drag), 들어올 때 모였다 펼쳐짐 ── */
@@ -195,6 +211,9 @@ html.deck .rows .row-list { margin-top: clamp(8px, 2.2vh, 30px); align-self: cen
 html.deck .row { padding: clamp(9px, calc(5.2vh - 22px), 30px) 0; overflow: hidden; align-items: start; cursor: pointer; transition: height 0.3s var(--ease); }
 html.deck .row-label { font-size: max(14px, min(1.3vw, 2.4vh, calc(19px * var(--k, 1)))); transition: opacity 0.3s; }
 html.deck .row:not(.sel) .row-label { opacity: 0.7; }
+/* 줄 이름이 두 줄로 넘어가면 둘째 줄이 번호 아래가 아니라 이름 첫 글자 아래에서 시작(대표 11-15 "SETUP은 PERSONAL 밑에") */
+.row-label { display: flex; gap: 0.3em; }
+.row-label i { flex: none; }
 html.deck .row h3 { font-size: max(17px, min(1.8vw, 3.2vh, calc(28px * var(--k, 1)))); }
 html.deck .row-body p { font-size: max(13px, min(1.12vw, 2.15vh, calc(17px * var(--k, 1)))); line-height: 1.65; }
 html.deck .keywords { margin-top: clamp(8px, 1.5vh, 16px); }
@@ -566,33 +585,106 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   }
   function stopAnims(e) { e.getAnimations().forEach(function (a) { a.cancel(); }); }
 
-  /* ───────── 3판 5-4. 소개: 필름 띠 ─────────
-     스튜디오 사진 여섯 장이 가로로 이어진 띠(틀 높이 창의 58%, 틀 사이 18px × 배율, 평소 밝기 38%). 혼자 왼쪽으로 초당 14px × 배율 흐르고,
-     마우스를 좌우로 움직이면 따라 흐른다(창 가로를 다 가면 틀 1.6장만큼, 0.5초 늦게). 마우스 아래 틀만 밝기 80%·또렷, 나머지 흐림 3px.
-     들어올 때 0.35초 뒤부터 띠가 오른쪽에서 틀 3장만큼 밀려 들어와 느려진다(0.9초) */
-  var FILM_SET = ['media-studio-1', 'media-studio-2', 'media-hero', 'media-studio-3', 'media-studio-4', 'media-studio-5'];
-  var filmIn = bglOf(intro), film = el('div', 'film'), FILM = { set: 0, step: 0, auto: 0, scrub: 0, scrubT: 0, drag: 0, flow: 0, enterAt: 0, x: 0, fo: null, ff: [] };
+  /* ───────── 소개: 시그 영상 벽(대표 11-15) ─────────
+     위 10칸·아래 10칸, 1:1 칸이 간격 없이 붙어 위 줄은 왼쪽·아래 줄은 오른쪽으로 초당 70px × 배율 흐른다(대표 11-15 "롤링 속도가 좀 느린가"·"더 빠르게": 18 → 40 → 70px). 칸 크기는 PC 창 높이 29%, 휴대폰 창 폭 42%(창 높이 22%까지)이고
+     한 줄 열 칸이 늘 창보다 한 칸 이상 길게 잡아(창 폭/9 이상) 같은 영상을 두 번 두지 않는다. 화면 밖으로 나간 칸이 반대쪽 끝으로 돌아온다.
+     영상은 시작 자리를 칸마다 무작위로 골라 반복한다(끝에 숫자가 오르는 영상이 많아 한꺼번에 오르지 않게). 이 화면이 보일 때만 받고 재생한다.
+     마우스: 좌우로 움직이면 두 줄이 반대로 따라 흐르고(창 가로를 다 가면 1.6칸, 0.5초 늦게), 마우스 곁 칸이 밝아지고(1.8칸 안),
+     마우스 아래 칸은 1.08배로 떠올라 금빛 테두리 + 초점 틀이 맞고, 둘레 칸은 밀려난다(12px × 배율까지). 칸 위에 있는 동안 흐름이 거의 멈춘다.
+     들어올 때 0.35초 뒤부터 칸들이 흩어진 퍼즐 조각(어긋난 자리·기울기 24°까지·60%)에서 무작위 순서로 0.8초에 제자리에 맞춰지고, 맞는 순간 금빛 테두리가 번쩍인다.
+     휴대폰은 구역이 올라오는 만큼 맞춰지고(올리면 거꾸로 흩어짐) 화면 가운데 칸이 떠오른다. 움직임 줄이기는 첫 장면 그림으로 멈춘 벽 */
+  var SIG_ROWS = [[1, 3, 6, 2, 16, 5, 9, 10, 15, 12], [14, 7, 20, 4, 11, 17, 8, 13, 18, 19]];
+  var SIGV = 'img/sig/sig-';
+  var filmIn = bglOf(intro), film = el('div', 'sig');
+  var FILM = { T: 200, L: 2000, auto: 0, scrub: 0, scrubT: 0, drag: 0, flow: 0, enterAt: 0, x: 0, fo: null, ff: [], sp: 1, play: null, loaded: false, top: 0, tr: [] };
   filmIn.appendChild(film);
-  function filmLayout() {
-    var vw = window.innerWidth, h = film.getBoundingClientRect().height || window.innerHeight * 0.58, gap = 18 * K(), fw = h * 1.6;
-    FILM.step = fw + gap; FILM.set = FILM.step * FILM_SET.length;
-    var need = Math.ceil((vw + FILM.set * 2) / FILM.set) + 1;
-    if (film.children.length !== need * FILM_SET.length) {
-      film.innerHTML = ''; FILM.ff = [];
-      for (var c = 0; c < need; c++) FILM_SET.forEach(function (n) {
-        var f = el('div', 'ff'); f.appendChild(pic(n)); f.appendChild(soft(n, { w: 320, blur: 3, disp: fw })); f.appendChild(el('i'));
-        film.appendChild(f); FILM.ff.push(f);
-      });
-    }
-    film.style.gap = gap.toFixed(1) + 'px';
-    filmPlace();
+  SIG_ROWS.forEach(function (row, r) {
+    row.forEach(function (n, c) {
+      var id = (n < 10 ? '0' : '') + n, f = el('div', 'sg'), im = el('img'), v = null;
+      im.src = SIGV + id + '.webp'; im.alt = ''; im.decoding = 'async'; f.appendChild(im);
+      if (!reduce) {
+        v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
+        v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.dataset.src = SIGV + id + '.mp4';
+        f.appendChild(v);
+      }
+      f.appendChild(el('i')); f.appendChild(el('b')); f.appendChild(el('u'));
+      f._r = r; f._c = c; f._v = v; f._x = 0; f._y = 0; f._s = 1; f._px = 0; f._py = 0; f._dim = 0.58; f._u = 1; f._z = ''; f._dim = 0.68;
+      // 퍼즐 조각: 흩어진 자리(칸의 ±90%)·기울기·맞춰지는 순서
+      f._dx = Math.random() * 2 - 1; f._dy = Math.random() * 2 - 1; f._rot = (Math.random() * 2 - 1) * 24; f._dl = Math.random();
+      film.appendChild(f); FILM.ff.push(f);
+    });
+  });
+  if (!reduce) film.appendChild(el('div', 'sig-sheen'));
+  function sigLoad() {
+    if (FILM.loaded || reduce) return;
+    FILM.loaded = true;
+    FILM.ff.forEach(function (f) {
+      var v = f._v;
+      v.addEventListener('loadedmetadata', function () { try { v.currentTime = Math.random() * (v.duration || 10); } catch (e) {} }, { once: true });
+      v.addEventListener('seeked', function () { v.classList.add('on'); }, { once: true });
+      // 통째로 받아 둔 뒤 튼다: 미리보기 서버(GitHub Pages)는 파일 일부만 주는 요청을 받지 않아, 그냥 걸면 무작위 자리로 건너뛰지 못하고 처음부터 돈다(칸마다 약 0.37MB)
+      // 파일로 바로 연 시안(file://)은 받기를 못 하지만 건너뛰기는 되므로 그냥 건다
+      if (location.protocol === 'file:') { v.src = v.dataset.src; if (FILM.play) { var q = v.play(); if (q && q.catch) q.catch(function () {}); } return; }
+      fetch(v.dataset.src).then(function (r) { return r.blob(); }).then(function (bl) {
+        v.src = URL.createObjectURL(bl);
+        if (FILM.play) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      }).catch(function () { v.src = v.dataset.src; });
+    });
   }
-  function filmPlace() {
-    var off = FILM.auto + FILM.scrub + FILM.drag + FILM.flow, e = 0;
-    if (FILM.enterAt) { var u = clamp((now() - FILM.enterAt) / 900, 0, 1); e = FILM.step * 3 * Math.pow(1 - u, 3); if (u >= 1) FILM.enterAt = 0; }
-    var m = ((off % FILM.set) + FILM.set) % FILM.set;
-    FILM.x = -FILM.set - m + e;
-    film.style.transform = 'translate3d(' + FILM.x.toFixed(1) + 'px,-50%,0)';
+  function sigPlay(on) {
+    if (on === FILM.play) return;
+    FILM.play = on;
+    if (on) sigLoad();
+    FILM.ff.forEach(function (f) {
+      var v = f._v; if (!v) return;
+      if (on) { if (v.src) { var p = v.play(); if (p && p.catch) p.catch(function () { FILM.play = null; }); } } else v.pause();
+    });
+  }
+  function filmLayout() {
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var T = D.on ? Math.max(vh * 0.29, vw / 9 + 2) : Math.max(Math.min(vw * 0.42, vh * 0.22), vw / 9 + 2);
+    FILM.T = T; FILM.L = T * 10;
+    film.style.height = (2 * T).toFixed(1) + 'px'; film.style.marginTop = (-T).toFixed(1) + 'px';
+    // 0.5px 겹쳐 그려 칸 사이에 바탕이 비쳐 보이지 않게
+    FILM.ff.forEach(function (f) { f.style.width = f.style.height = (T + 0.5).toFixed(1) + 'px'; });
+    filmPlace(1);
+  }
+  function backOut(u) { var c = 1.35; u -= 1; return 1 + (c + 1) * u * u * u + c * u * u; }
+  function filmPlace(dt) {
+    var T = FILM.T, L = FILM.L, off = FILM.auto + FILM.scrub + FILM.drag + FILM.flow, t = now(), k = K();
+    FILM.x = -off; // 위 줄이 흐른 자리(왼쪽으로 갈수록 작아짐, 확인 도구가 읽는다)
+    var flowAsm = !D.on && D.flowOn() && !reduce, asm = flowAsm ? D.span(intro, 1.0, 0.45) : 1;
+    var M = D.mouse, fo = FILM.fo, hx = 0, hy = 0, mx = null, my = null, endAll = true;
+    if (fo) { hx = fo._px + T / 2; hy = fo._py + T / 2; }
+    if (D.on && fine && M.at && onlyAt(INTRO)) { mx = M.x; my = M.y - FILM.top; }
+    else if (flowAsm) { mx = window.innerWidth / 2; my = window.innerHeight / 2 - FILM.top; }
+    var a = dt ? lag(dt, 0.14) : 1;
+    FILM.ff.forEach(function (f) {
+      var dir = f._r ? 1 : -1, p = f._c * T + dir * off, x = ((p % L) + L) % L - T, y = f._r * T;
+      f._px = x; f._py = y;
+      var cx = x + T / 2, cy = y + T / 2, tx = 0, ty = 0, ts = 1;
+      if (fo === f) ts = 1.08;
+      else if (fo) { var ddx = cx - hx, ddy = cy - hy, d = Math.sqrt(ddx * ddx + ddy * ddy) || 1, pw = 12 * k * Math.exp(-d / T + 1) / Math.E * 1; tx = ddx / d * pw; ty = ddy / d * pw; }
+      f._x += (tx - f._x) * a; f._y += (ty - f._y) * a; f._s += (ts - f._s) * a;
+      var light = 0;
+      if (mx !== null) { var lx = mx - cx, ly = my - cy; light = clamp(1 - Math.sqrt(lx * lx + ly * ly) / (T * 1.8), 0, 1); }
+      // 영상이 밝고 색이 진해 글이 묻히지 않게 평소 68% 눌러 둔다. 마우스 곁은 28%까지 덜 누르고, 떠오른 칸은 6%(휴대폰은 덜 밝게: 곁 15%, 가운데 칸 30%)
+      var dim = fo === f ? (flowAsm || sigUnderText(x + f._x, y + f._y + FILM.top, T) ? 0.3 : 0.06) : clamp(0.68 - (flowAsm ? 0.15 : 0.28) * light + (fo ? 0.05 : 0), 0, 1);
+      f._dim += (dim - f._dim) * a;
+      // 퍼즐 맞춤
+      var u = 1;
+      if (FILM.enterAt) { u = clamp((t - FILM.enterAt - f._dl * 650) / 800, 0, 1); if (u < 1) endAll = false; }
+      else if (flowAsm) u = clamp((asm - f._dl * 0.45) / 0.55, 0, 1);
+      if (u >= 1 && f._u < 1 && !reduce) f.lastChild.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: 'ease-out' });
+      f._u = u;
+      var e = backOut(u), ex = f._dx * T * 0.9 * (1 - e), ey = f._dy * T * 0.9 * (1 - e), rot = f._rot * (1 - e), sc = 0.6 + 0.4 * Math.min(e, 1.04);
+      f.style.transform = 'translate3d(' + (x + f._x + ex).toFixed(1) + 'px,' + (y + f._y + ey).toFixed(1) + 'px,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + (f._s * sc).toFixed(4) + ')';
+      f.style.opacity = u >= 1 ? '' : clamp(u * 2.2, 0, 1).toFixed(3);
+      f.children[f._v ? 2 : 1].style.opacity = f._dim.toFixed(3);
+      var z = fo === f ? '3' : u < 1 ? '2' : '';
+      if (z !== f._z) { f._z = z; f.style.zIndex = z; }
+    });
+    if (FILM.enterAt && endAll && t > FILM.enterAt) FILM.enterAt = 0;
   }
   function filmFocus(f) {
     if (f === FILM.fo) return;
@@ -600,31 +692,45 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     FILM.fo = f; if (f) f.classList.add('fo');
     film.classList.toggle('has-fo', !!f);
   }
+  // 마우스가 오른쪽 화면 단추·머리말처럼 소개 구역 밖의 것 위면 칸을 고르지 않는다.
+  // 글 덩어리(작은 영문·큰 문장·설명) 자리. 마우스가 글 위면 칸 대신 글에 초점이 가고, 떠오른 칸이 글 뒤에 깔리면 30%로 눌러 글이 읽히게
+  var sigText = [introEye, introH, $('.intro-text p')];
+  function sigInText(x, y) { return FILM.tr.some(function (r) { return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }); }
+  function sigUnderText(x, y, T) { return FILM.tr.some(function (r) { var w = Math.min(x + T, r.right) - Math.max(x, r.left), h = Math.min(y + T, r.bottom) - Math.max(y, r.top); return w > 0 && h > 0 && w * h > T * T * 0.12; }); }
+  function sigPick(r, x) {
+    for (var i = 0; i < FILM.ff.length; i++) { var f = FILM.ff[i]; if (f._r === r && x >= f._px && x < f._px + FILM.T) return f; }
+    return null;
+  }
   function filmFrame(dt) {
-    var M = D.mouse, k = K(), live = D.on ? (D.cur === INTRO || (D.trans && (D.trans.from === INTRO || D.trans.to === INTRO))) : (function () { var r = intro.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight; })();
+    var live = D.on ? (D.cur === INTRO || (D.trans && (D.trans.from === INTRO || D.trans.to === INTRO))) : (function () { var r = intro.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight; })();
+    sigPlay(!!live && !reduce && !document.hidden);
     if (!live) return;
-    FILM.auto += 14 * k * dt;
-    var fo = null;
+    var M = D.mouse, k = K(), T = FILM.T, fo = null;
+    FILM.top = film.getBoundingClientRect().top;
     if (D.on && fine && M.at) {
-      FILM.scrubT = (M.x / window.innerWidth) * FILM.step * 1.6;
-      if (onlyAt(INTRO)) {
-        var b = film.getBoundingClientRect();
-        if (M.y >= b.top && M.y <= b.bottom) { var j = Math.floor((M.x - FILM.x) / FILM.step); var lx = M.x - FILM.x - j * FILM.step; if (lx <= FILM.step - 18 * k) fo = FILM.ff[j] || null; }
-      }
+      FILM.scrubT = (M.x / window.innerWidth) * T * 1.6;
+      if (onlyAt(INTRO)) { FILM.tr = sigText.map(function (e) { return e.getBoundingClientRect(); }); var ry = M.y - FILM.top; var hit = document.elementFromPoint(M.x, M.y); if (ry >= 0 && ry < 2 * T && !sigInText(M.x, M.y) && hit && intro.contains(hit)) fo = sigPick(ry < T ? 0 : 1, M.x); }
     }
-    // 휴대폰 스크롤 반응(12-5): 내리는 만큼 띠가 더 흐르고(10px 내리면 5px), 화면 가운데의 틀만 또렷하다
-    if (!D.on && D.flowOn()) { FILM.flow = window.pageYOffset * 0.5; var jc = Math.floor((window.innerWidth / 2 - FILM.x) / FILM.step); fo = FILM.ff[jc] || null; }
+    // 휴대폰 스크롤 반응(12-5): 내리는 만큼 두 줄이 더 흐르고(10px 내리면 5px), 화면 가운데 칸이 떠오른다
+    if (!D.on && D.flowOn()) { FILM.flow = window.pageYOffset * 0.5; var cy = window.innerHeight / 2 - FILM.top; if (cy >= 0 && cy < 2 * T) fo = sigPick(cy < T ? 0 : 1, window.innerWidth / 2); }
+    FILM.sp += ((fo && D.on ? 0.1 : 1) - FILM.sp) * lag(dt, 0.25);
+    if (!reduce) FILM.auto += 70 * k * dt * FILM.sp;
     FILM.scrub += (FILM.scrubT - FILM.scrub) * lag(dt, 0.17);
     filmFocus(fo);
-    filmPlace();
+    filmPlace(dt);
   }
-  // 휴대폰: 손가락으로 띠를 민다(세로 스크롤은 그대로)
+  document.addEventListener('visibilitychange', function () { if (document.hidden) sigPlay(false); });
+  // 휴대폰: 손가락으로 두 줄을 민다(세로 스크롤은 그대로)
   (function () {
     var sx = null, sd = 0;
     intro.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') { sx = e.clientX; sd = FILM.drag; } });
-    intro.addEventListener('pointermove', function (e) { if (sx !== null && e.pointerType !== 'mouse') { FILM.drag = sd - (e.clientX - sx); if (reduce) filmPlace(); } });
+    intro.addEventListener('pointermove', function (e) { if (sx !== null && e.pointerType !== 'mouse') { FILM.drag = sd - (e.clientX - sx); if (reduce) filmPlace(0); } });
     ['pointerup', 'pointercancel'].forEach(function (t) { intro.addEventListener(t, function () { sx = null; }); });
   })();
+  function sigState() {
+    var vs = FILM.ff.filter(function (f) { return f._v; });
+    return { T: Math.round(FILM.T), play: vs.filter(function (f) { return !f._v.paused; }).length, shown: vs.filter(function (f) { return f._v.classList.contains('on'); }).length, t: vs.map(function (f) { return +f._v.currentTime.toFixed(1); }), asm: FILM.ff.filter(function (f) { return f._u >= 1; }).length };
+  }
 
   /* ───────── 5-5. 스튜디오 카드: 확정된 캐러셀 ─────────
      4초 자동, 이전·다음 버튼, 좌우 화살표, 손가락 밀기(40px), 마우스를 올리면 멈춤, 키보드 초점일 때 멈춤 — 확정본 그대로.
@@ -1155,7 +1261,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   filmLayout();
   if (reduce) { procBg(3, 0); rowsBg(0, false); window.addEventListener('scroll', rowsNear, { passive: true }); }
   /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-5, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
-     필름 띠: 위 filmFrame에서 스크롤만큼 흐르고 화면 가운데 틀만 또렷
+     시그 영상 벽: 위 filmFrame에서 스크롤만큼 흐르고, 구역이 올라오는 만큼 퍼즐이 맞춰지고, 화면 가운데 칸이 떠오른다
      하는 일: 화면 가운데에 가장 가까운 줄의 그림이 뒤에 그려진다(있던 rowsNear 그대로, 바뀔 때 겹쳐 바뀜)
      과정: 구역 위쪽 85% -> 30% 동안 미리 만든 네 겹(흑백·흐림 -> 색)의 투명도만 바꿔 이어서 현상된다
      흰 문의 구역: 구역 위쪽 92% -> 40% 동안 육각형 구멍이 60° 돌며 열린다. 바깥은 진회색 날(PC 넘김의 조리개와 같은 날·선) */
@@ -1201,7 +1307,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   window.__mediaFlow = FLOW;
 
   // 확인 도구용(움직임 줄이기에서도)
-  window.__media = { state: function () { return { cur: D.cur, sel: W.sel, ready: W.ready, card: C.i, auto: !!C.timer, stage: ST.open, rack: RACK.card ? RACK.card.getAttribute('data-off') : null, fd: cards.map(function (c) { return c.getAttribute('data-off') + ':' + (c.getAttribute('data-fd') || '-'); }).join(' '), vf: { x: Math.round(VF.x), y: Math.round(VF.y), w: Math.round(VF.w), h: Math.round(VF.h), a: +VF.a.toFixed(2), tgt: VF.tgt ? (VF.tgt.className || VF.tgt.tagName) : null }, iris: !!IR, thumb: thumbs.findIndex(function (t) { return t.classList.contains('on'); }), prog: cprog.getAttribute('data-cur') + '/' + cprog.getAttribute('data-total'), run: thumbs.findIndex(function (t) { return t.classList.contains('run'); }), rowBg: RB.cur, what: WG.state(), procBg: D.flowOn() ? FLOW.st : PB.cur, filmX: Math.round(FILM.x), filmFo: FILM.fo ? FILM.ff.indexOf(FILM.fo) % FILM_SET.length : -1, vid: heroVid.paused ? 'pause' : 'play', vsrc: (heroVid.currentSrc || '').split('/').pop(), vt: +heroVid.currentTime.toFixed(2) }; } };
+  window.__media = { state: function () { return { cur: D.cur, sel: W.sel, ready: W.ready, card: C.i, auto: !!C.timer, stage: ST.open, rack: RACK.card ? RACK.card.getAttribute('data-off') : null, fd: cards.map(function (c) { return c.getAttribute('data-off') + ':' + (c.getAttribute('data-fd') || '-'); }).join(' '), vf: { x: Math.round(VF.x), y: Math.round(VF.y), w: Math.round(VF.w), h: Math.round(VF.h), a: +VF.a.toFixed(2), tgt: VF.tgt ? (VF.tgt.className || VF.tgt.tagName) : null }, iris: !!IR, thumb: thumbs.findIndex(function (t) { return t.classList.contains('on'); }), prog: cprog.getAttribute('data-cur') + '/' + cprog.getAttribute('data-total'), run: thumbs.findIndex(function (t) { return t.classList.contains('run'); }), rowBg: RB.cur, what: WG.state(), procBg: D.flowOn() ? FLOW.st : PB.cur, filmX: Math.round(FILM.x), filmFo: FILM.fo ? FILM.ff.indexOf(FILM.fo) : -1, sig: sigState(), vid: heroVid.paused ? 'pause' : 'play', vsrc: (heroVid.currentSrc || '').split('/').pop(), vt: +heroVid.currentTime.toFixed(2) }; } };
   var rt2 = 0;
   window.addEventListener('resize', function () { clearTimeout(rt2); rt2 = setTimeout(function () { filmLayout(); if (reduce) WG.redraw(); }, 120); });
   if (reduce) return;
