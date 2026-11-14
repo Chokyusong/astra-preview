@@ -70,11 +70,27 @@ html.deck .footer-logo.footer-wordmark { height: 22px; margin-bottom: 0; }
 .quick-apply { position: relative; align-items: center; min-height: 36px; margin-left: auto; padding: 0 16px; border: 1px solid var(--paper); border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .quick-apply::after { content: ""; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; }
 .menu-button { align-items: center; justify-content: center; width: 44px; height: 44px; margin-right: -10px; padding: 0; border: 0; background: transparent; color: var(--paper); cursor: pointer; }
-.menu-panel { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; padding: calc(var(--header-h) + 12px) var(--gutter) 40px; background: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
+.menu-panel { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; padding: calc(var(--header-h) + 4px) var(--gutter) calc(16px + env(safe-area-inset-bottom)); background: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
 .menu-panel[hidden] { display: none; }
-.menu-list { margin: auto 0; display: flex; flex-direction: column; align-items: center; }
-.menu-panel a { min-height: 56px; display: flex; align-items: center; color: var(--paper); font-size: 26px; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; }
-.menu-panel a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 10px; }
+/* 휴대폰 메뉴(대표 11-14 "퀄리티 있게", 추천 1·2·4): 잡지 목차처럼 왼쪽 정렬, 번호 + 큰 영문(첫 화면과 같은 Bodoni) + 작은 한글,
+   지금 쪽은 금색과 ✦. 아래에 지원하기·상담 채널·회사 이름. 열릴 때 판이 위에서 내려오고 항목이 한 줄씩 떠오른다 */
+.menu-top { position: absolute; top: 0; left: var(--gutter); height: var(--header-h); display: flex; align-items: center; }
+.menu-top img { display: block; height: 19px; width: auto; }
+.menu-list { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.menu-panel .menu-list a { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; align-content: center; column-gap: 6px; flex: 1 1 0; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); color: var(--paper); text-decoration: none; overflow: hidden; }
+.menu-item-in { display: contents; }
+.menu-no { font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; color: var(--stone); font-variant-numeric: tabular-nums; }
+.menu-en { font-family: var(--display); font-size: min(8.4vw, 4.2vh, 36px); font-size: min(8.4vw, 4.2dvh, 36px); font-weight: 500; font-variation-settings: 'opsz' 20; letter-spacing: -0.01em; line-height: 1.05; }
+.menu-ko { grid-column: 2; font-size: 12px; line-height: 1.35; color: var(--stone); letter-spacing: 0.02em; }
+.menu-star { grid-column: 3; grid-row: 1; align-self: center; font-size: 15px; color: #c9a86a; opacity: 0; }
+.menu-panel .menu-list a[aria-current="page"] .menu-en, .menu-panel .menu-list a[aria-current="page"] .menu-no { color: #c9a86a; }
+.menu-panel .menu-list a[aria-current="page"] .menu-star { opacity: 1; }
+.menu-panel .menu-list a:active .menu-en { color: #c9a86a; }
+.menu-foot { flex: none; margin-top: 16px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px 10px; }
+.menu-apply { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 16px; font-weight: 600; text-decoration: none; }
+.menu-sns { display: flex; gap: 8px; }
+.menu-sns a { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 50%; color: var(--paper); }
+.menu-copy { grid-column: 1 / -1; margin: 0; text-align: center; font-size: 11px; letter-spacing: 0.24em; color: var(--stone); }
 .menu-close { position: absolute; top: calc((var(--header-h) - 44px) / 2); right: var(--gutter); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: var(--paper); cursor: pointer; }
 html.menu-open, html.menu-open body { overflow: hidden; }
 
@@ -581,15 +597,25 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
 </header>
 <nav class="menu-panel" id="menu-panel" aria-label="주 메뉴 (펼침)" hidden>
   <button class="menu-close" type="button" aria-label="메뉴 닫기"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <a class="menu-top" href="../2026-11-11-pages-motion/home.html" aria-label="ASTRA 홈"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5IDE4OSAyNDgwIDM1NiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJBU1RSQSIgZmlsbD0iI2ZmZiI+DQogIDxwYXRoIGQ9Ik0yMDcgMTg5IFExOTYuMyAzNzcuNyAzODUgMzY3IFExOTYuMyAzNTYuMyAyMDcgNTQ1IFEyMTcuNyAzNTYuMyAyOSAzNjcgUTIxNy43IDM3Ny43IDIwNyAxODlaIi8+DQogIDxwYXRoIGQ9Ik00MDUgNTEyIEw2MTcgMjA1IEw4MjkgNTEyIEw3OTMgNTEyIEw2MTcgMjU4IEw0NDEgNTEyWiIvPg0KICA8cGF0aCBkPSJNNjE3IDM0NSBRNjEzLjQgNDA4LjYgNjc3IDQwNSBRNjEzLjQgNDAxLjQgNjE3IDQ2NSBRNjIwLjYgNDAxLjQgNTU3IDQwNSBRNjIwLjYgNDA4LjYgNjE3IDM0NVoiLz4NCiAgPHBhdGggZD0iTTEyMTggMjI3IEg5NDkgQTY0IDY0IDAgMCAwIDk0OSAzNTUgSDExNDEgQTcxIDcxIDAgMCAxIDExNDEgNDk3IEg4ODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzMCIvPg0KICA8cGF0aCBkPSJNMTI5MCAyMjcgSDE2MzIgTTE0NTcgMjU4IFY1MTIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIzMCIvPg0KICA8cGF0aCBkPSJNMTcwMCAyMjcgSDE5NjYgQTY0IDY0IDAgMCAxIDE5NjYgMzU1IEgxNzAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMzAiLz4NCiAgPHBhdGggZD0iTTE4MTYgMzYyIEwxODU4IDM2MiBMMjA0NCA1MTIgTDIwMDIgNTEyWiIvPg0KICA8cGF0aCBkPSJNMjA4NSA1MTIgTDIyOTcgMjA1IEwyNTA5IDUxMiBMMjQ3MyA1MTIgTDIyOTcgMjU4IEwyMTIxIDUxMloiLz4NCiAgPHBhdGggZD0iTTIyOTcgMzQ1IFEyMjkzLjQgNDA4LjYgMjM1NyA0MDUgUTIyOTMuNCA0MDEuNCAyMjk3IDQ2NSBRMjMwMC42IDQwMS40IDIyMzcgNDA1IFEyMzAwLjYgNDA4LjYgMjI5NyAzNDVaIi8+DQo8L3N2Zz4NCg==" alt=""></a>
   <div class="menu-list">
-    <a href="../2026-11-11-pages-motion/home.html">홈</a>
-    <a href="../2026-11-11-pages-motion/about.html">회사소개</a>
-    <a href="../2026-11-11-pages-motion/mcn.html">MCN</a>
-    <a href="brand-v3.html" aria-current="page">브랜드</a>
-    <a href="../2026-11-11-pages-motion/entertainment.html">엔터테인먼트</a>
-    <a href="../2026-11-11-pages-motion/media.html">미디어</a>
-    <a href="../2026-11-11-pages-motion/partners.html">협력사</a>
-    <a href="../2026-11-11-pages-motion/contact.html">CONTACT</a>
+    <a href="../2026-11-11-pages-motion/home.html"><span class="menu-no">01</span><span class="menu-en">HOME</span><span class="menu-star" aria-hidden="true">✦</span><span class="menu-ko">홈</span></a>
+    <a href="../2026-11-11-pages-motion/about.html"><span class="menu-no">02</span><span class="menu-en">ABOUT</span><span class="menu-star" aria-hidden="true">✦</span><span class="menu-ko">회사소개</span></a>
+    <a href="../2026-11-11-pages-motion/mcn.html"><span class="menu-no">03</span><span class="menu-en">MCN</span><span class="menu-star" aria-hidden="true">✦</span></a>
+    <a href="brand-v3.html" aria-current="page"><span class="menu-no">04</span><span class="menu-en">BRAND</span><span class="menu-star" aria-hidden="true">✦</span><span class="menu-ko">브랜드</span></a>
+    <a href="../2026-11-11-pages-motion/entertainment.html"><span class="menu-no">05</span><span class="menu-en">ENTERTAINMENT</span><span class="menu-star" aria-hidden="true">✦</span><span class="menu-ko">엔터테인먼트</span></a>
+    <a href="../2026-11-11-pages-motion/media.html"><span class="menu-no">06</span><span class="menu-en">MEDIA</span><span class="menu-star" aria-hidden="true">✦</span><span class="menu-ko">미디어</span></a>
+    <a href="../2026-11-11-pages-motion/partners.html"><span class="menu-no">07</span><span class="menu-en">PARTNERS</span><span class="menu-star" aria-hidden="true">✦</span><span class="menu-ko">협력사</span></a>
+    <a href="../2026-11-11-pages-motion/contact.html"><span class="menu-no">08</span><span class="menu-en">CONTACT</span><span class="menu-star" aria-hidden="true">✦</span></a>
+  </div>
+  <div class="menu-foot">
+    <a class="menu-apply" href="../2026-11-11-pages-motion/contact.html#apply">지원하기</a>
+    <div class="menu-sns">
+      <a href="#" aria-label="카카오톡 상담"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5c-4.7 0-8.5 2.9-8.5 6.5 0 2.3 1.6 4.4 4 5.5l-.9 3.3 3.8-2.5c.5.1 1 .1 1.6.1 4.7 0 8.5-2.9 8.5-6.4S16.7 4.5 12 4.5z"/></svg></a>
+      <a href="#" aria-label="인스타그램"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.9" cy="7.1" r=".6" fill="currentColor" stroke="none"/></svg></a>
+      <a href="#" aria-label="블로그"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19l1-4L15.5 5.5a2.1 2.1 0 0 1 3 3L9 18l-4 1z"/><path d="M13.5 7.5l3 3"/></svg></a>
+    </div>
+    <p class="menu-copy">ASTRA ENTERTAINMENT</p>
   </div>
 </nav>
 
@@ -833,8 +859,17 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
     root.classList.toggle('menu-open', open);
     if (open) {
       if (!reduce) {
-        anim(panel, [{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: EASE });
-        anim($('.menu-list', panel), [{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: 520, easing: EASE });
+        // 판이 위에서 내려오고, 항목이 한 줄씩 아래에서 떠오르고, 아래쪽 묶음이 뒤따른다. ×는 반 바퀴 돌며 나타난다
+        anim(panel, [{ clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)' }], { duration: 560, easing: EASE });
+        $$('.menu-list a', panel).forEach(function (a, i) {
+          anim(a.querySelector('.menu-en'), [{ transform: 'translateY(110%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 700, delay: 160 + i * 55, fill: 'backwards', easing: EASE });
+          anim(a, [{ borderBottomColor: 'rgba(255,255,255,0)' }, { borderBottomColor: 'rgba(255,255,255,0.12)' }], { duration: 600, delay: 160 + i * 55, fill: 'backwards', easing: EASE });
+          [a.querySelector('.menu-no'), a.querySelector('.menu-ko')].forEach(function (el) {
+            anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 320 + i * 55, fill: 'backwards', easing: EASE });
+          });
+        });
+        anim($('.menu-foot', panel), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 600, delay: 620, fill: 'backwards', easing: EASE });
+        anim(menuClose, [{ transform: 'rotate(-90deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, delay: 200, fill: 'backwards', easing: EASE });
       }
       menuClose.focus();
     } else if (back) menuButton.focus();

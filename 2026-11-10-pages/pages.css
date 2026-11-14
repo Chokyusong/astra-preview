@@ -319,11 +319,27 @@ html::-webkit-scrollbar { display: none; }
 .quick-apply::after { content: ""; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; }
 .site-header .menu-button[aria-controls="menu-panel"] { justify-content: center; width: 44px; height: 44px; min-height: 44px; margin-right: -10px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--paper); cursor: pointer; }
 .site-header .menu-button[aria-controls="menu-panel"]::after { content: none; }
-.menu-panel { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; padding: calc(var(--header-h) + 12px) var(--gutter) 40px; background: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
+.menu-panel { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; padding: calc(var(--header-h) + 4px) var(--gutter) calc(16px + env(safe-area-inset-bottom)); background: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
 .menu-panel[hidden] { display: none; }
-.menu-list { margin: auto 0; display: flex; flex-direction: column; align-items: center; }
-.menu-panel a { min-height: 56px; display: flex; align-items: center; color: var(--paper); font-size: 26px; font-weight: 700; letter-spacing: -0.01em; text-decoration: none; }
-.menu-panel a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 10px; }
+/* 휴대폰 메뉴(대표 11-14 "퀄리티 있게"·"한 화면에"·"일곱 쪽에도", 브랜드 3판과 같은 값): 잡지 목차처럼 왼쪽 정렬,
+   번호 + 큰 영문(Bodoni) + 작은 한글, 지금 쪽은 금색과 ✦. 여덟 줄이 남는 높이를 나눠 가져 한 화면에 들어가고,
+   영문은 화면 폭과 높이 중 작은 쪽에 맞춘다. 아래에 지원하기·상담 채널 한 줄과 회사 이름. 번호·영문·아래 묶음은 site-menu.js가 채운다 */
+.menu-top { position: absolute; top: 0; left: var(--gutter); height: var(--header-h); display: flex; align-items: center; }
+.menu-top img { display: block; height: 19px; width: auto; }
+.menu-list { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.menu-panel .menu-list a { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; align-content: center; column-gap: 6px; flex: 1 1 0; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.12); color: var(--paper); text-decoration: none; overflow: hidden; }
+.menu-no { font-family: var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 0.08em; color: var(--stone); font-variant-numeric: tabular-nums; }
+.menu-en { font-family: var(--display); font-size: min(8.4vw, 4.2vh, 36px); font-size: min(8.4vw, 4.2dvh, 36px); font-weight: 500; font-variation-settings: 'opsz' 20; letter-spacing: -0.01em; line-height: 1.05; }
+.menu-ko { grid-column: 2; font-size: 12px; line-height: 1.35; color: var(--stone); letter-spacing: 0.02em; }
+.menu-star { grid-column: 3; grid-row: 1; align-self: center; font-size: 15px; color: #c9a86a; opacity: 0; }
+.menu-panel .menu-list a[aria-current="page"] .menu-en, .menu-panel .menu-list a[aria-current="page"] .menu-no { color: #c9a86a; }
+.menu-panel .menu-list a[aria-current="page"] .menu-star { opacity: 1; }
+.menu-panel .menu-list a:active .menu-en { color: #c9a86a; }
+.menu-foot { flex: none; margin-top: 16px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px 10px; }
+.menu-apply { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 16px; font-weight: 600; text-decoration: none; }
+.menu-sns { display: flex; gap: 8px; }
+.menu-sns a { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 50%; color: var(--paper); }
+.menu-copy { grid-column: 1 / -1; margin: 0; text-align: center; font-size: 11px; letter-spacing: 0.24em; color: var(--stone); }
 .menu-close { position: absolute; top: calc((var(--header-h) - 44px) / 2); right: var(--gutter); display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: var(--paper); cursor: pointer; }
 html.menu-open, html.menu-open body { overflow: hidden; }
 @media (max-width: 900px) {
