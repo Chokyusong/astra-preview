@@ -291,6 +291,9 @@ html.deck .mask > span { display: block; transform: translateY(108%); transition
 html.deck .scene.in .mask > span { transform: none; transition-delay: 0.3s; }
 html.deck .rise { opacity: 0; transform: translateY(26px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
 html.deck .scene.in .rise { opacity: 1; transform: none; transition-delay: calc(0.34s + var(--i, 0) * 0.09s); }
+/* 소개 제목은 떠오르지 않고 금색 윤곽선이 왼쪽부터 그려지며 나타난다(스크립트의 clip-path, 떠오르기와 겹치면 다 그려진 뒤에야 보였다) */
+html.deck .intro .reveal-title.rise { transform: none; transition: none; }
+html.deck .intro.in .reveal-title.rise { opacity: 1; transition: none; }
 
 /* 화면 이동 표시(오른쪽 가운데). 흰 화면 위에서는 검게 보인다 */
 html.deck .deck-index { display: flex; flex-direction: column; gap: 4px; position: fixed; right: 18px; top: 50%; z-index: 35; transform: translateY(-50%); mix-blend-mode: difference; }
@@ -517,7 +520,7 @@ html.deck .svc-panel.on .svc-photo:hover img { scale: 1.05; }
 html.deck .step::before { content: ''; position: absolute; z-index: -1; left: calc(var(--bh) * -1.2); width: calc(var(--bh) * 4.4); top: calc(-2.6 * var(--bh)); bottom: -36px; pointer-events: none; opacity: 0; transition: opacity 0.5s var(--ease); clip-path: polygon(40% 0, 60% 0, 100% 100%, 0 100%); background: radial-gradient(ellipse 58% 18% at 50% 100%, rgba(176, 144, 92, 0.22), rgba(176, 144, 92, 0) 100%), linear-gradient(to bottom, rgba(232, 210, 168, 0) 0%, rgba(214, 186, 136, 0.20) 100%); }
 html.deck .steps.done .step:hover::before { opacity: 1; }
 html.deck .steps.done .step:hover .burst { filter: drop-shadow(0 0 10px rgba(204, 168, 106, 0.85)) drop-shadow(calc(var(--sx) * var(--sk) * 6px) calc(var(--sy) * var(--sk) * 7px) 5px rgba(0, 0, 0, calc(0.13 * var(--sa) * var(--sk)))); }
-html.deck .step-text { transition: transform 0.5s var(--ease); }
+html.deck .step-text { transition: opacity 0.6s, transform 0.5s var(--ease); }
 html.deck .steps.done .step:hover .step-text { transform: translateY(-6px); }
 @media (prefers-reduced-motion: reduce) { html.deck .svc-photo::before, html.deck .svc-photo::after, html.deck .step::before { display: none; } }
 /* 촬영장 공기(대표 11-14 "다크판처럼 기본적으로 다 있어야지"): 다크판의 연기층을 흰 화면에 맞게 다시 깐다.
@@ -527,7 +530,7 @@ html.deck .air { display: block; position: fixed; inset: 0; width: 100%; height:
 html.deck.lt-wh .air { opacity: 1; }
 /* 하는 일 액자 기울기와 유리 반사는 넣었다가 뺐다(대표 11-14 "액자 흔들리는 것도 과해") */
 /* 서비스를 바꾸면 금빛 빛줄기가 새 사진을 닦는다(사진이 하얗게 번쩍이는 셔터는 미디어 쪽 것이라 여기서는 쓰지 않는다, 대표 11-14) */
-html.deck .svc-photo .sweep { position: absolute; top: 0; bottom: 0; left: 0; width: 16%; z-index: 3; pointer-events: none; opacity: 0; background: linear-gradient(90deg, rgba(214, 186, 136, 0) 0%, rgba(240, 220, 180, 0.75) 70%, #fff8e8 96%, rgba(255, 255, 255, 0) 100%); mix-blend-mode: screen; }
+html.deck .svc-photo .sweep { position: absolute; top: 0; bottom: 0; left: 0; width: 16%; z-index: 3; pointer-events: none; opacity: 0; background: linear-gradient(90deg, rgba(196, 154, 84, 0) 0%, rgba(206, 164, 92, 0.28) 55%, rgba(222, 184, 112, 0.62) 88%, rgba(236, 204, 140, 0.78) 96%, rgba(236, 204, 140, 0) 100%); }
 html.deck .svc-body h3, html.deck .svc-body p { transition: none; }
 /* 서비스 이름: 마우스를 올리면 오른쪽으로 밀리며 금색 밑줄이 먼저 자라 나온다 */
 html.deck .svc-tab { transition: color 0.2s, opacity 0.9s var(--ease), transform 0.9s var(--ease), padding-left 0.45s var(--ease); }
@@ -839,6 +842,8 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
     // 화이트·골드: 액자(흰 여백·금색 테두리)는 그대로 두고 사진만 닦이듯 바뀌며, 액자 그림자가 한 번 옅어졌다 돌아온다
     if (!reduce) {
       var ph = $('.svc-photo', panelOf(tab));
+      // 앞 사진이 있으면 닦이는 동안 새 액자 바탕을 비워 앞 사진이 그대로 보이게 한다
+      if ($('.svc-panel.prev')) { ph.style.background = 'transparent'; clearTimeout(ph._bg); ph._bg = setTimeout(function () { ph.style.background = ''; }, 680); }
       anim($('img', ph) || ph, [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: 620, easing: EASE });
       anim(ph, [{ '--sf': 1 }, { '--sf': 0.25, offset: 0.36 }, { '--sf': 1 }], { duration: 700, easing: 'ease-in-out' });
       if (root.classList.contains('deck')) {
@@ -994,8 +999,8 @@ html.deck .svc-tab[aria-selected="true"] svg { opacity: 1; }
       mLight.style.setProperty('--cx', cx.toFixed(0) + 'px');
     }
     // 머리말: 흰 구역(소개~과정) 위에 있으면 흰 판으로
-    var hm = $('.site-header').offsetHeight / 2;
-    setLight(introSec.getBoundingClientRect().top <= hm && procSec.getBoundingClientRect().bottom > hm);
+    var hh = $('.site-header').offsetHeight;
+    setLight(introSec.getBoundingClientRect().top <= hh + 1 && procSec.getBoundingClientRect().bottom > hh / 2);
     // 소개 문장: 화면 아래 85%에서 45%까지 올라오는 동안 낱말이 차례로 밝아진다
     var sr = statement.getBoundingClientRect();
     var p = (vh * 0.85 - sr.top) / (vh * 0.4 + sr.height);
