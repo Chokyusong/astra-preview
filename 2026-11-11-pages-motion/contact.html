@@ -4,128 +4,268 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>ASTRA CONTACT 움직이는 시안</title>
+<title>ASTRA CONTACT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Noto+Serif+KR:wght@300..600&family=Geist:wght@100..900&family=Cinzel:wght@600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="../2026-11-10-pages/pages.css">
 <script>if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('fx');</script>
 <style>
-/* CONTACT 2판 — 채울수록 무대가 켜진다 (설계 pages-motion-design.md 7절, 지시서 011).
-   하나의 생각: 빈 무대가 당신을 기다린다. 채울수록 무대가 켜진다. 화면이 답하는 것은 마우스가 아니라 양식을 채우는 일이다.
-   한 화면씩 넘기지 않는 스크롤 쪽이다(공통 틀 deck.js를 쓰지 않는다). 배치·문구·색·글꼴은 정지 시안(../2026-11-10-pages/contact.html) 그대로이고,
-   정지 시안의 칸 그림을 실제로 입력되는 칸으로 바꿨다. 양식 항목은 요청서(client/brief.yaml)의 두 양식 그대로다.
-   시안은 아무것도 보내거나 저장하지 않는다(바깥 요청 0, 브라우저 저장소 0). 값은 README.md "CONTACT" */
-:root { --ease: cubic-bezier(0.16, 1, 0.3, 1); }
-.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+@import url('../2026-11-10-pages/pages.css') layer(site);
 
-/* 떠 있는 버튼은 화면에 고정한다(다른 움직이는 시안과 같다) */
+/* CONTACT — 내 표지가 만들어지는 지원서 (시안 1 잡지 표지, 대표가 네 가지 중 고름 2026-11-14)
+   공통 틀(pages.css)은 아래 층(layer site)으로 불러 이 쪽 규칙이 늘 이긴다. 머리말·메뉴·바닥글·떠 있는 버튼은 다른 쪽과 같다.
+   이 쪽 이름이 공통 틀과 겹치는 것(contact·field 등)은 k- 를 붙였다.
+   지원서를 쓰는 동안 옆의 잡지 표지가 실시간으로 조판된다. 다 채우면 금색 도장 READY.
+   아무것도 보내거나 저장하지 않는다(fetch·브라우저 저장소 없음). */
+:root {
+  --c-paper: #ffffff; --paper-2: #f5f4f1; --warm: #dedcda; --c-ink: #141414; --ink-2: #6d6a65; --line: #e5e1da;
+  --gold: #a4865a; --gold-ink: #7a5f38; --line-2: #cfc9bf;
+  --serif-en: 'Bodoni Moda', 'Noto Serif KR', serif; --serif-kr: 'Noto Serif KR', serif;
+  --c-sans: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif;
+  --cg: 56px; --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 24px); }
+/* 이 쪽 기본 글씨는 본문(.k-contact)과 따라오는 작은 표지에만. 머리말·메뉴·바닥글은 공통 틀 그대로 둔다 */
+body { margin: 0; background: var(--c-paper); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+.k-contact, .mini { color: var(--c-ink); font-family: var(--c-sans); font-size: 16px; line-height: 1.6; }
+:where(.k-contact, .mini) a { color: inherit; }
+:where(.k-contact) :where(button, input, textarea), :where(.mini) { font: inherit; color: inherit; }
+.k-contact :focus-visible, .mini:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.slot-box { border: 1px dashed #b9b2a6; color: var(--ink-2); font-size: 13px; padding: 12px 14px; line-height: 1.5; }
+
+
+/* ── 본문 두 칸: 왼쪽 표지(화면에 붙음), 오른쪽 양식 ── */
+.k-contact { display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); }
+.desk { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); min-height: 600px; background: var(--paper-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 28px 40px 22px; border-right: 1px solid var(--line); }
+.cover-frame { position: relative; width: min(100%, calc((100vh - var(--header-h) - 110px) * 0.75)); aspect-ratio: 3 / 4; box-shadow: 0 1px 0 rgba(20,20,20,0.06), 0 30px 60px -30px rgba(60,48,30,0.35); }
+.desk-cap { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; width: min(100%, calc((100vh - var(--header-h) - 110px) * 0.75)); font-size: 12px; color: var(--ink-2); letter-spacing: 0.02em; }
+.desk-cap b { font-family: var(--serif-en); font-style: italic; font-weight: 500; font-size: 14px; color: var(--c-ink); letter-spacing: 0; margin-right: 8px; }
+.desk-cap .cnt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.desk-cap .cnt em { font-style: normal; color: var(--gold-ink); font-weight: 600; }
+
+/* ── 표지: 600×800 설계 크기로 그리고 틀에 맞춰 줄인다 ── */
+.cv { position: absolute; left: 0; top: 0; width: 600px; height: 800px; transform-origin: 0 0; overflow: hidden; background: #efebe5; color: var(--c-ink); font-family: var(--serif-en); }
+.ed { position: absolute; inset: 0; z-index: 0; }
+.ed[hidden] { display: block; visibility: hidden; }
+.ed-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ed[data-ed="apply"] .ed-photo { object-position: 50% 26%; }
+.ed[data-ed="business"] .ed-photo { object-position: 50% 30%; }
+.ed-wash { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(249,247,243,0.72) 0, rgba(249,247,243,0.18) 30%, rgba(249,247,243,0) 52%, rgba(249,247,243,0.35) 72%, rgba(249,247,243,0.88) 100%); }
+.cv-top { position: absolute; left: 28px; right: 28px; top: 20px; display: flex; justify-content: space-between; font-family: var(--c-sans); font-size: 10.5px; font-weight: 600; letter-spacing: 0.26em; text-transform: uppercase; z-index: 3; }
+.cv-top .ed-label { color: var(--gold-ink); }
+.cv-mast { position: absolute; left: 0; top: 30px; width: 600px; height: 190px; z-index: 3; overflow: visible; }
+.cv-mast text { font-family: 'Bodoni Moda', serif; font-weight: 500; font-variation-settings: 'opsz' 96; fill: var(--c-ink); }
+.kick { display: block; font-family: var(--c-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold-ink); margin-bottom: 6px; }
+.ln { position: absolute; z-index: 2; }
+.s { display: inline; }
+.s .ph { color: rgba(20,20,20,0.4); font-style: italic; font-family: 'Bodoni Moda', serif; }
+.l-field { left: 28px; top: 232px; width: 290px; }
+.l-field > .s { font-family: var(--serif-en); font-weight: 600; font-size: 38px; line-height: 1.12; letter-spacing: -0.01em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: keep-all; }
+.rule { display: block; width: 44px; height: 1px; background: var(--c-ink); margin: 18px 0 16px; }
+.l-sub { font-family: var(--c-sans); font-size: 17px; font-weight: 500; line-height: 1.3; margin-bottom: 16px; }
+.l-sub .s { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+.l-sub.handle .s { font-family: 'Bodoni Moda', 'Noto Serif KR', serif; font-style: italic; font-size: 22px; font-weight: 500; }
+.l-quote { right: 28px; top: 420px; width: 210px; text-align: right; }
+.l-quote .s { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; font-family: var(--serif-kr); font-weight: 400; font-size: 16px; line-height: 1.55; word-break: keep-all; }
+.l-quote .q { display: block; font-family: 'Bodoni Moda', serif; font-size: 64px; line-height: 0.6; height: 28px; color: var(--gold); }
+.l-name { left: 28px; right: 28px; bottom: 74px; }
+.nm { display: block; white-space: nowrap; font-family: var(--serif-en); font-weight: 600; line-height: 1; letter-spacing: -0.02em; font-size: 112px; }
+.nm .ph { font-weight: 400; letter-spacing: -0.03em; }
+.cv-foot { position: absolute; left: 28px; right: 28px; bottom: 22px; display: flex; align-items: flex-end; justify-content: space-between; z-index: 2; font-family: var(--c-sans); font-size: 10.5px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; }
+.cv-foot .hw .s { letter-spacing: 0.08em; font-size: 12px; }
+.cv-foot .hw .s .ph { font-family: var(--c-sans); font-style: normal; }
+.bar { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-size: 8.5px; letter-spacing: 0.2em; }
+.bar i { display: block; width: 92px; height: 28px; background: repeating-linear-gradient(90deg, #141414 0 2px, transparent 2px 4px, #141414 4px 5px, transparent 5px 8px, #141414 8px 11px, transparent 11px 12px, #141414 12px 13px, transparent 13px 16px); }
+/* 제안서 판 */
+.l-prop-head { left: 26px; top: 224px; font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400; font-size: 104px; line-height: 1; letter-spacing: -0.03em; }
+.l-idea { left: 28px; top: 350px; width: 300px; }
+.l-idea .s { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-family: var(--serif-kr); font-weight: 500; font-size: 28px; line-height: 1.32; word-break: keep-all; letter-spacing: -0.01em; }
+.l-idea .s .ph { font-size: 30px; }
+/* 금색 도장 */
+.stamp { position: absolute; z-index: 4; width: 184px; height: 184px; right: 20px; top: 226px; color: #8c6b36; opacity: 0; transform: rotate(-12deg) scale(1.9); pointer-events: none; }
+.stamp.on { filter: drop-shadow(0 0 1px rgba(255,250,240,0.6)); }
+.stamp svg { width: 100%; height: 100%; display: block; }
+.stamp.on { opacity: 1; transform: rotate(-12deg) scale(1); }
+html.fx .stamp.on { animation: thump 0.62s cubic-bezier(0.2, 0.9, 0.25, 1) both; }
+html.fx .stamp.off { transition: opacity 0.3s, transform 0.3s; }
+@keyframes thump { 0% { opacity: 0; transform: rotate(-4deg) scale(2.1); } 55% { opacity: 1; transform: rotate(-13deg) scale(0.93); } 75% { transform: rotate(-11.5deg) scale(1.02); } 100% { opacity: 1; transform: rotate(-12deg) scale(1); } }
+html.fx .cv.press { animation: press 0.42s 0.3s ease-out; }
+@keyframes press { 0% { transform: var(--cvT) translateY(0); } 30% { transform: var(--cvT) translateY(2px); } 100% { transform: var(--cvT) translateY(0); } }
+/* 판 바꾸기: 새 판이 아래에서 덮인다 */
+html.fx .ed.enter { animation: edIn 0.75s var(--ease) both; z-index: 1; }
+@keyframes edIn { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+/* 조판: 친 글자가 금색으로 찍혔다가 먹색으로 마른다 */
+.ch { display: inline-block; }
+html.fx .ch.new { animation: setIn 0.5s var(--ease) both; }
+html.fx .chi.new { animation: setInl 0.6s ease both; }
+@keyframes setIn { 0% { opacity: 0; transform: translateY(-0.32em) scale(1.12); color: var(--gold); filter: blur(3px); } 45% { opacity: 1; filter: blur(0); color: var(--gold); } 100% { opacity: 1; transform: none; } }
+@keyframes setInl { 0% { opacity: 0; color: var(--gold); } 45% { opacity: 1; color: var(--gold); } 100% { opacity: 1; } }
+html.fx .s .ph { animation: phIn 0.4s ease both; }
+@keyframes phIn { from { opacity: 0; } }
+/* 지금 쓰는 칸의 자리 표시: 인쇄 재단 표시(모서리 네 개) */
+.marks { position: absolute; z-index: 5; pointer-events: none; opacity: 0; left: 0; top: 0; width: 10px; height: 10px; }
+.marks.on { opacity: 1; }
+html.fx .marks { transition: left 0.45s var(--ease), top 0.45s var(--ease), width 0.45s var(--ease), height 0.45s var(--ease), opacity 0.3s; }
+.marks i { position: absolute; width: 14px; height: 14px; border: 0 solid var(--gold); }
+.marks i:nth-child(1) { left: -8px; top: -8px; border-left-width: 1.5px; border-top-width: 1.5px; }
+.marks i:nth-child(2) { right: -8px; top: -8px; border-right-width: 1.5px; border-top-width: 1.5px; }
+.marks i:nth-child(3) { left: -8px; bottom: -8px; border-left-width: 1.5px; border-bottom-width: 1.5px; }
+.marks i:nth-child(4) { right: -8px; bottom: -8px; border-right-width: 1.5px; border-bottom-width: 1.5px; }
+
+/* ── 양식 쪽 ── */
+.k-sheet { padding: 72px 80px 96px 80px; max-width: 760px; }
+.k-eyebrow { display: flex; align-items: baseline; gap: 14px; margin: 0 0 22px; font-size: 12.5px; color: var(--ink-2); letter-spacing: 0.04em; }
+.k-eyebrow b { font-family: 'Bodoni Moda', serif; font-weight: 500; font-size: 15px; letter-spacing: 0.3em; color: var(--c-ink); }
+.title { margin: 0; font-family: var(--serif-kr); font-weight: 500; font-size: 46px; line-height: 1.24; letter-spacing: -0.025em; word-break: keep-all; }
+.title em { font-style: normal; color: var(--gold-ink); }
+.lead { margin: 18px 0 0; color: var(--ink-2); font-size: 15.5px; max-width: 30em; word-break: keep-all; }
+.notice { margin-top: 26px; max-width: 420px; }
+.k-switch { display: flex; gap: 40px; margin: 52px 0 6px; border-bottom: 1px solid var(--line); }
+.k-switch button { position: relative; background: none; border: 0; padding: 0 0 14px; cursor: pointer; font-family: var(--serif-kr); font-size: 21px; font-weight: 500; color: #8d8981; letter-spacing: -0.01em; }
+.k-switch button small { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 14px; margin-right: 8px; color: inherit; }
+.k-switch button[aria-pressed="true"] { color: var(--c-ink); }
+.k-switch button::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--c-ink); transform: scaleX(0); transform-origin: 0 50%; }
+.k-switch button[aria-pressed="true"]::after { transform: scaleX(1); }
+html.fx .k-switch button::after { transition: transform 0.4s var(--ease); }
+.form[hidden], .done[hidden] { display: none; }
+.k-fields { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; counter-reset: fld; }
+.k-field { counter-increment: fld; padding-top: 26px; min-width: 0; }
+.k-field.full { grid-column: 1 / -1; }
+.k-field label { display: flex; align-items: baseline; gap: 8px; font-size: 13px; color: var(--ink-2); letter-spacing: 0.01em; }
+.k-field label::before { content: counter(fld, decimal-leading-zero); font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 13px; color: #a29d94; font-variant-numeric: tabular-nums; min-width: 18px; }
+.k-field label .req { color: var(--gold-ink); font-size: 11.5px; font-weight: 600; }
+.k-field label .oncv { margin-left: auto; font-size: 10.5px; letter-spacing: 0.16em; color: #9b8869; font-weight: 600; white-space: nowrap; }
+.k-field:focus-within label { color: var(--c-ink); }
+.k-field:focus-within label::before { color: var(--gold-ink); }
+.k-box { display: block; width: 100%; border: 0; border-bottom: 1px solid var(--line-2); background: transparent; padding: 8px 0 10px; font-size: 18px; line-height: 1.4; border-radius: 0; outline: none; }
+.k-box::placeholder { color: #a8a39a; }
+.k-box:focus { border-bottom-color: var(--c-ink); box-shadow: 0 1px 0 0 var(--c-ink); }
+.k-box:focus-visible { outline: none; }
+textarea.k-box { resize: vertical; min-height: 96px; }
+.err { display: none; margin: 7px 0 0; font-size: 12.5px; font-weight: 600; color: var(--gold-ink); }
+.err::before { content: "✦ "; }
+.k-field.bad .err, .agree-wrap.bad .err { display: block; }
+.k-field.bad .k-box { border-bottom-color: var(--gold-ink); box-shadow: 0 1px 0 0 var(--gold-ink); }
+.agree-wrap { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); }
+.agree-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.k-agree { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; font-size: 15px; }
+.k-agree input { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; margin: 0; border: 1.5px solid var(--c-ink); border-radius: 0; display: grid; place-items: center; cursor: pointer; flex: none; }
+.k-agree input::after { content: ""; width: 11px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: translateY(-1px) rotate(-45deg) scale(0); }
+.k-agree input:checked { background: var(--c-ink); }
+.k-agree input:checked::after { transform: translateY(-1px) rotate(-45deg) scale(1); }
+.k-agree input:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 3px; }
+.more { background: none; border: 0; padding: 4px 0; cursor: pointer; font-size: 13px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 4px; }
+.terms { margin-top: 14px; }
+.terms[hidden] { display: none; }
+.actions { display: flex; align-items: center; gap: 14px; margin-top: 36px; flex-wrap: wrap; }
+.send { display: inline-flex; align-items: center; gap: 18px; height: 60px; padding: 0 30px 0 32px; border: 0; background: var(--c-ink); color: #fff; font-size: 16.5px; font-weight: 600; cursor: pointer; letter-spacing: 0.01em; }
+.send span { font-family: 'Bodoni Moda', serif; font-size: 22px; line-height: 1; }
+html.fx .send span { transition: transform 0.3s var(--ease); }
+.send:hover span { transform: translateX(4px); }
+.kakao { display: inline-flex; align-items: center; height: 60px; padding: 0 26px; border: 1px solid var(--c-ink); color: var(--c-ink); text-decoration: none; font-size: 15px; font-weight: 600; }
+.kakao:hover { background: var(--paper-2); }
+/* 접수 화면 */
+.done { padding-top: 64px; }
+.done .kick { font-size: 11px; }
+.done h2 { margin: 10px 0 0; font-family: var(--serif-kr); font-weight: 500; font-size: 40px; line-height: 1.25; letter-spacing: -0.02em; word-break: keep-all; }
+.done p { margin: 14px 0 0; font-size: 17px; }
+.done .tiny { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+.done .send { margin-top: 40px; }
+
+/* ── 바닥글 ── */
+.col { min-width: 0; display: flex; flex-direction: column; min-height: calc(100vh - var(--header-h)); }
+.col main { flex: 1; }
+
+/* ── 휴대폰 따라오는 작은 표지 ── */
+.mini { display: none; }
+
+@media (max-width: 1180px) and (min-width: 901px) {
+  .k-sheet { padding: 56px 48px 80px; }
+  .title { font-size: 38px; }
+  .desk { padding: 24px 28px 20px; }
+}
+@media (max-width: 900px) {
+  :root { --cg: 16px; }
+  .k-contact { display: block; }
+  .k-intro { padding: 30px var(--cg) 0; }
+  .desk { position: relative; top: 0; height: auto; min-height: 0; border-right: 0; background: none; padding: 22px var(--cg) 6px; gap: 12px; }
+  .cover-frame, .desk-cap { width: min(70vw, 300px); }
+  .desk-cap { font-size: 11px; }
+  .desk-cap b { font-size: 12.5px; }
+  .k-sheet { padding: 0 var(--cg) 64px; max-width: none; }
+  .k-switch { margin-top: 28px; gap: 28px; }
+  .k-switch button { font-size: 18px; }
+  .k-fields { grid-template-columns: 1fr; }
+  .k-field { padding-top: 22px; }
+  .k-box { font-size: 17px; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .send, .kakao { justify-content: center; height: 56px; }
+  .send { justify-content: space-between; }
+  .col { min-height: 0; }
+  .done { padding-top: 36px; }
+  .done h2 { font-size: 30px; }
+  .mini { display: flex; position: fixed; z-index: 25; left: 0; right: 0; top: var(--header-h); height: 82px; align-items: center; gap: 14px; padding: 0 var(--cg); background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0; border-bottom: 1px solid var(--line); border-radius: 0; text-align: left; width: 100%; cursor: pointer; transform: translateY(-110%); visibility: hidden; font: inherit; color: var(--c-ink); }
+  .mini.show { transform: none; visibility: visible; }
+  html.fx .mini { transition: transform 0.4s var(--ease), visibility 0.4s; }
+  .mini-frame { position: relative; flex: none; width: 48px; height: 64px; overflow: hidden; box-shadow: 0 6px 14px -8px rgba(60,48,30,0.5); }
+  .mini-txt { min-width: 0; flex: 1; }
+  .mini-txt .kick { margin-bottom: 2px; font-size: 9.5px; }
+  .mini-name { display: block; font-family: var(--serif-en); font-weight: 600; font-size: 22px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mini-name .ph { font-weight: 400; font-style: italic; color: #a29d94; font-family: 'Bodoni Moda', serif; }
+  .mini-cnt { flex: none; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; line-height: 1.3; }
+  .mini-cnt em { font-style: normal; color: var(--gold-ink); font-weight: 700; font-size: 15px; }
+  html { scroll-padding-top: calc(var(--header-h) + 100px); }
+  .title { font-size: 30px; }
+  .lead { font-size: 14.5px; margin-top: 12px; }
+  .notice { margin-top: 18px; }
+}
+@media (max-width: 370px) {
+  .title { font-size: 27px; }
+  .cover-frame, .desk-cap { width: min(74vw, 300px); }
+}
+/* 이름 판이 바뀌면 그 판의 글만 보인다 */
+body[data-mode="apply"] [data-for="business"], body[data-mode="business"] [data-for="apply"] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* 공통 틀과 함께 쓸 때: 떠 있는 버튼은 화면에 고정(다른 움직이는 시안과 같다) */
 .fab-anchor { position: fixed; top: auto; bottom: 0; right: 0; width: 0; height: 0; z-index: 40; }
 .fab-button { cursor: pointer; }
-
-/* ── 7-1. 배치: PC에서 왼쪽 그림은 화면에 붙어 있고 오른쪽 양식만 스크롤된다 ── */
-@media (min-width: 901px) {
-  .contact { align-items: start; }
-  .contact-side { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); min-height: 0; }
-}
-
-/* ── 7-2. 왼쪽 무대: 사진 + 둥글게 빛이 뚫린 어두운 덮개 + (다 채우면) 빛 속 먼지. 값은 스크립트가 단계마다 그린다 ── */
-.stage { position: absolute; inset: 0; overflow: hidden; background: #000; }
-.stage-img { position: absolute; inset: 0; object-position: 50% 46%; will-change: transform, filter; }
-.stage-dark { position: absolute; inset: 0; }
-.stage .dust { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-/* 안내 문구 자리와 카톡 상담은 어느 단계에서도 읽힌다: 정지 시안의 위쪽 어둠(::after)을 무대 위에 둔다 */
-.contact-side::after { z-index: 0; pointer-events: none; }
-.contact-copy { z-index: 2; }
-
-/* ── 오른쪽 양식: 정지 시안의 칸 그림을 실제 입력 칸으로 ── */
-.switch { position: relative; }
-.switch-pill { position: absolute; left: 0; top: 0; bottom: 0; width: calc((100% - 8px) / 2); background: var(--ink); pointer-events: none; }
-html.fx .switch-pill { transition: transform 0.3s var(--ease); }
-.switch[data-on="business"] .switch-pill { transform: translateX(calc(100% + 8px)); }
-.switch button { position: relative; z-index: 1; cursor: pointer; }
-html.fx .switch button { transition: color 0.3s; }
-.switch button[aria-pressed="true"] { background: transparent; color: var(--paper); }
-.switch button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-.progress-line { overflow: hidden; }
-html.fx .progress-line { transition: box-shadow 0.3s; }
-.progress-line::after { display: none; }
-.progress-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--ink); }
-html.fx .progress-fill { transition: width 0.4s var(--ease); }
-/* 다 채우면 선 전체가 굵어진다. 높이를 바꾸면 아래 칸이 밀리므로(양식은 움직이지 않는다) 위아래 그림자로 굵게 보인다 */
-.progress.full .progress-line { box-shadow: 0 1px 0 var(--ink), 0 -1px 0 var(--ink); }
-.form[hidden] { display: none; }
-.field label { cursor: default; }
-.inbox { position: relative; display: block; }
-.field .box { display: block; width: 100%; box-sizing: border-box; margin: 0; padding: 0; border: 0; border-bottom: 1px solid #b5b5b5; border-radius: 0; background: transparent; font: inherit; font-size: 18px; font-weight: 400; line-height: 52px; height: 52px; color: var(--ink); outline: none; -webkit-appearance: none; appearance: none; }
-.field .box.area { height: 120px; min-height: 120px; padding: 14px 0; line-height: 1.6; resize: vertical; }
-.field .box::placeholder { color: #9a9a9a; opacity: 1; }
-.field.filled .box { border-bottom-color: var(--ink); }
-/* 7-4. 초점이 가면 칸 아래 선이 왼쪽에서 굵게 그어진다(0.3초) */
-.uline { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--ink); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none; }
-html.fx .uline { transition: transform 0.3s var(--ease); }
-.inbox:focus-within .uline { transform: scaleX(1); }
-/* 필수 칸이 채워지면 "필수"가 작은 체크로(글은 낭독기에 그대로 남는다) */
-.field i { display: inline-block; }
-.field.done i { font-size: 0; width: 14px; height: 14px; position: relative; vertical-align: -1px; }
-.field.done i::after { content: ""; position: absolute; left: 2px; top: 1px; width: 9px; height: 5px; border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(-45deg); }
-/* 7-6. 빈 칸 안내: 색을 더하지 않는다. 검정 굵은 밑줄과 안내 글 */
-.field.bad .box { border-bottom: 3px solid var(--ink); }
-.err { margin: 6px 0 0; font-size: 14px; font-weight: 600; line-height: 1.5; color: var(--ink); }
-.err::before { content: "— "; }
-.agree { position: relative; cursor: pointer; }
-.agree input { position: absolute; z-index: 1; left: 0; top: 50%; width: 22px; height: 22px; margin: -11px 0 0; opacity: 0; cursor: pointer; }
-.agree .check { position: relative; }
-.agree input:checked + .check { background: var(--ink); }
-.agree input:checked + .check::after { content: ""; position: absolute; left: 6px; top: 3px; width: 6px; height: 11px; border-right: 2px solid var(--paper); border-bottom: 2px solid var(--paper); transform: rotate(45deg); }
-.agree input:focus-visible + .check { outline: 2px solid var(--ink); outline-offset: 3px; }
-.agree-row.bad .check { border-width: 3px; }
-.sheet .btn.submit { display: flex; cursor: pointer; font-family: inherit; }
-html.fx .sheet .btn.submit { transition: transform 0.2s, background 0.2s; }
-.sheet .btn.submit:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-.sheet .btn.submit.press { transform: scale(0.985); background: #2a2a2a; }
-
-/* ── 7-8. 휴대폰 스크롤 반응(설계 12-7, 지시서 015): 무대 그림이 화면 위로 올라가 사라질 때 머리말 바로 아래 낮은 띠(88px)로 남는다.
-   띠에도 의자와 조명이 보이고, 필수 칸을 채운 만큼 PC와 같은 단계로 켜진다. 진행 숫자("필수 2 / 5")는 띠 오른쪽(얇은 진행 줄을 대신한다).
-   양식 구역에 있는 동안만 붙고, 맨 위로 올라가면 원래 큰 그림. 칸에 초점이 가면 띠 아래로 오게 한다 ── */
-.mprog { display: none; }
-@media (max-width: 900px) {
-  html { scroll-padding-top: calc(var(--header-h) + 100px); }
-  .mprog { display: flex; position: fixed; left: 0; right: 0; top: var(--header-h); z-index: 29; height: 88px; overflow: hidden; align-items: center; justify-content: flex-end; padding: 0 var(--gutter); background: #000; color: var(--paper); font-size: 13px; line-height: 1; opacity: 0; visibility: hidden; pointer-events: none; }
-  html.fx .mprog { transition: opacity 0.2s, visibility 0s 0.2s; }
-  html.mprog-on .mprog { opacity: 1; visibility: visible; transition: opacity 0.2s; }
-  .mprog-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 46%; will-change: transform, filter; }
-  .mprog-dark { position: absolute; inset: 0; }
-  /* 숫자는 띠 오른쪽 어둠 위에(밝은 단계에서도 읽히게) */
-  .mprog::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to left, rgba(10, 10, 10, 0.8) 0, rgba(10, 10, 10, 0) 42%); pointer-events: none; }
-  .mprog > span:not(.mprog-line) { position: relative; z-index: 1; font-size: 14px; font-weight: 600; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
-  .mprog-line { display: none; }
-}
-
-/* ── 7-7. 접수 화면: 왼쪽 그림이 화면 전체로 넓어진 뒤 그 위에 접수 안내 ── */
-.take { position: fixed; inset: 0; z-index: 60; overflow: hidden; }
-.take[hidden] { display: none; }
-.take-img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-position: 50% 46%; will-change: left, top, width, height, transform, filter; }
-/* 돌아갈 때 왼쪽 그림의 위쪽 어둠(정지 시안 .contact-side::after)을 같이 줄여 와서 바꿔 끼울 때 튀지 않게 */
-.take-top { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(10, 10, 10, 0.82) 0, rgba(10, 10, 10, 0.25) 46%, rgba(10, 10, 10, 0) 70%); opacity: 0; }
-.take-dark { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(10, 10, 10, 0.62), rgba(10, 10, 10, 0.2) 70%, rgba(10, 10, 10, 0.1)); opacity: 0; }
-.take-msg { position: absolute; left: 50%; top: 50%; width: min(90vw, 760px); transform: translate(-50%, -50%); text-align: center; color: var(--paper); }
-/* 글 묶음 뒤 어두운 번짐: 가운데 글이 밝은 의자 다리 위에 놓여도 읽히게(검토 011) */
-.take-msg { isolation: isolate; }
-.take-msg::before { content: ''; position: absolute; z-index: -1; left: -16%; right: -16%; top: -70px; bottom: -60px; background: radial-gradient(closest-side, rgba(10, 10, 10, 0.78), rgba(10, 10, 10, 0.62) 55%, rgba(10, 10, 10, 0) 100%); opacity: 0; pointer-events: none; }
-.take.shown .take-msg::before { opacity: 1; }
-html.fx .take-msg::before { transition: opacity 0.3s; }
-.take-msg h2 { margin: 0; font-family: var(--serif-ko); font-size: clamp(28px, 3.2vw, 48px); font-weight: 500; line-height: 1.35; outline: none; }
-.take-msg p { margin: 14px 0 0; font-size: clamp(17px, 1.4vw, 21px); color: #f0f0f0; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
-.take-msg small { display: block; margin-top: 22px; font-size: 14px; color: #d4d4d4; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8); }
-.take-msg .btn { margin-top: 34px; cursor: pointer; font-family: inherit; background: transparent; color: var(--paper); }
-.take-msg .btn:focus-visible { outline: 2px solid var(--paper); outline-offset: 4px; }
-.take-msg > * { opacity: 0; }
-.take.shown .take-msg > *, .take.shown .take-dark { opacity: 1; }
+/* 이 쪽은 흰 바탕이라 머리말도 흰색(대표 11-14). 로고는 흰 글자 그림을 뒤집어 검게, 펼침 메뉴는 다른 쪽과 같은 검은 판 */
+.site-header.solid { background: rgba(255, 255, 255, 0.94); border-bottom: 1px solid var(--line); }
+.site-header .wordmark-type { filter: invert(1); }
+.site-header .nav a { color: var(--ink-2); }
+.site-header .nav a[aria-current="page"] { color: var(--c-ink); box-shadow: 0 1px 0 var(--c-ink); }
+.site-header .nav .btn, .site-header .quick-apply { border-color: var(--c-ink); background: var(--c-ink); color: #fff; }
+.site-header .menu-button[aria-controls="menu-panel"] { color: var(--c-ink); }
+/* 바닥글은 다른 쪽처럼 검은 바탕(이 쪽 바탕은 흰색이라 따로 깐다) */
+.site-footer { background: var(--ink); }
+/* 공통 틀의 img 규칙(가로·세로 100%)이 표지 안 그림에 번지지 않게 */
+.k-contact img:not(.ed-photo), .mini img { width: auto; height: auto; }
+/* 휴대폰: 따라오는 작은 표지가 떠 있는 버튼과 겹치지 않게 버튼은 그대로, 바닥글은 공통 */
 </style>
 </head>
-<body>
+<body data-mode="apply">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- 어두운 예시 사진을 밝고 따뜻한 잡지 인쇄 톤으로: 흑백 뒤 어두운 쪽을 들어 올린다 -->
+    <filter id="hikey" color-interpolation-filters="sRGB">
+      <feColorMatrix type="saturate" values="0.12"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.50 0.74 0.90 0.98 1"/>
+        <feFuncG type="table" tableValues="0.47 0.71 0.87 0.96 0.99"/>
+        <feFuncB type="table" tableValues="0.42 0.65 0.82 0.92 0.96"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="ink" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/>
+    </filter>
+  </defs>
+</svg>
+
 <header class="site-header solid">
   <a class="wordmark" href="home.html" aria-label="ASTRA 홈"><img class="wordmark-type" src="../2026-11-10-pages/img/logo-astra-star.svg" alt=""></a>
   <a class="quick-apply" href="contact.html#apply">빠른 지원하기</a>
@@ -145,33 +285,107 @@ html.fx .take-msg::before { transition: opacity 0.3s; }
     <a href="contact.html" aria-current="page">CONTACT</a>
   </div>
 </nav>
-<div class="mprog" aria-hidden="true" data-extra><span>필수 <b class="mprog-n">0</b> / <b class="mprog-t">5</b></span><span class="mprog-line"><span class="mprog-fill"></span></span></div>
-<main>
-<div class="contact">
-  <section class="contact-side">
-    <div class="stage" aria-hidden="true"><img class="stage-img" src="../2026-11-10-pages/img/contact.webp" alt=""><div class="stage-dark"></div><canvas class="dust"></canvas></div>
-    <div class="contact-copy">
-      <h1 class="slot">안내 문구 (자료 받으면 입력)</h1>
-      <a class="btn btn-solid kakao" href="#">카톡 상담</a>
+
+
+<button class="mini" type="button" aria-label="내 표지 보기" tabindex="-1">
+  <span class="mini-frame" aria-hidden="true"></span>
+  <span class="mini-txt"><span class="kick">Live cover</span><span class="mini-name" data-for="apply"><span class="s" data-slot="a-name" data-ph="Your Name"></span></span><span class="mini-name" data-for="business"><span class="s" data-slot="b-name" data-ph="Your Name"></span></span></span>
+  <span class="mini-cnt">필수<br><em class="n-done">0</em> / <span class="n-all">6</span></span>
+</button>
+
+<div class="k-contact">
+  <div class="k-intro m-only-block" hidden></div>
+  <aside class="desk" aria-label="내 표지 미리보기">
+    <div class="cover-frame" id="coverFrame">
+      <div class="cv" id="cover" aria-hidden="true">
+        <div class="ed" data-ed="apply">
+          <img class="ed-photo" id="coverPhoto" alt="">
+          <script>/* 쪽을 열 때마다 표지 사진 여섯 장 중 하나를 골라 그 뒤로는 고정(대표 11-14: 새로 열 때만 바뀜, 보는 중에는 안 바뀜) */(function () { var n = ['', '-2', '-3', '-4', '-5', '-6'][Math.floor(Math.random() * 6)]; document.getElementById('coverPhoto').src = 'img/contact-cover-portrait' + n + '.webp'; })();</script>
+          <div class="ed-wash"></div>
+          <div class="ln l-field"><span class="kick">Field</span><span class="s" data-slot="a-field" data-ph="Your Field" data-wrap></span>
+            <span class="rule"></span>
+            <div class="l-sub"><span class="kick">Via</span><span class="s" data-slot="a-ref" data-ph="Your Route"></span></div>
+            <div class="l-sub handle"><span class="kick">Profile</span><span class="s" data-slot="a-url" data-ph="@yourprofile" data-fmt="handle"></span></div>
+          </div>
+          <div class="ln l-quote"><span class="kick">In my words</span><span class="q">“</span><span class="s" data-slot="a-msg" data-ph="Your Words" data-fmt="first" data-max="70" data-wrap></span></div>
+          <div class="ln l-name"><span class="kick">On the cover</span><span class="nm s" data-slot="a-name" data-ph="Your Name" data-fit></span></div>
+          <div class="cv-foot"><span class="hw">H / W&nbsp;&nbsp;<span class="s" data-slot="a-hw" data-ph="— / —"></span></span><span class="bar"><i></i>ASTRA · 2026.11</span></div>
+        </div>
+        <div class="ed" data-ed="business" hidden>
+          <img class="ed-photo" src="img/contact-cover-proposal.webp" alt="">
+          <div class="ed-wash"></div>
+          <div class="ln l-prop-head">Proposal</div>
+          <div class="ln l-idea"><span class="kick">The idea</span><span class="s" data-slot="b-prop" data-ph="Your Proposal" data-fmt="first" data-max="56" data-wrap></span></div>
+          <div class="ln l-name"><span class="kick">Presented by</span><span class="nm s" data-slot="b-name" data-ph="Your Name" data-fit></span></div>
+          <div class="cv-foot"><span>For partners &amp; brands</span><span class="bar"><i></i>ASTRA · 2026.11</span></div>
+        </div>
+        <div class="cv-top"><span>November 2026</span><span>✦ Astra Entertainment</span><span class="ed-label"><span data-for="apply">Creator Issue</span><span data-for="business">Business Issue</span></span></div>
+        <svg class="cv-mast" viewBox="0 0 600 190"><text x="300" y="172" text-anchor="middle" font-size="200">ASTRA</text></svg>
+        <div class="stamp" aria-hidden="true"><svg viewBox="0 0 160 160"><defs><path id="ring" d="M80 80 m-58 0 a58 58 0 1 1 116 0 a58 58 0 1 1 -116 0"/></defs><g filter="url(#ink)" fill="none" stroke="currentColor"><circle cx="80" cy="80" r="74" stroke-width="3.2"/><circle cx="80" cy="80" r="68" stroke-width="1"/><circle cx="80" cy="80" r="44" stroke-width="1"/></g><g filter="url(#ink)" fill="currentColor"><text font-family="Pretendard Variable, sans-serif" font-size="10.5" font-weight="700" letter-spacing="3.1"><textPath href="#ring">ASTRA ENTERTAINMENT ✦ NOVEMBER 2026 ✦</textPath></text><text x="80" y="90" text-anchor="middle" font-family="Bodoni Moda, serif" font-size="27" font-weight="700" letter-spacing="1">READY</text><path d="M80 52 q-1 8.4 -8 8 q7 -.4 8 8 q1 -8.4 8 -8 q-7 .4 -8 -8z"/><path d="M80 98 q-.6 5 -5 4.8 q4.4 -.2 5 4.8 q.6 -5 5 -4.8 q-4.4 .2 -5 -4.8z"/></g></svg></div>
+        <div class="marks"><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+    <p class="desk-cap"><span><b>Live cover</b>쓰는 대로 표지에 실립니다</span><span class="cnt">필수 <em class="n-done">0</em> / <span class="n-all">6</span></span></p>
+  </aside>
+
+  <div class="col">
+  <main>
+  <section class="k-sheet" aria-labelledby="pg-title">
+    <p class="k-eyebrow"><b>CONTACT</b><span>지원 · 문의</span></p>
+    <h1 class="title" id="pg-title"><span data-for="apply">지원서를 쓰면,<br><em>표지</em>가 됩니다.</span><span data-for="business">제안을 쓰면,<br><em>표지</em>가 됩니다.</span></h1>
+    <p class="lead">한 칸씩 채울 때마다 표지에 그대로 실립니다. 필수 칸을 모두 채우면 표지가 완성됩니다.</p>
+    <div class="notice slot-box">안내 문구 (자료 받으면 입력)</div>
+
+    <div class="k-switch" role="group" aria-label="문의 종류">
+      <button type="button" aria-pressed="true" data-mode="apply" aria-controls="form-apply"><small>I.</small>지원하기</button>
+      <button type="button" aria-pressed="false" data-mode="business" aria-controls="form-business"><small>II.</small>비즈니스 문의</button>
+    </div>
+
+    <form class="form" id="form-apply" data-kind="apply" novalidate aria-label="지원하기">
+      <div class="k-fields">
+        <div class="k-field full" data-req><label for="a-field">지원분야 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><input class="k-box" id="a-field" name="field_of_interest" type="text" required aria-required="true" aria-describedby="a-field-e" maxlength="40"><p class="err" id="a-field-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="a-name">이름 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><input class="k-box" id="a-name" name="name" type="text" required aria-required="true" aria-describedby="a-name-e" autocomplete="name" maxlength="30"><p class="err" id="a-name-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field" data-req><label for="a-phone">연락처 <span class="req">필수</span></label><input class="k-box" id="a-phone" name="phone" type="tel" required aria-required="true" aria-describedby="a-phone-e" autocomplete="tel" placeholder="010-0000-0000"><p class="err" id="a-phone-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field" data-req><label for="a-birth">생년월일 <span class="req">필수</span></label><input class="k-box" id="a-birth" name="birth_date" type="text" required aria-required="true" aria-describedby="a-birth-e" autocomplete="bday" inputmode="numeric" placeholder="2000.01.01"><p class="err" id="a-birth-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field" data-req><label for="a-gender">성별 <span class="req">필수</span></label><input class="k-box" id="a-gender" name="gender" type="text" required aria-required="true" aria-describedby="a-gender-e"><p class="err" id="a-gender-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field"><label for="a-hw">신장 체중<span class="oncv">✦ 표지</span></label><input class="k-box" id="a-hw" name="height_weight" type="text" placeholder="170 / 52" maxlength="20"></div>
+        <div class="k-field"><label for="a-ref">지원경로<span class="oncv">✦ 표지</span></label><input class="k-box" id="a-ref" name="referral" type="text" maxlength="40"></div>
+        <div class="k-field"><label for="a-url">인스타 및 프로필 개인 URL<span class="oncv">✦ 표지</span></label><input class="k-box" id="a-url" name="profile_url" type="text" inputmode="url" autocomplete="url"></div>
+        <div class="k-field full"><label for="a-msg">하고싶은말<span class="oncv">✦ 표지</span></label><textarea class="k-box" id="a-msg" name="message" rows="3"></textarea></div>
+      </div>
+      <div class="agree-wrap">
+        <div class="agree-row"><label class="k-agree"><input type="checkbox" id="a-agree" name="agree" required aria-required="true" aria-describedby="a-agree-e">개인정보 수집·이용 동의 (필수)</label><button class="more" type="button" aria-expanded="false" aria-controls="a-terms">내용 보기</button></div>
+        <div class="terms slot-box" id="a-terms" hidden>수집 항목·이용 목적·보관 기간 안내 자리 (법률 확인 뒤 입력)</div>
+        <p class="err" id="a-agree-e">개인정보 수집·이용에 동의해 주세요</p>
+      </div>
+      <div class="actions"><button class="send" type="submit">지원서 보내기 <span aria-hidden="true">→</span></button><a class="kakao" href="#">카톡 상담</a></div>
+    </form>
+
+    <form class="form" id="form-business" data-kind="business" novalidate aria-label="비즈니스 문의" hidden>
+      <div class="k-fields">
+        <div class="k-field full" data-req><label for="b-name">담당자 이름 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><input class="k-box" id="b-name" name="contact_name" type="text" required aria-required="true" aria-describedby="b-name-e" autocomplete="name" maxlength="30"><p class="err" id="b-name-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="b-phone">연락처 <span class="req">필수</span></label><input class="k-box" id="b-phone" name="phone" type="tel" required aria-required="true" aria-describedby="b-phone-e" autocomplete="tel" placeholder="010-0000-0000"><p class="err" id="b-phone-e">이 칸을 채워 주세요</p></div>
+        <div class="k-field full" data-req><label for="b-prop">제안 내용 <span class="req">필수</span><span class="oncv">✦ 표지</span></label><textarea class="k-box" id="b-prop" name="proposal" rows="5" required aria-required="true" aria-describedby="b-prop-e"></textarea><p class="err" id="b-prop-e">이 칸을 채워 주세요</p></div>
+      </div>
+      <div class="agree-wrap">
+        <div class="agree-row"><label class="k-agree"><input type="checkbox" id="b-agree" name="agree" required aria-required="true" aria-describedby="b-agree-e">개인정보 수집·이용 동의 (필수)</label><button class="more" type="button" aria-expanded="false" aria-controls="b-terms">내용 보기</button></div>
+        <div class="terms slot-box" id="b-terms" hidden>수집 항목·이용 목적·보관 기간 안내 자리 (법률 확인 뒤 입력)</div>
+        <p class="err" id="b-agree-e">개인정보 수집·이용에 동의해 주세요</p>
+      </div>
+      <div class="actions"><button class="send" type="submit">제안 보내기 <span aria-hidden="true">→</span></button><a class="kakao" href="#">카톡 상담</a></div>
+    </form>
+
+    <div class="done" hidden tabindex="-1" id="done">
+      <span class="kick">Received ✦</span>
+      <h2 id="done-title">지원서가 접수되었습니다.</h2>
+      <p>확인 후 연락드리겠습니다.</p>
+      <p class="tiny">시안이라 실제로 보내지 않습니다.</p>
+      <button class="send" type="button" id="again">처음으로 <span aria-hidden="true">↺</span></button>
     </div>
   </section>
-  <section class="sheet" aria-label="양식">
-    <div class="switch" role="group" aria-label="문의 종류" data-on="apply"><span class="switch-pill" aria-hidden="true"></span><button type="button" aria-pressed="true" aria-controls="form-apply" data-form="apply">지원하기</button><button type="button" aria-pressed="false" aria-controls="form-business" data-form="business">비즈니스 문의</button></div>
-    <div class="progress"><p class="progress-text"><span>필수 항목을 채운 만큼 선이 채워집니다</span><b><span class="pn">0</span> / <span class="pt">5</span></b></p><div class="progress-line" role="progressbar" aria-label="필수 항목 채움" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"><span class="progress-fill"></span></div></div>
-    <form class="form" id="form-apply" data-kind="apply" novalidate aria-label="지원하기">
-      <div class="fields"><div class="field" data-req><label for="a-field">지원분야<i>필수</i></label><span class="inbox"><input class="box" id="a-field" name="field_of_interest" type="text" required aria-required="true"><span class="uline" aria-hidden="true"></span></span></div><div class="field" data-req><label for="a-name">이름<i>필수</i></label><span class="inbox"><input class="box" id="a-name" name="name" type="text" required aria-required="true" autocomplete="name" placeholder="홍길동"><span class="uline" aria-hidden="true"></span></span></div><div class="field" data-req><label for="a-phone">연락처<i>필수</i></label><span class="inbox"><input class="box" id="a-phone" name="phone" type="tel" required aria-required="true" autocomplete="tel" placeholder="010-0000-0000"><span class="uline" aria-hidden="true"></span></span></div><div class="field" data-req><label for="a-birth">생년월일<i>필수</i></label><span class="inbox"><input class="box" id="a-birth" name="birth_date" type="text" required aria-required="true" autocomplete="bday"><span class="uline" aria-hidden="true"></span></span></div><div class="field" data-req><label for="a-gender">성별<i>필수</i></label><span class="inbox"><input class="box" id="a-gender" name="gender" type="text" required aria-required="true"><span class="uline" aria-hidden="true"></span></span></div><div class="field"><label for="a-hw">신장 체중</label><span class="inbox"><input class="box" id="a-hw" name="height_weight" type="text"><span class="uline" aria-hidden="true"></span></span></div><div class="field"><label for="a-ref">지원경로</label><span class="inbox"><input class="box" id="a-ref" name="referral" type="text"><span class="uline" aria-hidden="true"></span></span></div><div class="field"><label for="a-url">인스타 및 프로필 개인 URL</label><span class="inbox"><input class="box" id="a-url" name="profile_url" type="text" inputmode="url" autocomplete="url"><span class="uline" aria-hidden="true"></span></span></div><div class="field full"><label for="a-msg">하고싶은말</label><span class="inbox"><textarea class="box area" id="a-msg" name="message"></textarea><span class="uline" aria-hidden="true"></span></span></div></div>
-      <div class="agree-row"><label class="agree"><input type="checkbox" name="agree" id="a-agree" required aria-required="true"><span class="check" aria-hidden="true"></span>개인정보 수집·이용 동의 (필수)</label></div>
-      <button class="btn submit" type="submit">지원서 보내기</button>
-    </form>
-    <form class="form" id="form-business" data-kind="business" novalidate aria-label="비즈니스 문의" hidden data-extra>
-      <div class="fields"><div class="field" data-req><label for="b-name">담당자 이름<i>필수</i></label><span class="inbox"><input class="box" id="b-name" name="contact_name" type="text" required aria-required="true" autocomplete="name"><span class="uline" aria-hidden="true"></span></span></div><div class="field" data-req><label for="b-phone">연락처<i>필수</i></label><span class="inbox"><input class="box" id="b-phone" name="phone" type="tel" required aria-required="true" autocomplete="tel"><span class="uline" aria-hidden="true"></span></span></div><div class="field full" data-req><label for="b-prop">제안 내용<i>필수</i></label><span class="inbox"><textarea class="box area" id="b-prop" name="proposal" required aria-required="true"></textarea><span class="uline" aria-hidden="true"></span></span></div></div>
-      <div class="agree-row"><label class="agree"><input type="checkbox" name="agree" id="b-agree" required aria-required="true"><span class="check" aria-hidden="true"></span>개인정보 수집·이용 동의 (필수)</label></div>
-      <button class="btn submit" type="submit">제안 보내기</button>
-    </form>
-    <p class="sr-only" aria-live="polite" id="live" data-extra></p>
-  </section>
+  </main>
+  </div>
 </div>
-</main>
 <footer class="site-footer">
   <div>
     <img class="footer-logo footer-wordmark" src="../2026-11-10-pages/img/logo-astra-star.svg" alt="ASTRA ENTERTAINMENT">
@@ -197,31 +411,246 @@ html.fx .take-msg::before { transition: opacity 0.3s; }
     </button>
   </div>
 </div>
-<div class="take" hidden role="dialog" aria-modal="true" aria-labelledby="take-title" data-extra>
-  <img class="take-img" src="../2026-11-10-pages/img/contact.webp" alt="">
-  <div class="take-top"></div>
-  <div class="take-dark"></div>
-  <div class="take-msg">
-    <h2 id="take-title" tabindex="-1">지원서가 접수되었습니다.</h2>
-    <p>확인 후 연락드리겠습니다.</p>
-    <small>시안이라 실제로 보내지 않습니다.</small>
-    <button class="btn" type="button" data-home>처음으로</button>
-  </div>
-</div>
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var FX = document.documentElement.classList.contains('fx');
+  var body = document.body;
+  var cover = $('#cover'), frame = $('#coverFrame');
+
+  /* 휴대폰 따라오는 작은 표지: 큰 표지를 그대로 복사해 줄여 쓴다 */
+  var mini = $('.mini'), miniFrame = $('.mini-frame');
+  var miniCv = cover.cloneNode(true); miniCv.removeAttribute('id');
+  $$('.marks', miniCv).forEach(function (m) { m.remove(); });
+  miniFrame.appendChild(miniCv);
+
+  function fitCovers() {
+    var k = frame.clientWidth / 600;
+    cover.style.setProperty('--cvT', 'scale(' + k + ')'); cover.style.transform = 'scale(' + k + ')';
+    var km = miniFrame.clientWidth / 600 || 0.08;
+    miniCv.style.setProperty('--cvT', 'scale(' + km + ')'); miniCv.style.transform = 'scale(' + km + ')';
+    placeMarks();
+  }
+  if (window.ResizeObserver) new ResizeObserver(fitCovers).observe(frame); else window.addEventListener('resize', fitCovers);
+
+  /* 칸 → 표지 글 */
+  function fmt(el, v) {
+    v = (v || '').replace(/\s+$/, '');
+    var f = el.getAttribute('data-fmt');
+    if (f === 'handle') {
+      var m = v.match(/instagram\.com\/([A-Za-z0-9._]+)/i);
+      if (m) return '@' + m[1];
+      if (/^@/.test(v)) return v;
+      return v.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
+    }
+    if (f === 'first') {
+      v = v.replace(/^\s+/, '').split(/\n/)[0];
+      var mx = +el.getAttribute('data-max') || 60;
+      if (v.length > mx) v = v.slice(0, mx).replace(/\s+\S*$/, '') + '…';
+    }
+    return v;
+  }
+  function setSlot(el, text) {
+    var prev = el.__v || '';
+    if (prev === text && el.__init) return;
+    el.__init = true;
+    var wrap = el.hasAttribute('data-wrap');
+    if (!text) {
+      el.textContent = ''; el.__v = '';
+      var ph = document.createElement('span'); ph.className = 'ph'; ph.textContent = el.getAttribute('data-ph') || '';
+      el.appendChild(ph); return;
+    }
+    if (!prev) el.textContent = '';
+    var a = Array.from(prev), b = Array.from(text), p = 0;
+    while (p < a.length && p < b.length && a[p] === b[p]) p++;
+    var kids = Array.prototype.slice.call(el.childNodes);
+    for (var i = kids.length - 1; i >= p; i--) el.removeChild(kids[i]);
+    var step = Math.min(34, 560 / Math.max(1, b.length - p));
+    for (var j = p; j < b.length; j++) {
+      var c = b[j], n;
+      if (c === ' ' || c === '\n') n = document.createTextNode(' ');
+      else {
+        n = document.createElement('span'); n.className = wrap ? 'chi' : 'ch'; n.textContent = c;
+        if (FX) { n.classList.add('new'); n.style.animationDelay = Math.round((j - p) * step) + 'ms'; }
+      }
+      el.appendChild(n);
+    }
+    el.__v = text;
+  }
+  function render(id) {
+    var inp = document.getElementById(id); if (!inp) return;
+    $$('[data-slot="' + id + '"]').forEach(function (el) { setSlot(el, fmt(el, inp.value)); });
+    if (id === 'a-name' || id === 'b-name') fitNames();
+  }
+  /* 제호 ASTRA: 표지 폭에 꼭 맞게 글자 크기를 정한다 */
+  function fitMast() {
+    $$('.cv-mast text').forEach(function (t) {
+      t.setAttribute('font-size', 200);
+      var w = t.getComputedTextLength(); if (!w) return;
+      t.setAttribute('font-size', (200 * 552 / w).toFixed(1));
+    });
+  }
+  /* 이름 크기: 한 줄에 맞게 줄인다 */
+  var meas = document.createElement('span');
+  meas.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-family:"Bodoni Moda","Noto Serif KR",serif;font-weight:600;letter-spacing:-0.02em;font-size:100px;left:-9999px;top:0';
+  document.body.appendChild(meas);
+  function fitNames() {
+    ['a-name', 'b-name'].forEach(function (id) {
+      var v = document.getElementById(id).value.trim();
+      meas.style.fontStyle = v ? 'normal' : 'italic'; meas.style.fontWeight = v ? 600 : 400;
+      meas.textContent = v || 'Your Name';
+      var w = meas.offsetWidth || 1, max = 544, base = id === 'a-name' ? 112 : 96;
+      var fs = Math.max(40, Math.min(base, 100 * max / w));
+      $$('[data-slot="' + id + '"][data-fit]').forEach(function (el) { el.style.fontSize = fs + 'px'; });
+    });
+  }
+
+  /* 판(지원서 / 제안서) */
+  var mode = 'apply';
+  function setMode(m, quiet) {
+    if (m === mode && !quiet) return;
+    mode = m; body.setAttribute('data-mode', m);
+    $$('.k-switch button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === m)); });
+    $('#form-apply').hidden = m !== 'apply'; $('#form-business').hidden = m !== 'business';
+    [cover, miniCv].forEach(function (cv) {
+      $$('.ed', cv).forEach(function (ed) {
+        var on = ed.getAttribute('data-ed') === m;
+        clearTimeout(ed.__t); ed.classList.remove('enter');
+        if (on) { ed.hidden = false; if (FX && !quiet) { void ed.offsetWidth; ed.classList.add('enter'); } }
+        else if (FX && !quiet) ed.__t = setTimeout(function () { ed.hidden = true; }, 760);
+        else ed.hidden = true;
+      });
+    });
+    $$('.n-all').forEach(function (n) { n.textContent = m === 'apply' ? 6 : 4; });
+    lastFocus = null; placeMarks(); check(true);
+  }
+  $$('.k-switch button').forEach(function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); }); });
+
+  /* 필수 채움 → 도장 */
+  var ready = false;
+  function check(silent) {
+    var f = $('#form-' + mode), req = $$('[data-req] .k-box', f), ag = $('input[type=checkbox]', f);
+    var n = req.filter(function (x) { return x.value.trim(); }).length + (ag.checked ? 1 : 0);
+    $$('.n-done').forEach(function (x) { x.textContent = n; });
+    var r = n === req.length + 1;
+    if (r !== ready || silent) {
+      ready = r;
+      [cover, miniCv].forEach(function (cv) {
+        var st = $('.stamp', cv);
+        st.classList.toggle('off', !r);
+        if (r) {
+          st.classList.remove('on'); if (FX && !silent) void st.offsetWidth; st.classList.add('on');
+          if (FX && !silent) { cv.classList.remove('press'); void cv.offsetWidth; cv.classList.add('press'); }
+        } else st.classList.remove('on');
+      });
+    }
+  }
+
+  /* 지금 쓰는 칸의 표지 자리에 재단 표시 */
+  var marks = $('.marks', cover), lastFocus = null;
+  function placeMarks() {
+    if (!lastFocus) { marks.classList.remove('on'); return; }
+    var slot = $('.ed:not([hidden]) [data-slot="' + lastFocus + '"]', cover);
+    if (!slot) { marks.classList.remove('on'); return; }
+    var host = slot.closest('.ln') || slot.parentNode;
+    if (lastFocus === 'a-hw') host = slot.parentNode;
+    var cr = cover.getBoundingClientRect(), r = host.getBoundingClientRect(), k = cr.width / 600 || 1;
+    marks.style.left = (r.left - cr.left) / k + 'px'; marks.style.top = (r.top - cr.top) / k + 'px';
+    marks.style.width = r.width / k + 'px'; marks.style.height = r.height / k + 'px';
+    marks.classList.add('on');
+  }
+
+  $$('.form .k-box').forEach(function (inp) {
+    inp.addEventListener('input', function () {
+      render(inp.id);
+      var fd = inp.closest('.k-field'); if (fd && inp.value.trim()) { fd.classList.remove('bad'); inp.removeAttribute('aria-invalid'); }
+      check(); if (lastFocus === inp.id) requestAnimationFrame(placeMarks);
+    });
+    inp.addEventListener('focus', function () { lastFocus = inp.id; placeMarks(); });
+    inp.addEventListener('blur', function () { setTimeout(function () { if (!document.activeElement || !document.activeElement.classList.contains('k-box')) { lastFocus = null; placeMarks(); } }, 0); });
+  });
+  $$('.form input[type=checkbox]').forEach(function (c) {
+    c.addEventListener('change', function () { if (c.checked) { c.closest('.agree-wrap').classList.remove('bad'); c.removeAttribute('aria-invalid'); } check(); });
+  });
+  $$('.more').forEach(function (m) {
+    m.addEventListener('click', function () {
+      var t = document.getElementById(m.getAttribute('aria-controls')), open = t.hidden;
+      t.hidden = !open; m.setAttribute('aria-expanded', String(open)); m.textContent = open ? '내용 접기' : '내용 보기';
+    });
+  });
+
+  /* 보내기: 아무 데도 보내지 않는다 */
+  $$('.form').forEach(function (f) {
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var first = null;
+      $$('[data-req]', f).forEach(function (fd) {
+        var b = $('.k-box', fd), bad = !b.value.trim();
+        fd.classList.toggle('bad', bad); if (bad) b.setAttribute('aria-invalid', 'true'); else b.removeAttribute('aria-invalid');
+        if (bad && !first) first = b;
+      });
+      var ag = $('input[type=checkbox]', f), aw = ag.closest('.agree-wrap');
+      aw.classList.toggle('bad', !ag.checked); if (!ag.checked) ag.setAttribute('aria-invalid', 'true');
+      if (!ag.checked && !first) first = ag;
+      if (first) { first.focus(); return; }
+      $('#done-title').textContent = mode === 'apply' ? '지원서가 접수되었습니다.' : '문의가 접수되었습니다.';
+      f.hidden = true; $('.k-switch').hidden = true;
+      var d = $('#done'); d.hidden = false; d.focus({ preventScroll: true });
+      var y = $('.k-sheet').getBoundingClientRect().top + window.scrollY - 80;
+      if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y), behavior: FX ? 'smooth' : 'auto' });
+    });
+  });
+  $('#again').addEventListener('click', function () {
+    $$('.form').forEach(function (f) {
+      f.reset(); $$('.bad', f).forEach(function (x) { x.classList.remove('bad'); });
+      $$('[aria-invalid]', f).forEach(function (x) { x.removeAttribute('aria-invalid'); });
+      $$('.terms', f).forEach(function (t) { t.hidden = true; });
+      $$('.more', f).forEach(function (m) { m.setAttribute('aria-expanded', 'false'); m.textContent = '내용 보기'; });
+    });
+    ['a-field', 'a-name', 'a-ref', 'a-url', 'a-msg', 'a-hw', 'b-name', 'b-prop'].forEach(render);
+    $('#done').hidden = true; $('.k-switch').hidden = false;
+    setMode('apply', true);
+    var top = $('.k-sheet').getBoundingClientRect().top + window.scrollY - 80;
+    window.scrollTo({ top: window.innerWidth <= 900 ? 0 : Math.max(0, top), behavior: 'auto' });
+    $('.k-switch button').focus({ preventScroll: true });
+  });
+
+  /* 휴대폰: 큰 표지가 머리말 뒤로 지나가면 작은 표지 띠를 보인다 */
+  var mq = window.matchMedia('(max-width: 900px)');
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { mini.classList.toggle('show', mq.matches && !e.isIntersecting && e.boundingClientRect.top < 0); });
+    }, { rootMargin: '-60px 0px 0px 0px', threshold: 0 }).observe(frame);
+  }
+  mini.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: FX ? 'smooth' : 'auto' }); });
+
+  /* 휴대폰에서는 제목 묶음을 표지 위로 옮긴다 */
+  var intro = $('.k-intro'), sheet = $('.k-sheet'), headBits = [$('.k-eyebrow'), $('.title'), $('.lead'), $('.notice')];
+  function placeIntro() {
+    if (mq.matches) { intro.hidden = false; headBits.forEach(function (n) { intro.appendChild(n); }); }
+    else { intro.hidden = true; for (var i = headBits.length - 1; i >= 0; i--) sheet.insertBefore(headBits[i], sheet.firstChild); }
+  }
+  placeIntro(); if (mq.addEventListener) mq.addEventListener('change', placeIntro);
+
+  ['a-field', 'a-name', 'a-ref', 'a-url', 'a-msg', 'a-hw', 'b-name', 'b-prop'].forEach(render);
+  fitMast(); fitCovers(); check(true);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitMast(); fitNames(); placeMarks(); });
+  // 다른 쪽의 "지원하기"(contact.html#apply)·주소 끝 #business로 들어오면 그 양식을 연다
+  function fromHash() { var h = location.hash.slice(1); if (h === 'business' || h === 'apply') setMode(h, true); }
+  fromHash(); window.addEventListener('hashchange', fromHash);
+})();
+</script>
 <script>
 (function () {
   'use strict';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var root = document.documentElement;
-  var $ = function (s, r) { return (r || document).querySelector(s); };
-  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
   var anim = function (el, kf, o) { return el && el.animate ? el.animate(kf, o) : null; };
-  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
-  var lerp = function (a, b, u) { return a + (b - a) * u; };
-  var easeOut = function (u) { return 1 - Math.pow(1 - u, 3); };
-  var smooth = function (u) { return u * u * (3 - 2 * u); };
-  var narrow = function () { return window.innerWidth <= 900; };
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  // 카톡 상담·인스타·블로그: 주소를 아직 받지 않아 어디로도 가지 않는다(가짜 주소를 넣지 않는다)
+  $$('a[href="#"]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
 
   /* ───────── 떠 있는 버튼(다른 쪽과 같다) ───────── */
   var fabButton = $('.fab-button'), fabBox = $('.fab'), fabItems = $$('.fab-menu a');
@@ -243,379 +672,6 @@ html.fx .take-msg::before { transition: opacity 0.3s; }
   // 카톡 상담: 채널 주소를 아직 받지 않아 어디로도 가지 않는다(가짜 주소를 넣지 않는다)
   $$('a[href="#"]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
 
-  // 공통 잔손질: 카톡 상담 버튼이 마우스 쪽으로 끌려온다(가로 18%, 세로 30%, 나가면 0.5초에 복귀). 양식 안의 버튼은 끌지 않는다(잘못 누르지 않게)
-  $$('.contact-copy .btn').forEach(function (b) {
-    b.addEventListener('pointermove', function (e) {
-      if (reduce || narrow() || e.pointerType !== 'mouse') return;
-      var r = b.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      var m = /translate\(([-\d.]+)px, ?([-\d.]+)px\)/.exec(b.style.transform || '');
-      if (m) { cx -= Number(m[1]); cy -= Number(m[2]); }
-      b.style.transform = 'translate(' + ((e.clientX - cx) * 0.18).toFixed(1) + 'px,' + ((e.clientY - cy) * 0.3).toFixed(1) + 'px)';
-    });
-    b.addEventListener('pointerleave', function () {
-      if (!b.style.transform) return;
-      anim(b, [{ transform: b.style.transform }, { transform: 'none' }], { duration: 500, easing: EASE });
-      b.style.transform = '';
-    });
-  });
-
-  /* ───────── 7-2. 왼쪽 무대: 조명 단계 ─────────
-     단계마다 사진 밝기, 빛의 반지름(왼쪽 그림 가로 기준), 사진 크기(의자 쪽으로 다가감), 바깥 덮개의 짙기.
-     설계 값에서 덮개 짙기를 정했다(설계에 없음). 한 단계만 올라도 알아볼 만큼 세게: README "CONTACT" */
-  var LV = {
-    b: [0.34, 0.55, 0.76, 0.97, 1.18, 1.40],
-    r: [0.22, 0.38, 0.56, 0.76, 1.00, 1.40],
-    s: [1.000, 1.020, 1.040, 1.060, 1.080, 1.100],
-    a: [0.96, 0.92, 0.84, 0.72, 0.52, 0.00]
-  };
-  var BIZ = [0, 2, 4, 5]; // 비즈니스 문의는 필수가 3칸: 0·2·4·5 단계
-  var side = $('.contact-side'), stage = $('.stage'), simg = $('.stage-img'), sdark = $('.stage-dark'), dust = $('.stage .dust');
-  var S = {
-    L: 0, from: 0, to: 0, t0: 0, dur: 1, up: false,   // 단계(소수)와 바뀌는 중
-    on: reduce ? 1 : 0, onT0: 0,                       // 들어올 때 0 → 1(0.9초)
-    flick: 0,                                          // 깜빡임 시작 시각
-    chair: { x: 0, y: 0 }, w: 1, h: 1,
-    b: 0, r: 0, s: 1, a: 1
-  };
-  function at(tab, L) { var i = Math.floor(clamp(L, 0, 5)), u = clamp(L, 0, 5) - i; return i >= 5 ? tab[5] : lerp(tab[i], tab[i + 1], u); }
-  // 의자 자리: 사진이 칸을 덮도록 맞춰질 때(object-fit: cover, 위치 50% 46%) 사진 속 의자(가로 50%, 세로 46%)가 오는 곳
-  function measureStage() {
-    var r = stage.getBoundingClientRect(), iw = 1000, ih = 1250;
-    S.w = r.width || 1; S.h = r.height || 1;
-    var sc = Math.max(S.w / iw, S.h / ih), dw = iw * sc, dh = ih * sc;
-    S.chair.x = (S.w - dw) * 0.5 + dw * 0.5;
-    S.chair.y = (S.h - dh) * 0.46 + dh * 0.46;
-    simg.style.transformOrigin = S.chair.x.toFixed(1) + 'px ' + S.chair.y.toFixed(1) + 'px';
-    dustLayout();
-    S.dirty = true;
-  }
-  function setLevel(L, ms) {
-    if (L === S.to && ms !== 0) return;
-    S.from = S.L; S.to = L; S.up = L > S.L; S.t0 = performance.now();
-    S.dur = reduce || ms === 0 ? 0 : (ms || (S.up ? 600 : 400));
-    if (!S.dur) S.L = L;
-    S.dirty = true;
-  }
-  function stageTick(t) {
-    var bump = 0, pb = 1;
-    if (S.dur && S.L !== S.to) {
-      var u = clamp((t - S.t0) / S.dur, 0, 1);
-      S.L = lerp(S.from, S.to, easeOut(u));
-      if (u >= 1) S.L = S.to;
-      // 오를 때: 밝기는 처음 0.15초에 목표보다 8% 더 밝아졌다가 남은 시간에 내려앉는다(조명이 켜지는 느낌)
-      if (S.up) { var e = (t - S.t0) / 1000; pb = e < 0.15 ? easeOut(e / 0.15) : 1; bump = e < 0.15 ? 0.08 * easeOut(e / 0.15) : 0.08 * (1 - smooth(clamp((e - 0.15) / 0.45, 0, 1))); }
-      S.dirty = true;
-    } else if (S.dur && S.up && t - S.t0 < S.dur) { var e2 = (t - S.t0) / 1000; bump = e2 < 0.15 ? 0.08 : 0.08 * (1 - smooth(clamp((e2 - 0.15) / 0.45, 0, 1))); S.dirty = true; }
-    var on = S.on;
-    if (on < 1) { on = S.onT0 ? easeOut(clamp((t - S.onT0) / 900, 0, 1)) : 0; if (on >= 1) S.on = 1; S.dirty = true; }
-    var fl = 1;
-    if (S.flick) {
-      // 7-6. 한 번 깜빡인다: 0.12초 어두워졌다 돌아옴, 두 번
-      var f = t - S.flick;
-      if (f < 480) { fl = (f < 120 || (f >= 240 && f < 360)) ? 0.45 : 1; S.dirty = true; } else { S.flick = 0; S.dirty = true; }
-    }
-    if (!S.dirty) return;
-    S.dirty = false;
-    var Lb = S.up && S.dur ? lerp(S.from, S.to, pb) : S.L;
-    S.b = (at(LV.b, Lb) + bump) * on * fl;
-    S.r = at(LV.r, S.L) * on;
-    S.s = at(LV.s, S.L);
-    S.a = lerp(1, at(LV.a, S.L), on);
-    simg.style.filter = 'brightness(' + S.b.toFixed(3) + ')';
-    simg.style.transform = 'scale(' + S.s.toFixed(4) + ')';
-    var R = S.r * S.w, cy = S.chair.y - S.h * 0.02;
-    sdark.style.background = S.a <= 0.002 ? 'none' : 'radial-gradient(circle at ' + S.chair.x.toFixed(1) + 'px ' + cy.toFixed(1) + 'px, rgba(0,0,0,0) 0, rgba(0,0,0,0) ' + (R * 0.5).toFixed(1) + 'px, rgba(0,0,0,' + (S.a * 0.55).toFixed(3) + ') ' + (R * 0.8).toFixed(1) + 'px, rgba(0,0,0,' + S.a.toFixed(3) + ') ' + R.toFixed(1) + 'px)';
-    bandPaint();
-  }
-  // 휴대폰 띠(12-7): 무대와 같은 밝기·빛 반지름(띠 가로 기준)·다가감·덮개 짙기. 의자는 띠 가로 가운데, 높이 46%
-  var band = $('.mprog'), bimg = document.createElement('img'), bdark = document.createElement('div');
-  bimg.className = 'mprog-img'; bimg.alt = ''; bimg.decoding = 'async'; bimg.src = simg.getAttribute('src');
-  bdark.className = 'mprog-dark';
-  band.insertBefore(bdark, band.firstChild); band.insertBefore(bimg, bdark);
-  var BAND_H = 88;
-  function bandPaint() {
-    var w = band.clientWidth || window.innerWidth, cx = w / 2, cy0 = BAND_H * 0.46, R = S.r * w, cy = cy0 - BAND_H * 0.02;
-    bimg.style.transformOrigin = cx.toFixed(1) + 'px ' + cy0.toFixed(1) + 'px';
-    bimg.style.filter = 'brightness(' + S.b.toFixed(3) + ')';
-    bimg.style.transform = 'scale(' + S.s.toFixed(4) + ')';
-    bdark.style.background = S.a <= 0.002 ? 'none' : 'radial-gradient(circle at ' + cx.toFixed(1) + 'px ' + cy.toFixed(1) + 'px, rgba(0,0,0,0) 0, rgba(0,0,0,0) ' + (R * 0.5).toFixed(1) + 'px, rgba(0,0,0,' + (S.a * 0.55).toFixed(3) + ') ' + (R * 0.8).toFixed(1) + 'px, rgba(0,0,0,' + S.a.toFixed(3) + ') ' + R.toFixed(1) + 'px)';
-  }
-
-  /* 다 채운 단계(5)에서만 빛 속에 먼지(따뜻한 빛 알갱이 30개, 미디어 첫 화면과 같은 종류, 혼자 움직임) */
-  var DUST = { p: [], w: 0, h: 0, dpr: 1, spr: [], a: 0 };
-  [0.0, 0.35, 0.6].forEach(function (hard) {
-    var c = document.createElement('canvas'), R = 32; c.width = c.height = R * 2;
-    var x = c.getContext('2d'), g = x.createRadialGradient(R, R, 0, R, R, R);
-    g.addColorStop(0, 'rgba(255,222,176,1)'); g.addColorStop(hard, 'rgba(255,214,160,0.9)'); g.addColorStop(1, 'rgba(255,200,140,0)');
-    x.fillStyle = g; x.fillRect(0, 0, R * 2, R * 2); DUST.spr.push(c);
-  });
-  for (var di = 0; di < 30; di++) DUST.p.push({ x: 0.2 + Math.random() * 0.6, y: Math.random() * 0.75, u: Math.random(), sp: 4 + Math.random() * 12, ph: Math.random() * 6.28, w: 0.4 + Math.random() * 0.9, j: Math.random() * 6.28 });
-  function dustLayout() {
-    DUST.dpr = Math.min(1.5, window.devicePixelRatio || 1); DUST.w = S.w; DUST.h = S.h;
-    dust.width = Math.round(S.w * DUST.dpr); dust.height = Math.round(S.h * DUST.dpr);
-  }
-  function dustTick(t, dt) {
-    var want = reduce ? 0 : clamp(S.L - 4, 0, 1) * S.on;
-    if (want === 0 && DUST.a === 0) return;
-    DUST.a += (want - DUST.a) * (1 - Math.exp(-dt / 0.4));
-    if (DUST.a < 0.01 && want === 0) DUST.a = 0;
-    var x = dust.getContext('2d'), W2 = DUST.w, H2 = DUST.h;
-    x.setTransform(DUST.dpr, 0, 0, DUST.dpr, 0, 0); x.clearRect(0, 0, W2, H2);
-    if (!DUST.a) return;
-    x.globalCompositeOperation = 'lighter';
-    DUST.p.forEach(function (p) {
-      var size = 2 + p.u * 11, a = (0.42 - p.u * 0.3) * DUST.a;
-      p.x += (Math.sin(t / 1000 * 0.3 + p.j) * 4) * dt / W2;
-      p.y -= p.sp * 0.5 * dt / H2;
-      if (p.y < -0.03) { p.y += 0.8; p.x = 0.2 + Math.random() * 0.6; }
-      var px = p.x * W2, py = p.y * H2;
-      a *= 0.55 + 0.45 * Math.sin(t / 1000 * p.w + p.ph);
-      if (a <= 0.004) return;
-      x.globalAlpha = a;
-      var spr = DUST.spr[p.u > 0.66 ? 0 : p.u > 0.33 ? 1 : 2], d = size * (p.u > 0.66 ? 2.2 : p.u > 0.33 ? 1.7 : 1.4);
-      x.drawImage(spr, px - d / 2, py - d / 2, d, d);
-    });
-    x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
-  }
-
-  /* ───────── 7-4. 양식: 필수 칸을 채운 만큼 ───────── */
-  var forms = { apply: $('#form-apply'), business: $('#form-business') };
-  var sw = $('.switch'), swBtns = $$('.switch button'), prog = $('.progress'), pn = $('.pn', prog), pt = $('.pt', prog), pfill = $('.progress-fill'), pbar = $('.progress-line');
-  var mn = $('.mprog-n'), mt = $('.mprog-t'), mfill = $('.mprog-fill'), live = $('#live');
-  var kind = 'apply';
-  var reqs = function (f) { return $$('[data-req] .box', f); };
-  var count = function (f) { return reqs(f).filter(function (b) { return b.closest('.field').classList.contains('done'); }).length; };
-  function levelOf(k, n) { return k === 'business' ? BIZ[n] : n; }
-  function refresh(ms) {
-    var f = forms[kind], n = count(f), tot = reqs(f).length;
-    pn.textContent = n; pt.textContent = tot; mn.textContent = n; mt.textContent = tot;
-    pfill.style.width = mfill.style.width = (n / tot * 100) + '%';
-    pbar.setAttribute('aria-valuenow', n); pbar.setAttribute('aria-valuemax', tot);
-    prog.classList.toggle('full', n === tot);
-    setLevel(levelOf(kind, n), ms);
-  }
-  // 칸마다: 비어 있지 않게 된 순간 0.25초 기다린 뒤 "채워짐"(지우면 거꾸로). 모양 검사는 하지 않는다(실제 사이트에서 정한다)
-  $$('.form .box').forEach(function (b) {
-    var fld = b.closest('.field'), req = fld.hasAttribute('data-req'), timer = 0;
-    b.addEventListener('input', function () {
-      var full = b.value.trim() !== '';
-      fld.classList.toggle('filled', full);
-      if (full) clearBad(fld);
-      if (!req) return;
-      clearTimeout(timer);
-      if (full === fld.classList.contains('done')) return;
-      timer = setTimeout(function () { fld.classList.toggle('done', full); refresh(); }, 250);
-      b._flush = function () { clearTimeout(timer); fld.classList.toggle('done', b.value.trim() !== ''); };
-    });
-  });
-  $$('.agree input').forEach(function (c) { c.addEventListener('change', function () { if (c.checked) clearBad(c.closest('.agree-row')); }); });
-
-  /* ───────── 7-6. 빈 칸 안내 ───────── */
-  function showBad(box, msg) {
-    var host = box.closest('.field') || box.closest('.agree-row');
-    host.classList.add('bad');
-    var err = $('.err', host);
-    if (!err) { err = document.createElement('p'); err.className = 'err'; err.id = box.id + '-err'; err.setAttribute('data-extra', ''); host.appendChild(err); }
-    err.textContent = msg; err.hidden = false;
-    box.setAttribute('aria-invalid', 'true'); box.setAttribute('aria-describedby', err.id);
-  }
-  function clearBad(host) {
-    if (!host || !host.classList.contains('bad')) return;
-    host.classList.remove('bad');
-    var err = $('.err', host); if (err) err.hidden = true;
-    var box = $('.box, input', host); if (box) { box.removeAttribute('aria-invalid'); box.removeAttribute('aria-describedby'); }
-  }
-  function flicker() { if (!reduce) { S.flick = performance.now(); S.dirty = true; } }
-
-  /* ───────── 7-5. 지원하기 ↔ 비즈니스 문의 ───────── */
-  var swapping = null;
-  function items(f) { return $$('.field, .agree-row, .submit', f); }
-  function setKind(k, how) {
-    if (!forms[k]) return;
-    var old = forms[kind], nu = forms[k], prev = kind;
-    swBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-form') === k)); });
-    sw.setAttribute('data-on', k);
-    if (k === prev && how !== 'init') return;
-    kind = k;
-    if (swapping) { swapping.forEach(function (a) { if (a) a.cancel(); }); swapping = null; }
-    var fx = !reduce && how !== 'init';
-    if (!fx) { old.hidden = true; nu.hidden = false; $$('.form').forEach(function (f) { f.hidden = f !== nu; }); refresh(how === 'init' ? 0 : undefined); return; }
-    // 앞 양식의 칸이 위에서부터 0.03초 간격으로 12px 떨어지며 사라지고(전체 0.3초), 새 양식의 칸이 0.04초 간격으로 12px 아래에서 올라온다(전체 0.45초)
-    // 칸이 많으면(지원하기 11개) 간격을 줄여 전체 0.3초 안에 끝낸다
-    var oi = items(old), ost = Math.min(30, 150 / Math.max(1, oi.length - 1)), outs = oi.map(function (el, i) {
-      return anim(el, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(12px)' }], { duration: 300 - ost * (oi.length - 1), delay: i * ost, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' });
-    });
-    swapping = outs;
-    setLevelSoon();
-    var endOut = 300;
-    setTimeout(function () {
-      if (kind !== k) return;
-      outs.forEach(function (a) { if (a) a.cancel(); });
-      old.hidden = true; nu.hidden = false;
-      var ni = items(nu), nst = Math.min(40, 200 / Math.max(1, ni.length - 1)), dur = 450 - nst * (ni.length - 1);
-      swapping = ni.map(function (el, i) { return anim(el, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: dur, delay: i * nst, easing: EASE, fill: 'backwards' }); });
-    }, endOut);
-    function setLevelSoon() { refresh(500); } // 왼쪽 조명이 새 양식의 채운 만큼으로 0.5초에
-  }
-  swBtns.forEach(function (b) { b.addEventListener('click', function () { setKind(b.getAttribute('data-form')); try { history.replaceState(null, '', '#' + b.getAttribute('data-form')); } catch (e) { /* 파일로 열 때 */ } }); });
-  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (forms[h]) setKind(h); });
-
-  /* ───────── 보내기: 빈 칸이면 안내, 다 채웠으면 접수 화면(7-7). 아무것도 보내거나 저장하지 않는다 ───────── */
-  var take = $('.take'), timg = $('.take-img', take), tdark = $('.take-dark', take), ttitle = $('#take-title'), tback = $('[data-home]', take), TK = { open: false, busy: false, start: null };
-  var MSG = { apply: '지원서가 접수되었습니다.', business: '문의가 접수되었습니다.' };
-  var TAKE_B = 1.25; // 접수 화면의 사진 밝기(가장 밝은 단계 1.4보다 조금 낮게: 가운데 흰 글이 읽히게)
-  $$('.form').forEach(function (f) {
-    f.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (TK.busy || TK.open) return;
-      reqs(f).forEach(function (b) { if (b._flush) b._flush(); });
-      var empty = reqs(f).filter(function (b) { return b.value.trim() === ''; });
-      var agree = $('.agree input', f);
-      empty.forEach(function (b) { showBad(b, '이 칸을 채워 주세요'); });
-      if (!agree.checked) showBad(agree, '개인정보 수집·이용에 동의해 주세요');
-      refresh(0);
-      if (empty.length || !agree.checked) {
-        var first = empty[0] || agree;
-        live.textContent = '채우지 않은 필수 항목이 ' + (empty.length + (agree.checked ? 0 : 1)) + '개 있습니다.';
-        first.focus({ preventScroll: true });
-        var r = first.getBoundingClientRect(), hh = $('.site-header').offsetHeight + (narrow() ? BAND_H : 0);
-        if (r.top < hh + 40 || r.bottom > window.innerHeight - 40) window.scrollTo({ top: window.pageYOffset + r.top - hh - Math.max(60, window.innerHeight * 0.25), behavior: reduce ? 'auto' : 'smooth' });
-        flicker();
-        return;
-      }
-      live.textContent = '';
-      submitOK(f);
-    });
-  });
-  function rectOfSide() {
-    var r = side.getBoundingClientRect(), H = window.innerHeight, hh = $('.site-header').offsetHeight;
-    if (narrow() && root.classList.contains('mprog-on')) return { x: 0, y: hh, w: window.innerWidth, h: BAND_H, band: true }; // 휴대폰 띠가 붙어 있으면 띠가 아래로 넓어져 화면을 덮는다(12-7)
-    if (r.bottom <= hh + 4) return { x: 0, y: hh, w: window.innerWidth, h: 0 }; // 휴대폰에서 그림이 위로 지나가 있으면 머리말 아래 띠에서 아래로 넓어진다
-    return { x: r.left, y: r.top, w: r.width, h: Math.min(r.bottom, H) - r.top };
-  }
-  function place(el, R) { el.style.left = R.x + 'px'; el.style.top = R.y + 'px'; el.style.width = R.w + 'px'; el.style.height = R.h + 'px'; }
-  function submitOK(f) {
-    TK.busy = true;
-    var btn = $('.submit', f);
-    btn.classList.add('press');
-    ttitle.textContent = MSG[f.getAttribute('data-kind')];
-    setLevel(5, 0);
-    setTimeout(function () {
-      btn.classList.remove('press');
-      var R0 = rectOfSide(), R1 = { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight };
-      TK.start = R0;
-      take.hidden = false; take.classList.remove('shown');
-      ['main', '.site-header', '.site-footer', '.fab-anchor', '.mprog'].forEach(function (s) { var n = $(s); if (n) n.inert = true; });
-      var done = function () {
-        place(timg, R1); timg.style.transform = 'none'; timg.style.filter = 'brightness(' + TAKE_B + ')';
-        take.classList.add('shown');
-        if (!reduce) [tdark].concat($$('.take-msg > *', take)).forEach(function (el, i) { anim(el, [{ opacity: 0, transform: i ? 'translateY(14px)' : 'none' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: i ? (i - 1) * 80 : 0, easing: EASE, fill: 'backwards' }); });
-        TK.open = true; TK.busy = false;
-        ttitle.focus();
-      };
-      if (reduce) { done(); return; }
-      // 왼쪽 그림의 오른쪽 가장자리가 옆으로 밀고 가 화면 전체를 덮는다(0.8초, 처음은 천천히 뒤는 빠르게). 의자가 화면 가운데로 온다
-      place(timg, R0);
-      var a = anim(timg, [
-        { left: R0.x + 'px', top: R0.y + 'px', width: R0.w + 'px', height: R0.h + 'px', transform: 'scale(' + S.s.toFixed(4) + ')', transformOrigin: R0.band ? (R0.w / 2).toFixed(1) + 'px ' + (R0.h * 0.46).toFixed(1) + 'px' : S.chair.x.toFixed(1) + 'px ' + S.chair.y.toFixed(1) + 'px', filter: 'brightness(' + Math.max(0.6, S.b).toFixed(3) + ')' },
-        { left: R1.x + 'px', top: R1.y + 'px', width: R1.w + 'px', height: R1.h + 'px', transform: 'scale(1)', transformOrigin: '50% 46%', filter: 'brightness(' + TAKE_B + ')' }
-      ], { duration: 800, easing: 'cubic-bezier(0.55, 0, 0.8, 0.3)', fill: 'forwards' });
-      a.onfinish = function () { a.cancel(); done(); };
-    }, 200);
-  }
-  // "처음으로": 그림이 왼쪽으로 줄어들고 빈 양식이 돌아온다
-  tback.addEventListener('click', function () {
-    if (!TK.open || TK.busy) return;
-    TK.busy = true;
-    var f = forms[kind];
-    f.reset();
-    $$('.field, .agree-row', f).forEach(function (h) { h.classList.remove('filled', 'done'); clearBad(h); });
-    window.scrollTo(0, 0);
-    // 왼쪽 무대는 가장 밝은 단계로 돌아와 있다가, 그림이 다 줄어든 뒤 0.4초에 단계 0으로 내려간다
-    refresh(0); setLevel(5, 0); // 진행 선과 숫자는 바로 비우고, 무대만 밝은 채로 둔다
-    var finish = function () {
-      take.hidden = true; take.classList.remove('shown');
-      ['main', '.site-header', '.site-footer', '.fab-anchor', '.mprog'].forEach(function (s) { var n = $(s); if (n) n.inert = false; });
-      TK.open = false; TK.busy = false;
-      refresh();
-      var b = swBtns.filter(function (x) { return x.getAttribute('data-form') === kind; })[0]; if (b) b.focus();
-    };
-    if (reduce) { finish(); return; }
-    measureStage(); stageTick(performance.now());
-    var R0 = { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight }, R1 = rectOfSide();
-    take.classList.remove('shown');
-    var top = $('.take-top', take), dur = 650, ez = 'cubic-bezier(0.2, 0.7, 0.25, 1)';
-    var a = anim(timg, [
-      { left: R0.x + 'px', top: R0.y + 'px', width: R0.w + 'px', height: R0.h + 'px', transform: 'scale(1)', transformOrigin: '50% 46%', filter: 'brightness(' + TAKE_B + ')' },
-      { left: R1.x + 'px', top: R1.y + 'px', width: R1.w + 'px', height: R1.h + 'px', transform: 'scale(' + LV.s[5] + ')', transformOrigin: S.chair.x.toFixed(1) + 'px ' + S.chair.y.toFixed(1) + 'px', filter: 'brightness(' + LV.b[5] + ')' }
-    ], { duration: dur, easing: ez, fill: 'forwards' });
-    anim(top, [{ left: R0.x + 'px', top: R0.y + 'px', width: R0.w + 'px', height: R0.h + 'px', opacity: 0 }, { left: R1.x + 'px', top: R1.y + 'px', width: R1.w + 'px', height: R1.h + 'px', opacity: 1 }], { duration: dur, easing: ez, fill: 'forwards' });
-    a.onfinish = function () {
-      a.cancel(); top.getAnimations().forEach(function (x) { x.cancel(); });
-      finish();
-      anim($('.contact-copy'), [{ opacity: 0 }, { opacity: 1 }], { duration: 400, easing: EASE });
-    };
-  });
-  document.addEventListener('keydown', function (e) {
-    // 접수 화면 안에서 Tab은 "처음으로"에 머문다
-    if (TK.open && e.key === 'Tab') { e.preventDefault(); tback.focus(); }
-  });
-
-  /* ───────── 7-8. 휴대폰: 양식 구역에 있는 동안 머리말 아래 무대 띠(12-7) ─────────
-     무대 그림의 아래 끝이 머리말 아래 88px 위로 올라가면(그림이 띠보다 낮아지면) 띠가 붙고, 양식 끝이 가까워지면 떨어진다 */
-  var sheet = $('.sheet');
-  function mprog() {
-    if (!narrow()) { root.classList.remove('mprog-on'); return; }
-    var hh = $('.site-header').offsetHeight, sb = side.getBoundingClientRect().bottom, r = sheet.getBoundingClientRect();
-    var on = sb <= hh + BAND_H && r.bottom > hh + BAND_H + 160;
-    if (on !== root.classList.contains('mprog-on')) { root.classList.toggle('mprog-on', on); if (on) bandPaint(); }
-  }
-  window.addEventListener('scroll', mprog, { passive: true });
-  // 칸에 초점이 가면(손가락·Tab·빈 칸 안내) 띠 아래로 오게 한다
-  document.addEventListener('focusin', function (e) {
-    if (!narrow() || !root.classList.contains('mprog-on') || !e.target.closest) return;
-    var el = e.target.closest('.field, .agree-row, .submit, .switch'); if (!el) return;
-    var lim = $('.site-header').offsetHeight + BAND_H + 12, top = el.getBoundingClientRect().top;
-    if (top < lim) window.scrollBy(0, top - lim);
-  });
-
-  /* ───────── 7-3. 들어올 때 ───────── */
-  var h = location.hash.slice(1);
-  setKind(forms[h] ? h : 'apply', 'init');
-  measureStage();
-  if (!reduce) {
-    S.onT0 = performance.now();
-    // 양식 판이 오른쪽에서 40px 밀려 들어오고(0.6초), 전환 단추 → 진행 선 → 칸이 0.04초 간격으로 떠오른다. 0.9초 안에 다 나온다
-    anim(sheet, [{ transform: 'translateX(40px)' }, { transform: 'none' }], { duration: 600, easing: EASE, fill: 'backwards' });
-    var seq = [sw, prog].concat(items(forms[kind]));
-    var step = Math.min(40, 500 / seq.length);
-    seq.forEach(function (el, i) { anim(el, [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 400, delay: 80 + i * step, easing: EASE, fill: 'backwards' }); });
-    anim($('.contact-copy h1'), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 350, easing: EASE, fill: 'backwards' });
-    anim($('.contact-copy .btn'), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 550, easing: EASE, fill: 'backwards' });
-  }
-  var last = performance.now();
-  function frame(t) {
-    var dt = Math.min(0.05, (t - last) / 1000); last = t;
-    stageTick(t);
-    dustTick(t, dt);
-    requestAnimationFrame(frame);
-  }
-  stageTick(performance.now());
-  requestAnimationFrame(frame);
-  var rt = 0;
-  window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { measureStage(); mprog(); }, 80); });
-  mprog();
-
-  window.__contact = {
-    state: function () {
-      return {
-        kind: kind, n: count(forms[kind]), total: reqs(forms[kind]).length, level: S.to, L: +S.L.toFixed(3),
-        b: +S.b.toFixed(3), r: +S.r.toFixed(3), s: +S.s.toFixed(4), a: +S.a.toFixed(3), dust: +DUST.a.toFixed(2),
-        bad: $$('.bad').filter(function (x) { return !x.closest('[hidden]'); }).length, take: TK.open ? 'open' : TK.busy ? 'busy' : 'closed',
-        mprog: root.classList.contains('mprog-on'), band: { b: bimg.style.filter, s: bimg.style.transform, dark: bdark.style.background ? bdark.style.background.length : 0 }, fill: pfill.style.width, hidden: { apply: forms.apply.hidden, business: forms.business.hidden }
-      };
-    }
-  };
 })();
 </script>
 <script src="site-menu.js"></script>

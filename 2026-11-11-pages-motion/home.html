@@ -16,6 +16,8 @@
 .home-gl { display: none; }
 .home-gl.ready { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
 .astra { font-weight: 400; }
+/* 휴대폰에서 가운데 ASTRA가 작다(대표 11-14): 글자 크기 20vw → 23vw, 폭이 화면의 약 87%(393px 폭에서 300→343px). PC는 그대로 */
+@media (max-width: 900px) { .astra { font-size: min(23vw, 47vh); } }
 .astra-letter { animation: astra-breath 1.5s cubic-bezier(.37,0,.63,1) infinite alternate both; }
 @keyframes astra-breath { from { font-variation-settings: "wght" 100; } to { font-variation-settings: "wght" 900; } }
 @media (prefers-reduced-motion: reduce) { .astra-letter { animation: none; font-variation-settings: "wght" 600; } }
