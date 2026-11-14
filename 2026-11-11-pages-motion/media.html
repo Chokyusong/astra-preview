@@ -596,7 +596,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   var SIG_ROWS = [[1, 3, 6, 2, 16, 5, 9, 10, 15, 12], [14, 7, 20, 4, 11, 17, 8, 13, 18, 19]];
   var SIGV = 'img/sig/sig-';
   var filmIn = bglOf(intro), film = el('div', 'sig');
-  var FILM = { T: 200, L: 2000, auto: 0, scrub: 0, scrubT: 0, drag: 0, flow: 0, enterAt: 0, x: 0, fo: null, ff: [], sp: 1, play: null, loaded: false, top: 0, tr: [] };
+  var FILM = { T: 200, L: 2000, auto: 0, scrub: 0, scrubT: 0, drag: 0, flow: 0, enterAt: 0, x: 0, fo: null, fo2: null, ff: [], sp: 1, play: null, loaded: false, top: 0, tr: [] };
   filmIn.appendChild(film);
   SIG_ROWS.forEach(function (row, r) {
     row.forEach(function (n, c) {
@@ -663,13 +663,14 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       var dir = f._r ? 1 : -1, p = f._c * T + dir * off, x = ((p % L) + L) % L - T, y = f._r * T;
       f._px = x; f._py = y;
       var cx = x + T / 2, cy = y + T / 2, tx = 0, ty = 0, ts = 1;
-      if (fo === f) ts = 1.08;
-      else if (fo) { var ddx = cx - hx, ddy = cy - hy, d = Math.sqrt(ddx * ddx + ddy * ddy) || 1, pw = 12 * k * Math.exp(-d / T + 1) / Math.E * 1; tx = ddx / d * pw; ty = ddy / d * pw; }
+      var isF = f === fo || f === FILM.fo2;
+      if (isF) ts = 1.08;
+      else if (fo && D.on) { var ddx = cx - hx, ddy = cy - hy, d = Math.sqrt(ddx * ddx + ddy * ddy) || 1, pw = 12 * k * Math.exp(-d / T + 1) / Math.E * 1; tx = ddx / d * pw; ty = ddy / d * pw; }
       f._x += (tx - f._x) * a; f._y += (ty - f._y) * a; f._s += (ts - f._s) * a;
       var light = 0;
       if (mx !== null) { var lx = mx - cx, ly = my - cy; light = clamp(1 - Math.sqrt(lx * lx + ly * ly) / (T * 1.8), 0, 1); }
       // 영상이 밝고 색이 진해 글이 묻히지 않게 평소 68% 눌러 둔다. 마우스 곁은 28%까지 덜 누르고, 떠오른 칸은 6%(휴대폰은 덜 밝게: 곁 15%, 가운데 칸 30%)
-      var dim = fo === f ? (flowAsm || sigUnderText(x + f._x, y + f._y + FILM.top, T) ? 0.3 : 0.06) : clamp(0.68 - (flowAsm ? 0.15 : 0.28) * light + (fo ? 0.05 : 0), 0, 1);
+      var dim = isF ? (flowAsm || sigUnderText(x + f._x, y + f._y + FILM.top, T) ? 0.3 : 0.06) : clamp(0.68 - (flowAsm ? 0.15 : 0.28) * light + (fo ? 0.05 : 0), 0, 1);
       f._dim += (dim - f._dim) * a;
       // 퍼즐 맞춤
       var u = 1;
@@ -681,15 +682,18 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       f.style.transform = 'translate3d(' + (x + f._x + ex).toFixed(1) + 'px,' + (y + f._y + ey).toFixed(1) + 'px,0) rotate(' + rot.toFixed(2) + 'deg) scale(' + (f._s * sc).toFixed(4) + ')';
       f.style.opacity = u >= 1 ? '' : clamp(u * 2.2, 0, 1).toFixed(3);
       f.children[f._v ? 2 : 1].style.opacity = f._dim.toFixed(3);
-      var z = fo === f ? '3' : u < 1 ? '2' : '';
+      var z = isF ? '3' : u < 1 ? '2' : '';
       if (z !== f._z) { f._z = z; f.style.zIndex = z; }
     });
     if (FILM.enterAt && endAll && t > FILM.enterAt) FILM.enterAt = 0;
   }
-  function filmFocus(f) {
-    if (f === FILM.fo) return;
-    if (FILM.fo) FILM.fo.classList.remove('fo');
-    FILM.fo = f; if (f) f.classList.add('fo');
+  // f2: 휴대폰에서 아래 줄 가운데 칸(위 줄은 f)
+  function filmFocus(f, f2) {
+    f2 = f2 || null;
+    if (f === FILM.fo && f2 === FILM.fo2) return;
+    [FILM.fo, FILM.fo2].forEach(function (o) { if (o && o !== f && o !== f2) o.classList.remove('fo'); });
+    FILM.fo = f; FILM.fo2 = f2;
+    [f, f2].forEach(function (o) { if (o) o.classList.add('fo'); });
     film.classList.toggle('has-fo', !!f);
   }
   // 마우스가 오른쪽 화면 단추·머리말처럼 소개 구역 밖의 것 위면 칸을 고르지 않는다.
@@ -712,11 +716,13 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       if (onlyAt(INTRO)) { FILM.tr = sigText.map(function (e) { return e.getBoundingClientRect(); }); var ry = M.y - FILM.top; var hit = document.elementFromPoint(M.x, M.y); if (ry >= 0 && ry < 2 * T && !sigInText(M.x, M.y) && hit && intro.contains(hit)) fo = sigPick(ry < T ? 0 : 1, M.x); }
     }
     // 휴대폰 스크롤 반응(12-5): 내리는 만큼 두 줄이 더 흐르고(10px 내리면 5px), 화면 가운데 칸이 떠오른다
-    if (!D.on && D.flowOn()) { FILM.flow = window.pageYOffset * 0.5; var cy = window.innerHeight / 2 - FILM.top; if (cy >= 0 && cy < 2 * T) fo = sigPick(cy < T ? 0 : 1, window.innerWidth / 2); }
+    // 벽 가운데가 늘 화면 가운데에 붙어 있어 가운데 한 점으로 고르면 늘 아래 줄만 골라졌다(대표 11-15 "모바일에선 아래쪽 1개밖에 안 되네"). 위·아래 줄에서 화면 가운데 칸을 하나씩 띄운다
+    var fo2 = null;
+    if (!D.on && D.flowOn()) { FILM.flow = window.pageYOffset * 0.5; var vh2 = window.innerHeight; if (FILM.top < vh2 * 0.8 && FILM.top + 2 * T > vh2 * 0.2) { fo = sigPick(0, window.innerWidth / 2); fo2 = sigPick(1, window.innerWidth / 2); } }
     FILM.sp += ((fo && D.on ? 0.1 : 1) - FILM.sp) * lag(dt, 0.25);
     if (!reduce) FILM.auto += 70 * k * dt * FILM.sp;
     FILM.scrub += (FILM.scrubT - FILM.scrub) * lag(dt, 0.17);
-    filmFocus(fo);
+    filmFocus(fo, fo2);
     filmPlace(dt);
   }
   document.addEventListener('visibilitychange', function () { if (document.hidden) sigPlay(false); });
