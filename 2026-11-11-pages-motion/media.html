@@ -174,29 +174,32 @@ html.deck .studio { height: 100%; display: flex; flex-direction: column; justify
 html.deck .studio .cards { --tn: clamp(34px, 5vh, 50px); --w: min(58vw, calc(62vh / 0.625), calc((100vh - var(--header-h) - 152px - var(--tn)) * 1.6)); margin-bottom: calc(var(--tn) + 42px); }
 
 /* ── 화면 4 하는 일(5-6): 다섯 이름은 늘 보이고 고른 줄만 펼쳐진다. 줄 높이는 스크립트가 잰다 ── */
-/* 3판(5-6): 고른 줄의 화면이 구역 전체 뒤에 깔린다. 줄이 바뀌면 컷(앞 화면 0.12초에 꺼짐, 새 화면이 흐림·밝음에서 0.45초에 초점) */
-.rshot { position: absolute; inset: 0; opacity: 0; }
-.rshot.on { opacity: 1; }
-.rshot .rz { position: absolute; inset: 0; }
-.rshot .soft { opacity: 0; }
-.rdim { position: absolute; inset: 0; background: #000; opacity: 0.5; }
-/* 스크롤하는 화면은 글이 화면 가로 전체에 걸쳐 왼쪽 가림 대신 사진 전체를 고르게 더 누른다(밝은 조명이 글 끝을 가리지 않게, 대표 11-13) */
-html:not(.deck) .rscrim { background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.28) 35%, rgba(0, 0, 0, 0.28) 65%, rgba(0, 0, 0, 0.45) 100%); }
-/* 줄 이름 자리(왼쪽 30%)만 가린다. 사진 위에 올라야 하므로 겹 순서는 스크립트가 사진보다 위로 둔다(014 검토: 밝은 사진 위 줄 이름이 안 읽힘) */
-.rscrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.62) 24%, rgba(0, 0, 0, 0.3) 32%, rgba(0, 0, 0, 0) 40%); }
+/* 4판(대표 11-14 "배경사진 빼고 인터랙티브·모션그래픽으로 고퀄리티, 어두운 테마 그대로지만 답답하지 않게, 카메라 [ ] 따라다니는 것도 잘 쓰게"):
+   뒤에 사진 대신 그림판 하나(media-what.js). 숯색 바탕 + 금빛 번짐 + 마우스 곁 점 격자, 고른 줄마다 다른 선 그림이 그려지고 마우스에 반응한다.
+   그림 속 물건에 마우스를 올리면 초점 틀이 그 물건에 맞는다. 위 오른쪽은 카메라 녹화 표시(REC·시간·노출값) */
+.whud { position: absolute; z-index: 2; top: calc(var(--header-h) + clamp(16px, 3.4vh, 40px)); right: var(--gutter); margin: 0; text-align: right; font-family: Geist, var(--sans); font-size: 12px; font-weight: 500; letter-spacing: 0.16em; line-height: 2; color: rgba(255, 255, 255, 0.42); font-variant-numeric: tabular-nums; }
+.whud p { margin: 0; }
+.whud-tc i { display: inline-block; width: 7px; height: 7px; margin-right: 10px; border-radius: 50%; background: #e0524a; vertical-align: 1px; animation: wrec 1.6s steps(1) infinite; }
+.whud-tc b { margin-left: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.78); }
+@keyframes wrec { 50% { opacity: 0.25; } }
+html.deck .whud { font-size: max(11px, calc(12px * var(--k, 1))); }
+/* 휴대폰은 글이 그림 위를 다 덮어 녹화 표시가 글과 겹친다: 감춘다 */
+html:not(.deck) .whud { display: none; }
+@media (prefers-reduced-motion: reduce) { .whud-tc i { animation: none; } }
 /* 다섯 줄 묶음은 제목 아래 남은 높이의 세로 가운데. 묶음 높이는 가장 긴 줄이 펼쳐졌을 때로 고정해(스크립트) 줄이 바뀌어도 위치가 흔들리지 않는다 */
 html.deck .rows { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); padding: calc(var(--header-h) + clamp(10px, 2.6vh, 36px)) var(--gutter) clamp(12px, 3vh, 40px); }
 html.deck .rows .section-title { font-size: max(30px, min(4.2vw, 7.5vh, calc(60px * var(--k, 1)))); }
 html.deck .rows .row-list { margin-top: clamp(8px, 2.2vh, 30px); align-self: center; }
 /* 줄 간격: 1100×620에서 10px, 1440×900에서 25px, 큰 창 30px(설계에 값이 없어 화면을 보고 정함) */
-html.deck .row { padding: clamp(9px, calc(5.2vh - 22px), 30px) 0; overflow: hidden; align-items: start; cursor: pointer; transition: height 0.5s var(--ease); }
-html.deck .row-label { font-size: max(14px, min(1.3vw, 2.4vh, calc(19px * var(--k, 1)))); transition: opacity 0.5s; }
+/* 줄 펼침 0.3초(대표 11-14 "이름에 올려도 바뀌는 게 느려": 0.5초에서 줄임) */
+html.deck .row { padding: clamp(9px, calc(5.2vh - 22px), 30px) 0; overflow: hidden; align-items: start; cursor: pointer; transition: height 0.3s var(--ease); }
+html.deck .row-label { font-size: max(14px, min(1.3vw, 2.4vh, calc(19px * var(--k, 1)))); transition: opacity 0.3s; }
 html.deck .row:not(.sel) .row-label { opacity: 0.7; }
 html.deck .row h3 { font-size: max(17px, min(1.8vw, 3.2vh, calc(28px * var(--k, 1)))); }
 html.deck .row-body p { font-size: max(13px, min(1.12vw, 2.15vh, calc(17px * var(--k, 1)))); line-height: 1.65; }
 html.deck .keywords { margin-top: clamp(8px, 1.5vh, 16px); }
 html.deck .keywords li { font-size: max(12px, min(1vw, 1.9vh, calc(14px * var(--k, 1)))); }
-html.deck .row h3, html.deck .row-body { transition: opacity 0.3s; }
+html.deck .row h3, html.deck .row-body { transition: opacity 0.2s; }
 html.deck .row:not(.sel) h3, html.deck .row:not(.sel) .row-body { opacity: 0; }
 /* 오른쪽 아래 상담 버튼(오른쪽 28px + 60px)에 낱말이 가리지 않게 설명 칸 오른쪽을 비운다 */
 html.deck .row-body { padding-right: max(0px, calc(100px - var(--gutter))); }
@@ -335,6 +338,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   </div>
 </div>
 <script src="deck.js"></script>
+<script src="media-what.js"></script>
 <script>
 /* 미디어 2판 — 마우스가 카메라다(설계 5절). 넘기기·떠오르기·버튼 끌림·배율은 공통 틀(deck.js)이 한다.
    이 쪽이 하는 일: 초점 틀, 초점이 맞으며 나타나는 글, 첫 화면 배경의 초점, 캐러셀(확정본 + 얕은 초점·끌기·들어올 때 펼침),
@@ -420,7 +424,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     var tg = null;
     if (show) {
       if (VF.kbd && document.activeElement === VF.kbd && M.at < VF.kbdAt && scenes[n].contains(VF.kbd)) tg = VF.kbd.closest('.row, .step') || VF.kbd;
-      else if (n === WHAT && W.sel >= 0) tg = rows[W.sel];
+      else if (n === WHAT && W.sel >= 0) tg = whatTarget();
       else tg = hoverTarget(n);
       if (!tg && !M.at) show = false;
     }
@@ -431,8 +435,10 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     } else { gx = M.x; gy = M.y; gw = 84 * k; gh = 56 * k; }
     // 보이지 않다가 나타날 때는 그 자리에 바로 놓는다
     if (VF.a < 0.02 && show) { VF.x = gx; VF.y = gy; VF.w = gw; VF.h = gh; VF.tgt = tg; VF.tw = null; }
+    // 하는 일에서 줄 → 줄은 미끄러지지 않고 바로 옮겨 가며 찰칵(카메라 컷, 대표 11-14 "이름에 올려도 바뀌는 게 느려")
+    else if (tg !== VF.tgt && n === WHAT && tg && VF.tgt && rows.indexOf(tg) >= 0 && rows.indexOf(VF.tgt) >= 0) { VF.x = gx; VF.y = gy; VF.w = gw; VF.h = gh; VF.tgt = tg; VF.tw = null; VF.pulse = t; }
     else if (tg !== VF.tgt) {
-      VF.tw = tg ? { x: VF.x, y: VF.y, w: VF.w, h: VF.h, t0: t, dur: n === WHAT ? 500 : 280 } : null;
+      VF.tw = tg ? { x: VF.x, y: VF.y, w: VF.w, h: VF.h, t0: t, dur: tg.key ? 300 : n === WHAT ? 500 : 280 } : null;
       VF.tgt = tg; VF.pulse = 0;
     }
     if (tg) {
@@ -466,7 +472,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   // 휴대폰(마우스 없음): PC 초점 틀을 모션그래픽으로. 손가락으로 가리킬 수 없으니 내리는 동안 화면 가운데(높이 30~70%)에
   // 가장 가까운 제목·글·앞 카드·과정 단계·버튼으로 틀이 스스로 옮겨 맞춰지고(0.32초), 맞춰진 순간 PC처럼 4px 줄었다 돌아온다.
   // 맞출 것이 없으면 사라진다. 흰 문의 구역에서는 검정(대표 11-14 "PC와 같은 효과를 모션그래픽으로")
-  var VF_M = '.hero h1, .intro h2, .intro-text p, .section-title, .step, .cta .display, .cta .btn';
+  var VF_M = '.hero h1, .intro h2, .intro-text p, .section-title, .rows .row h3, .step, .cta .display, .cta .btn';
   function vfFlow(t, dt) {
     var vh = window.innerHeight, k = K(), best = null, bd = 1e9;
     $$(VF_M).concat(front() ? [front()] : []).forEach(function (el) {
@@ -869,40 +875,27 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   function setSel(i) { if (D.on) rowsBg(i, false); W.sel = i; rows.forEach(function (r, k) { r.classList.toggle('sel', k === i); r.setAttribute('aria-expanded', String(k === i)); }); }
   // 줄이 바뀔 때: 초점 틀이 다음 줄로 미끄러져 내려가고(0.5초), 앞 줄은 접히고 새 줄이 0.5초에 펼쳐진다.
   // 새 줄의 제목은 초점이 맞으며 나타나고, 설명이 떠오르고, 낱말 다섯 개가 0.05초 간격으로 나타난다
-  /* 3판 5-6: 줄마다 화면 하나가 구역 전체 뒤에 깔린다(밝기 50%, 왼쪽 가림 78% → 오른쪽 25%). 고른 동안 6초에 1.06배로 다가간다.
-     줄이 바뀌면 컷: 앞 화면 0.12초에 꺼지고 새 화면이 흐림 14px·밝기 1.5배에서 0.45초에 초점이 잡힌다. 마지막에 고른 줄의 화면만 남는다 */
-  var ROW_PICS = ['media-studio-2', 'media-studio-1', 'media-hero', 'media-studio-3', 'media-studio-5'].map(tall);
-  var rowsIn = bglOf(what), RB = { cur: -1, z: 1 }, rdim = el('div', 'rdim');
-  var rshots = ROW_PICS.map(function (n) { var sh = el('div', 'rshot'), z = el('div', 'rz'); z.appendChild(pic(n)); z.appendChild(soft(n, { w: 360, blur: 14 })); sh.appendChild(z); rowsIn.appendChild(sh); return sh; });
-  var rscrim = el('div', 'rscrim');
-  rowsIn.appendChild(rdim); rowsIn.appendChild(rscrim);
-  // cut: true면 카메라 컷(PC), 'soft'면 0.7초에 겹쳐 바뀜(휴대폰 스크롤, 대표 11-13 "자연스럽고 이쁘게")
+  /* 4판 5-6(대표 11-14): 사진 대신 줄마다 다른 선 그림(media-what.js). PC는 컷(앞 그림 0.14초에 꺼지고 새 그림이 흐림 7px에서 초점이 맞으며 1.3초에 그려짐),
+     휴대폰 스크롤은 0.65초에 겹쳐 바뀜. 고른 줄 글 뒤에서는 그림만 옅어진다 */
+  var rowsIn = bglOf(what), RB = { cur: -1 };
+  var WG = window.MediaWhat(rowsIn, { reduce: reduce, state: function () {
+    return { deck: D.on, k: K(), mouse: D.on && fine && D.mouse.at ? D.mouse : null, band: D.on && W.sel >= 0 ? rows[W.sel].getBoundingClientRect() : null };
+  } });
+  // cut: true면 카메라 컷(PC), 'soft'면 겹쳐 바뀜(휴대폰 스크롤), false면 바로
   function rowsBg(i, cut) {
     if (i === RB.cur) return;
-    var prev = RB.cur; RB.cur = i;
-    var softX = cut === 'soft' && !reduce && prev >= 0 && i >= 0;
-    if (cut === 'soft') cut = false;
-    rshots.forEach(function (sh, k) { if (k === i || (k === prev && (cut || softX) && !reduce)) return; stopAnims(sh); stopAnims(sh.firstChild); stopAnims(sh.querySelector('.soft')); sh.classList.remove('on'); });
-    if (softX) {
-      var ps = rshots[prev], ns = rshots[i];
-      stopAnims(ns); ns.style.zIndex = ++RB.z; rscrim.style.zIndex = RB.z + 1; ns.classList.add('on');
-      ns.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, easing: 'cubic-bezier(.4,0,.2,1)' }).onfinish = function () { if (RB.cur !== prev) ps.classList.remove('on'); };
-      ns.firstChild.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }], { duration: 6000, easing: 'cubic-bezier(0.25, 0.1, 0.4, 1)', fill: 'forwards' });
-      return;
+    RB.cur = i;
+    WG.show(i, cut === 'soft' ? 'soft' : cut ? 'cut' : 'now');
+  }
+  // 하는 일에서 초점 틀이 맞출 것: 마우스가 고른 줄 밖에서 그림 속 물건 위에 있으면 그 물건, 아니면 고른 줄
+  function whatTarget() {
+    var M = D.mouse, row = rows[W.sel], h = null;
+    if (M.at && W.ready && !D.trans) {
+      var r = row.getBoundingClientRect();
+      if (M.y < r.top || M.y > r.bottom) h = WG.hit(M.x, M.y);
     }
-    stopAnims(rdim);
-    if (prev >= 0 && cut && !reduce) { var p = rshots[prev]; stopAnims(p); p.classList.remove('on'); p.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, easing: 'linear' }); }
-    if (i < 0) return;
-    var sh = rshots[i], z = sh.firstChild, sf = sh.querySelector('.soft');
-    stopAnims(sh); stopAnims(z); stopAnims(sf);
-    sh.style.zIndex = ++RB.z; rscrim.style.zIndex = RB.z + 1; sh.classList.add('on');
-    if (reduce) return;
-    if (cut) {
-      sh.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 40, delay: 80, fill: 'backwards' });
-      sf.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, delay: 80, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
-      rdim.animate([{ opacity: 0.25 }, { opacity: 0.5 }], { duration: 450, delay: 80, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
-    }
-    z.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }], { duration: 6000, easing: 'cubic-bezier(0.25, 0.1, 0.4, 1)', fill: 'forwards' });
+    WG.focus(h ? h.key : null);
+    return h || row;
   }
   // 스크롤하는 화면: 화면 가운데에 가장 가까운 줄의 화면(움직임 줄이기는 컷 없이 바로)
   function rowsNear() {
@@ -920,9 +913,10 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     fitRows();
     var row = rows[i], o = { easing: EASE, fill: 'backwards' };
     cancelIn(row);
-    anim(row.querySelector('h3'), FOCUS, { duration: 800, delay: 60, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
-    anim(row.querySelector('.row-body p'), [{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 700, delay: 180 }, o));
-    $$('.keywords li', row).forEach(function (li, k) { anim(li, [{ opacity: 0, transform: 'scale(0.9)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 360, delay: 340 + k * 50 }, o)); });
+    // 11-14 빠르게: 제목 0.45초(전 0.8초), 설명 0.1초 뒤 0.45초, 낱말 0.18초 뒤부터 0.04초 간격
+    anim(row.querySelector('h3'), FOCUS, { duration: 450, delay: 20, easing: 'cubic-bezier(0.3, 0.6, 0.3, 1)', fill: 'backwards' });
+    anim(row.querySelector('.row-body p'), [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 450, delay: 100 }, o));
+    $$('.keywords li', row).forEach(function (li, k) { anim(li, [{ opacity: 0, transform: 'scale(0.9)' }, { opacity: 1, transform: 'none' }], Object.assign({ duration: 300, delay: 180 + k * 40 }, o)); });
   }
   function whatReset() {
     clearT('what'); fzReset(whatTitle);
@@ -942,12 +936,12 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
     r.addEventListener('focus', function () { if (D.on && W.ready) select(i, 'key'); });
     r.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && D.on) { e.preventDefault(); select(i, 'key'); } });
   });
-  // 줄에 0.11초 올려 두면 그 줄. 휠·키보드로 고른 뒤에는 마우스가 다른 줄로 옮겨 가기 전까지 올려 두기로 다시 고르지 않는다(MCN에서 난 버그)
+  // 줄 이름에 0.06초 올려 두면 그 줄(11-14 0.11초에서 줄임)(4판: 그림 위를 지나가도 바뀌지 않게 이름 자리만). 휠·키보드로 고른 뒤에는 마우스가 다른 줄로 옮겨 가기 전까지 올려 두기로 다시 고르지 않는다(MCN에서 난 버그)
   function whatFrame(t) {
     var live = onlyAt(WHAT) && W.ready, M = D.mouse, hov = -1;
-    if (live && M.at) { var el = document.elementFromPoint(M.x, M.y), r = el && el.closest ? el.closest('.row') : null; hov = r ? rows.indexOf(r) : -1; }
+    if (live && M.at) { var el = document.elementFromPoint(M.x, M.y), r = el && el.closest ? el.closest('.row-label') : null; r = r ? r.closest('.row') : null; hov = r ? rows.indexOf(r) : -1; }
     if (hov !== W.hov) { W.hov = hov; W.hovAt = t; W.hovDone = false; }
-    if (live && hov >= 0 && !W.hovDone && hov !== W.sel && t - W.hovAt >= 110 && M.at > W.hovAt - 200) select(hov, 'hover');
+    if (live && hov >= 0 && !W.hovDone && hov !== W.sel && t - W.hovAt >= 60 && M.at > W.hovAt - 200) select(hov, 'hover');
   }
   document.addEventListener('keydown', function (e) {
     if (!onlyAt(WHAT) || !W.ready || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -1094,8 +1088,13 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
       vfFrame(t, dt);
       if (D.cur === STUDIO || RACK.card) { rackFrame(); stageFrame(dt); }
       if (D.cur === WHAT) whatFrame(t);
+      if (D.cur === WHAT || (D.trans && (D.trans.from === WHAT || D.trans.to === WHAT))) WG.frame(t, dt);
       if (D.cur === PROC || (D.trans && (D.trans.from === PROC || D.trans.to === PROC))) procFrame(t, dt);
-    } else { scrollFrame(); if (!fine && !reduce && D.flowOn()) vfFlow(t, dt); else if (VF.a) { VF.a = 0; vf.style.opacity = '0'; } }
+    } else {
+      scrollFrame();
+      var wr = what.getBoundingClientRect(); if (wr.bottom > 0 && wr.top < window.innerHeight) WG.frame(t, dt);
+      if (!fine && !reduce && D.flowOn()) vfFlow(t, dt); else if (VF.a) { VF.a = 0; vf.style.opacity = '0'; }
+    }
     filmFrame(dt);
     heroVideoFrame();
   }
@@ -1157,7 +1156,7 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   if (reduce) { procBg(3, 0); rowsBg(0, false); window.addEventListener('scroll', rowsNear, { passive: true }); }
   /* ───────── 휴대폰·태블릿·좁힌 창: PC 반응을 스크롤에 묶는다(설계 12-5, 지시서 015). 내리는 만큼 진행, 올리면 거꾸로 ─────────
      필름 띠: 위 filmFrame에서 스크롤만큼 흐르고 화면 가운데 틀만 또렷
-     하는 일: 화면 가운데에 가장 가까운 줄의 화면이 뒤에 깔린다(있던 rowsNear 그대로, 바뀔 때 컷)
+     하는 일: 화면 가운데에 가장 가까운 줄의 그림이 뒤에 그려진다(있던 rowsNear 그대로, 바뀔 때 겹쳐 바뀜)
      과정: 구역 위쪽 85% -> 30% 동안 미리 만든 네 겹(흑백·흐림 -> 색)의 투명도만 바꿔 이어서 현상된다
      흰 문의 구역: 구역 위쪽 92% -> 40% 동안 육각형 구멍이 60° 돌며 열린다. 바깥은 진회색 날(PC 넘김의 조리개와 같은 날·선) */
   var FLOW = { proc: 0, end: 0, st: -1, tap: -1, tapY: 0 };
@@ -1202,9 +1201,9 @@ html.deck .cta .btn { min-height: calc(64px * var(--k, 1)); padding: 0 calc(40px
   window.__mediaFlow = FLOW;
 
   // 확인 도구용(움직임 줄이기에서도)
-  window.__media = { state: function () { return { cur: D.cur, sel: W.sel, ready: W.ready, card: C.i, auto: !!C.timer, stage: ST.open, rack: RACK.card ? RACK.card.getAttribute('data-off') : null, fd: cards.map(function (c) { return c.getAttribute('data-off') + ':' + (c.getAttribute('data-fd') || '-'); }).join(' '), vf: { x: Math.round(VF.x), y: Math.round(VF.y), w: Math.round(VF.w), h: Math.round(VF.h), a: +VF.a.toFixed(2), tgt: VF.tgt ? (VF.tgt.className || VF.tgt.tagName) : null }, iris: !!IR, thumb: thumbs.findIndex(function (t) { return t.classList.contains('on'); }), prog: cprog.getAttribute('data-cur') + '/' + cprog.getAttribute('data-total'), run: thumbs.findIndex(function (t) { return t.classList.contains('run'); }), rowBg: RB.cur, procBg: D.flowOn() ? FLOW.st : PB.cur, filmX: Math.round(FILM.x), filmFo: FILM.fo ? FILM.ff.indexOf(FILM.fo) % FILM_SET.length : -1, vid: heroVid.paused ? 'pause' : 'play', vsrc: (heroVid.currentSrc || '').split('/').pop(), vt: +heroVid.currentTime.toFixed(2) }; } };
+  window.__media = { state: function () { return { cur: D.cur, sel: W.sel, ready: W.ready, card: C.i, auto: !!C.timer, stage: ST.open, rack: RACK.card ? RACK.card.getAttribute('data-off') : null, fd: cards.map(function (c) { return c.getAttribute('data-off') + ':' + (c.getAttribute('data-fd') || '-'); }).join(' '), vf: { x: Math.round(VF.x), y: Math.round(VF.y), w: Math.round(VF.w), h: Math.round(VF.h), a: +VF.a.toFixed(2), tgt: VF.tgt ? (VF.tgt.className || VF.tgt.tagName) : null }, iris: !!IR, thumb: thumbs.findIndex(function (t) { return t.classList.contains('on'); }), prog: cprog.getAttribute('data-cur') + '/' + cprog.getAttribute('data-total'), run: thumbs.findIndex(function (t) { return t.classList.contains('run'); }), rowBg: RB.cur, what: WG.state(), procBg: D.flowOn() ? FLOW.st : PB.cur, filmX: Math.round(FILM.x), filmFo: FILM.fo ? FILM.ff.indexOf(FILM.fo) % FILM_SET.length : -1, vid: heroVid.paused ? 'pause' : 'play', vsrc: (heroVid.currentSrc || '').split('/').pop(), vt: +heroVid.currentTime.toFixed(2) }; } };
   var rt2 = 0;
-  window.addEventListener('resize', function () { clearTimeout(rt2); rt2 = setTimeout(function () { filmLayout(); }, 120); });
+  window.addEventListener('resize', function () { clearTimeout(rt2); rt2 = setTimeout(function () { filmLayout(); if (reduce) WG.redraw(); }, 120); });
   if (reduce) return;
   var rt = 0;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(fitRows, 120); });
